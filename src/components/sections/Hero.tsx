@@ -319,7 +319,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
       {/* A. Top-Left Nav Block */}
       <div
         ref={navRef}
-        className="hidden md:flex absolute top-[12px] left-[12px] w-[580px] h-[48px] bg-[#18181b] z-30 items-center justify-between rounded-tl-[24px] shadow-[-2px_-2px_0_0_#18181b] px-4"
+        className="hidden md:flex absolute top-[12px] left-[12px] w-[580px] h-[56px] bg-[#18181b] z-30 items-center justify-between rounded-tl-[24px] shadow-[-2px_-2px_0_0_#18181b] px-4"
       >
         {/* Left Side: Logo */}
         <div className="relative flex items-center h-full -top-[3px] w-full">
@@ -432,18 +432,18 @@ export default function Hero({ startAnimation = true }: HeroProps) {
         </div>
 
         {/* S-Curve on the right, standard concave corner on the bottom-left */}
-        <SCurveTop className="absolute top-0 -right-[31.5px]" width={32} height={48} />
+        <SCurveTop className="absolute top-0 -right-[31.5px]" width={32} height={56} />
         <CornerOuter className="absolute -bottom-[39.5px] left-0" width={40} height={40} />
       </div>
 
       {/* B. Bottom-Left Name Block — Trusted by Ticker */}
       <div
         ref={logoRef}
-        className="hidden md:flex absolute bottom-[12px] left-[12px] w-[480px] h-[72px] bg-[#18181b] z-30 items-center rounded-bl-[24px] shadow-[-2px_2px_0_0_#18181b]"
+        className="hidden md:flex absolute bottom-[12px] left-[12px] w-[510px] h-[80px] bg-[#18181b] z-30 items-center rounded-bl-[24px] shadow-[-2px_2px_0_0_#18181b]"
       >
         {/* Left Side: Static Label */}
         <div className="flex items-center h-full pl-6 pr-4 border-r border-[#27272a]/70 shrink-0 select-none">
-          <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold font-plus-jakarta whitespace-nowrap">
+          <span className="text-[11.5px] uppercase tracking-[0.22em] text-zinc-400 font-bold font-plus-jakarta whitespace-nowrap">
             Trusted by
           </span>
         </div>
@@ -453,59 +453,59 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           <div className="flex w-max gap-10 animate-marquee">
             {/* Set 1 */}
             <div className="flex items-center gap-10 pr-10 text-zinc-400">
-              <div className="flex items-center gap-2 text-[14px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
-                <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor"><path d="M5 2h14v6H12.5L19 14.5V22H5v-6h6.5L5 9.5V2z" /></svg>
+              <div className="flex items-center gap-2 text-[16px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M5 2h14v6H12.5L19 14.5V22H5v-6h6.5L5 9.5V2z" /></svg>
                 <span>Framer</span>
               </div>
-              <div className="flex items-center gap-2 text-[14px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
-                <svg className="w-4 h-3.5" viewBox="0 0 76 65" fill="currentColor"><polygon points="38,0 76,65 0,65" /></svg>
+              <div className="flex items-center gap-2 text-[16px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
+                <svg className="w-[18px] h-[16px]" viewBox="0 0 76 65" fill="currentColor"><polygon points="38,0 76,65 0,65" /></svg>
                 <span>Vercel</span>
               </div>
-              <div className="flex items-center gap-2 text-[14px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
-                <svg className="w-3 h-4.5" viewBox="0 0 8 12" fill="currentColor"><path d="M2 12C3.10457 12 4 11.1046 4 10V8H2C0.89543 8 0 8.89543 0 10C0 11.1046 0.89543 12 2 12Z" /><path d="M0 6C0 4.89543 0.89543 4 2 4H4V8H2C0.89543 8 0 7.10457 0 6Z" /><path d="M0 2C0 0.89543 0.89543 0 2 0H4V4H2C0.89543 4 0 3.10457 0 2Z" /><path d="M4 0H6C7.10457 0 8 0.89543 8 2C8 3.10457 7.10457 4 6 4H4V0Z" /><path d="M6 8C7.10457 8 8 7.10457 8 6C8 4.89543 7.10457 4 6 4C4.89543 4 4 4.89543 4 6V8H6Z" /></svg>
+              <div className="flex items-center gap-2 text-[16px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
+                <svg className="w-[14px] h-[20px]" viewBox="0 0 8 12" fill="currentColor"><path d="M2 12C3.10457 12 4 11.1046 4 10V8H2C0.89543 8 0 8.89543 0 10C0 11.1046 0.89543 12 2 12Z" /><path d="M0 6C0 4.89543 0.89543 4 2 4H4V8H2C0.89543 8 0 7.10457 0 6Z" /><path d="M0 2C0 0.89543 0.89543 0 2 0H4V4H2C0.89543 4 0 3.10457 0 2Z" /><path d="M4 0H6C7.10457 0 8 0.89543 8 2C8 3.10457 7.10457 4 6 4H4V0Z" /><path d="M6 8C7.10457 8 8 7.10457 8 6C8 4.89543 7.10457 4 6 4C4.89543 4 4 4.89543 4 6V8H6Z" /></svg>
                 <span>Figma</span>
               </div>
-              <div className="text-[14px] font-bold font-sans italic hover:text-white transition-colors shrink-0">
+              <div className="text-[16px] font-bold font-sans italic hover:text-white transition-colors shrink-0">
                 Stripe
               </div>
-              <div className="flex items-center gap-2 text-[14px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
-                <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor"><path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" /></svg>
+              <div className="flex items-center gap-2 text-[16px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" /></svg>
                 <span>GitHub</span>
               </div>
-              <div className="flex items-center gap-2 text-[14px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
-                <svg className="w-3.5 h-4.5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.36 11.02h-7.11l3.56-9.02a.6.6 0 0 0-1.04-.54L2.64 12.98a.6.6 0 0 0 .52 1h7.11l-3.56 9.02a.6.6 0 0 0 1.04.54l14.13-11.52c.32-.26.14-.8-.52-.8z" /></svg>
+              <div className="flex items-center gap-2 text-[16px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
+                <svg className="w-[17px] h-[21px]" viewBox="0 0 24 24" fill="currentColor"><path d="M21.36 11.02h-7.11l3.56-9.02a.6.6 0 0 0-1.04-.54L2.64 12.98a.6.6 0 0 0 .52 1h7.11l-3.56 9.02a.6.6 0 0 0 1.04.54l14.13-11.52c.32-.26.14-.8-.52-.8z" /></svg>
                 <span>Supabase</span>
               </div>
-              <div className="text-[14px] font-bold font-syne tracking-tight hover:text-white transition-colors shrink-0">
+              <div className="text-[16px] font-bold font-syne tracking-tight hover:text-white transition-colors shrink-0">
                 Linear
               </div>
             </div>
             {/* Set 2 */}
             <div className="flex items-center gap-10 pr-10 text-zinc-400">
-              <div className="flex items-center gap-2 text-[14px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
-                <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor"><path d="M5 2h14v6H12.5L19 14.5V22H5v-6h6.5L5 9.5V2z" /></svg>
+              <div className="flex items-center gap-2 text-[16px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M5 2h14v6H12.5L19 14.5V22H5v-6h6.5L5 9.5V2z" /></svg>
                 <span>Framer</span>
               </div>
-              <div className="flex items-center gap-2 text-[14px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
-                <svg className="w-4 h-3.5" viewBox="0 0 76 65" fill="currentColor"><polygon points="38,0 76,65 0,65" /></svg>
+              <div className="flex items-center gap-2 text-[16px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
+                <svg className="w-[18px] h-[16px]" viewBox="0 0 76 65" fill="currentColor"><polygon points="38,0 76,65 0,65" /></svg>
                 <span>Vercel</span>
               </div>
-              <div className="flex items-center gap-2 text-[14px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
-                <svg className="w-3 h-4.5" viewBox="0 0 8 12" fill="currentColor"><path d="M2 12C3.10457 12 4 11.1046 4 10V8H2C0.89543 8 0 8.89543 0 10C0 11.1046 0.89543 12 2 12Z" /><path d="M0 6C0 4.89543 0.89543 4 2 4H4V8H2C0.89543 8 0 7.10457 0 6Z" /><path d="M0 2C0 0.89543 0.89543 0 2 0H4V4H2C0.89543 4 0 3.10457 0 2Z" /><path d="M4 0H6C7.10457 0 8 0.89543 8 2C8 3.10457 7.10457 4 6 4H4V0Z" /><path d="M6 8C7.10457 8 8 7.10457 8 6C8 4.89543 7.10457 4 6 4C4.89543 4 4 4.89543 4 6V8H6Z" /></svg>
+              <div className="flex items-center gap-2 text-[16px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
+                <svg className="w-[14px] h-[20px]" viewBox="0 0 8 12" fill="currentColor"><path d="M2 12C3.10457 12 4 11.1046 4 10V8H2C0.89543 8 0 8.89543 0 10C0 11.1046 0.89543 12 2 12Z" /><path d="M0 6C0 4.89543 0.89543 4 2 4H4V8H2C0.89543 8 0 7.10457 0 6Z" /><path d="M0 2C0 0.89543 0.89543 0 2 0H4V4H2C0.89543 4 0 3.10457 0 2Z" /><path d="M4 0H6C7.10457 0 8 0.89543 8 2C8 3.10457 7.10457 4 6 4H4V0Z" /><path d="M6 8C7.10457 8 8 7.10457 8 6C8 4.89543 7.10457 4 6 4C4.89543 4 4 4.89543 4 6V8H6Z" /></svg>
                 <span>Figma</span>
               </div>
-              <div className="text-[14px] font-bold font-sans italic hover:text-white transition-colors shrink-0">
+              <div className="text-[16px] font-bold font-sans italic hover:text-white transition-colors shrink-0">
                 Stripe
               </div>
-              <div className="flex items-center gap-2 text-[14px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
-                <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor"><path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" /></svg>
+              <div className="flex items-center gap-2 text-[16px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" /></svg>
                 <span>GitHub</span>
               </div>
-              <div className="flex items-center gap-2 text-[14px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
-                <svg className="w-3.5 h-4.5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.36 11.02h-7.11l3.56-9.02a.6.6 0 0 0-1.04-.54L2.64 12.98a.6.6 0 0 0 .52 1h7.11l-3.56 9.02a.6.6 0 0 0 1.04.54l14.13-11.52c.32-.26.14-.8-.52-.8z" /></svg>
+              <div className="flex items-center gap-2 text-[16px] font-bold font-plus-jakarta hover:text-white transition-colors shrink-0">
+                <svg className="w-[17px] h-[21px]" viewBox="0 0 24 24" fill="currentColor"><path d="M21.36 11.02h-7.11l3.56-9.02a.6.6 0 0 0-1.04-.54L2.64 12.98a.6.6 0 0 0 .52 1h7.11l-3.56 9.02a.6.6 0 0 0 1.04.54l14.13-11.52c.32-.26.14-.8-.52-.8z" /></svg>
                 <span>Supabase</span>
               </div>
-              <div className="text-[14px] font-bold font-syne tracking-tight hover:text-white transition-colors shrink-0">
+              <div className="text-[16px] font-bold font-syne tracking-tight hover:text-white transition-colors shrink-0">
                 Linear
               </div>
             </div>
@@ -513,7 +513,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
         </div>
 
         {/* S-Curve on the right, standard concave corner on the top-left */}
-        <SCurveTop className="absolute bottom-0 -right-[119.5px] scale-y-[-1]" width={120} height={72} />
+        <SCurveTop className="absolute bottom-0 -right-[119.5px] scale-y-[-1]" width={120} height={80} />
         <CornerOuter className="absolute -top-[39.5px] left-0 scale-y-[-1]" width={40} height={40} />
       </div>
 
@@ -527,10 +527,9 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           href="https://instagram.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="relative left-[6px] -top-[24px] w-[76px] h-[92px] flex items-center justify-center rounded-[12px] bg-[#27272a] text-white hover:bg-zinc-700 border-[3px] border-[#C57019] transition-colors z-10"
-          style={{ transform: "skewY(-20deg)" }}
+          className="social-btn social-btn-insta relative left-[6px] -top-[24px] w-[76px] h-[92px] flex items-center justify-center rounded-[12px] bg-[#27272a] text-white border-[3px] border-[#C57019] z-10"
         >
-          <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: "skewY(20deg)" }}>
+          <svg className="social-icon w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
             <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
             <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
@@ -542,10 +541,9 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           href="https://linkedin.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="relative left-[6px] -top-[24px] w-[76px] h-[92px] flex items-center justify-center rounded-[12px] bg-[#27272a] text-white hover:bg-zinc-700 border-[3px] border-[#C57019] transition-colors z-10"
-          style={{ transform: "skewY(-20deg)" }}
+          className="social-btn social-btn-linkedin relative left-[6px] -top-[24px] w-[76px] h-[92px] flex items-center justify-center rounded-[12px] bg-[#27272a] text-white border-[3px] border-[#C57019] z-10"
         >
-          <span className="font-syne font-bold text-[20px]" style={{ transform: "skewY(20deg)" }}>in</span>
+          <span className="social-icon font-syne font-bold text-[20px]">in</span>
         </a>
 
         {/* X / Twitter */}
@@ -553,10 +551,9 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           href="https://x.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="relative left-[6px] -top-[24px] w-[76px] h-[92px] flex items-center justify-center rounded-[12px] bg-[#27272a] text-white hover:bg-zinc-700 border-[3px] border-[#C57019] transition-colors z-10"
-          style={{ transform: "skewY(-20deg)" }}
+          className="social-btn social-btn-x relative left-[6px] -top-[24px] w-[76px] h-[92px] flex items-center justify-center rounded-[12px] bg-[#27272a] text-white border-[3px] border-[#C57019] z-10"
         >
-          <span className="font-syne font-bold text-[20px]" style={{ transform: "skewY(20deg)" }}>𝕏</span>
+          <span className="social-icon font-syne font-bold text-[20px]">𝕏</span>
         </a>
 
         {/* S-Curve on the top, standard concave corner on the bottom-left */}
