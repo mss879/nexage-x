@@ -56,6 +56,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
   const logoRef = useRef<HTMLDivElement>(null);
   const socialsRef = useRef<HTMLDivElement>(null);
   const imageWrapperRef = useRef<HTMLDivElement>(null);
+  const descRef = useRef<HTMLParagraphElement>(null);
 
   const addToTitleRefs = (el: HTMLSpanElement | null) => {
     if (el && !titleLinesRef.current.includes(el)) {
@@ -69,6 +70,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
       gsap.set(cardRef.current, { scale: 0.97, opacity: 0, y: 30 });
       gsap.set(imageWrapperRef.current, { scale: 1.05, opacity: 0 });
       gsap.set(titleLinesRef.current, { y: 50, opacity: 0 });
+      gsap.set(descRef.current, { y: 20, opacity: 0 });
       gsap.set(buttonRef.current, { scale: 0.9, opacity: 0 });
       gsap.set(navRef.current, { y: -25, opacity: 0 });
       gsap.set(logoRef.current, { y: 25, opacity: 0 });
@@ -101,12 +103,20 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           ease: "power3.out",
         }, "-=1.1");
 
+        // Narrative sub-headline entrance
+        tl.to(descRef.current, {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "power3.out",
+        }, "-=0.7");
+
         tl.to(buttonRef.current, {
           scale: 1,
           opacity: 1,
           duration: 0.8,
           ease: "back.out(1.6)",
-        }, "-=0.7");
+        }, "-=0.6");
 
         tl.to([navRef.current, logoRef.current, socialsRef.current], {
           x: 0,
@@ -115,7 +125,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           duration: 0.8,
           stagger: 0.1,
           ease: "power3.out",
-        }, "-=0.6");
+        }, "-=0.5");
       } // End if (startAnimation)
     }, containerRef);
 
@@ -271,11 +281,20 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           </div>
 
           {/* Headline Typography — exact Framer text styling */}
-          <h1 className="flex flex-col font-syne text-[2.8rem] sm:text-[3.8rem] md:text-[4.6rem] lg:text-[5.5rem] leading-[1.05] tracking-tight text-[#000000] select-none font-medium mb-10">
-            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">Crafting digital</span>
-            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">experiences</span>
-            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">that feel <strong className="font-bold">serene</strong>.</span>
+          <h1 className="flex flex-col font-syne text-[2.2rem] sm:text-[3.2rem] md:text-[4.0rem] lg:text-[4.6rem] xl:text-[5.2rem] leading-[1.05] tracking-tight text-[#000000] select-none font-medium mb-6">
+            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">Designing stunning storefronts.</span>
+            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">
+              Engineering <span className="bg-gradient-to-r from-[#df8326] to-[#C57019] bg-clip-text text-transparent">smart logistics.</span>
+            </span>
           </h1>
+
+          {/* Premium Sub-headline / Brand narrative */}
+          <p
+            ref={descRef}
+            className="text-sm sm:text-base md:text-lg lg:text-xl font-sans font-light text-zinc-700 leading-relaxed tracking-tight max-w-[620px] mb-8 select-none"
+          >
+            A high-performance e-commerce and digital automation studio. We blend <strong className="font-semibold text-black">stunning creative design</strong>, <strong className="font-semibold text-black">robust software engineering</strong>, and <strong className="font-semibold text-[#df8326]">smart logistics automation</strong>—from launch-ready storefronts to automated shipping and scaling operations.
+          </p>
 
           {/* CTA button — orange gradient with top border highlight, rounded-xl (12px) */}
           <a
