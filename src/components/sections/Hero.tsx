@@ -281,10 +281,10 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           </div>
 
           {/* Headline Typography — exact Framer text styling */}
-          <h1 className="flex flex-col font-syne text-[2.2rem] sm:text-[3.2rem] md:text-[4.0rem] lg:text-[4.6rem] xl:text-[5.2rem] leading-[1.05] tracking-tight text-[#000000] select-none font-medium mb-6">
-            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">Designing stunning storefronts.</span>
+          <h1 className="flex flex-col font-syne text-[2.0rem] sm:text-[2.8rem] md:text-[3.5rem] lg:text-[4.2rem] xl:text-[4.8rem] leading-[1.05] tracking-tight text-[#000000] select-none font-medium mb-6">
+            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">Crafting high-performance storefronts</span>
             <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">
-              Engineering <span className="bg-gradient-to-r from-[#df8326] to-[#C57019] bg-clip-text text-transparent">smart logistics.</span>
+              integrated with <span className="bg-gradient-to-r from-[#df8326] to-[#C57019] bg-clip-text text-transparent">automated logistics.</span>
             </span>
           </h1>
 
