@@ -337,3 +337,36 @@ body {
 .social-btn-x:hover .social-icon {
   transform: skewY(20deg) scale(1.28) rotate(-10deg) !important;
 }
+
+/* Premium CTA Button Shimmer & Scale Animations */
+.cta-btn {
+  transform: skewX(-20deg) !important;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  overflow: hidden;
+}
+
+.cta-btn:hover {
+  transform: skewX(-20deg) translateY(-4px) scale(1.04) !important;
+  box-shadow: 0 15px 35px rgba(223, 131, 38, 0.45) !important;
+}
+
+.cta-btn:active {
+  transform: skewX(-20deg) translateY(-1px) scale(0.98) !important;
+}
+
+/* Shimmer keyframe and helper class */
+@keyframes cta-shimmer {
+  0% {
+    transform: skewX(20deg) translateX(-200%);
+  }
+  40% {
+    transform: skewX(20deg) translateX(200%);
+  }
+  100% {
+    transform: skewX(20deg) translateX(200%);
+  }
+}
+
+.cta-shimmer-effect {
+  animation: cta-shimmer 4.5s ease-in-out infinite;
+}

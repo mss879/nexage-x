@@ -3,7 +3,10 @@
 import React, { useState, useEffect } from "react";
 import Hero from "@/components/sections/Hero";
 import AboutUs from "@/components/sections/AboutUs";
+import Services from "@/components/sections/Services";
 import WhyChooseMe from "@/components/sections/WhyChooseMe";
+import Projects from "@/components/sections/Projects";
+import Methodology from "@/components/sections/Methodology";
 import Preloader from "@/components/Preloader";
 
 export default function Home() {
@@ -40,7 +43,17 @@ export default function Home() {
         
         {/* Section 3: Why Choose Me */}
         <WhyChooseMe />
+
+        {/* Section 4: Services (What We Do) */}
+        <Services />
+
+        {/* Section: Projects (Recent Work Showcase) */}
+        <Projects />
+
+        {/* Section 5: Methodology (How We Work) */}
+        <Methodology />
       </div>
     </main>
   );
 }
+

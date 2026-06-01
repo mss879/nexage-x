@@ -1,19 +1,47 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { Cpu, ShoppingBag, Package } from "lucide-react";
+import { ShoppingBag, Package, RefreshCw } from "lucide-react";
+
+const services = [
+  {
+    name: "Fulfillment Sync",
+    icon: Package,
+    initialPos: { bottom: "10%", left: "45%" },
+    floatAnim: { y: [0, -6, 0] },
+    floatDuration: 4.2,
+    floatDelay: 0.3,
+  },
+  {
+    name: "Marketplace Setup",
+    icon: ShoppingBag,
+    initialPos: { top: "45%", left: "20%" },
+    floatAnim: { y: [0, -5, 0] },
+    floatDuration: 3.8,
+    floatDelay: 0.5,
+  },
+  {
+    name: "Supply Chain",
+    icon: RefreshCw,
+    initialPos: { top: "15%", right: "8%" },
+    floatAnim: { y: [0, -6, 0] },
+    floatDuration: 3.9,
+    floatDelay: 0.7,
+  },
+];
 
 export default function WhyChooseMe() {
-  const cardClipPath = "polygon(0 0, 100% 0, 100% calc(100% - 48px), calc(100% - 48px) 100%, 0 100%)";
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const videoRefCard2 = React.useRef<HTMLVideoElement>(null);
-  const videoRefCard4 = React.useRef<HTMLVideoElement>(null);
+  const cardClipPath = "polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 48px), calc(100% - 48px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px)";
+  const constraintsRef = useRef<HTMLDivElement>(null);
+  const videoRefCard2 = useRef<HTMLVideoElement>(null);
+  const videoRefCard4 = useRef<HTMLVideoElement>(null);
 
-  React.useEffect(() => {
+  const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
+
+  useEffect(() => {
     const observerOptions = {
       root: null,
       rootMargin: "0px",
@@ -24,7 +52,7 @@ export default function WhyChooseMe() {
       entries.forEach((entry) => {
         const video = entry.target as HTMLVideoElement;
         if (entry.isIntersecting) {
-          video.play().catch(() => {});
+          video.play().catch(() => { });
         } else {
           video.pause();
         }
@@ -45,65 +73,68 @@ export default function WhyChooseMe() {
     };
   }, []);
 
-  useGSAP(() => {
-    if (!containerRef.current) return;
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const container = constraintsRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
 
-    // Organic floating staggered sines for premium suspended physics feel
-    gsap.to(".node-1", {
-      y: -8,
-      x: 4,
-      duration: 3.2,
-      ease: "sine.inOut",
-      yoyo: true,
-      repeat: -1
-    });
+    const pills = container.querySelectorAll(".draggable-pill");
+    pills.forEach((pill, idx) => {
+      // If actively dragging this pill, let Framer Motion handle it, do not apply repulsion offsets!
+      if (draggingIdx === idx) return;
 
-    gsap.to(".node-2", {
-      y: 8,
-      x: -3,
-      duration: 3.8,
-      ease: "sine.inOut",
-      yoyo: true,
-      repeat: -1,
-      delay: 0.3
-    });
+      const htmlPill = pill as HTMLElement;
+      const pillRect = htmlPill.getBoundingClientRect();
+      const pillCenterX = pillRect.left - rect.left + pillRect.width / 2;
+      const pillCenterY = pillRect.top - rect.top + pillRect.height / 2;
 
-    gsap.to(".node-3", {
-      y: -6,
-      x: -4,
-      duration: 3.5,
-      ease: "sine.inOut",
-      yoyo: true,
-      repeat: -1,
-      delay: 0.6
-    });
+      const dx = pillCenterX - mouseX;
+      const dy = pillCenterY - mouseY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const threshold = 110; // Active repulsion boundary in pixels
 
-    // Glowing laser pulse dashoffset flows
-    gsap.fromTo(".flow-line",
-      { strokeDashoffset: 100 },
-      {
-        strokeDashoffset: 0,
-        duration: 3,
-        ease: "none",
-        repeat: -1
+      if (dist < threshold) {
+        const force = (threshold - dist) / threshold;
+        const maxPush = 40; // Max push distance in px
+        const pushX = (dx / dist) * force * maxPush;
+        const pushY = (dy / dist) * force * maxPush;
+
+        gsap.to(htmlPill, {
+          x: pushX,
+          y: pushY,
+          duration: 0.35,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+      } else {
+        // Smoothly float back to original position
+        gsap.to(htmlPill, {
+          x: 0,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
       }
-    );
+    });
+  };
 
-    // Staggered custom ripple expanding pulses
-    gsap.fromTo(".ripple-pulse",
-      { scale: 0.8, opacity: 0.6 },
-      {
-        scale: 2.2,
-        opacity: 0,
-        duration: 2,
-        ease: "power1.out",
-        stagger: {
-          each: 0.6,
-          repeat: -1
-        }
-      }
-    );
-  }, { scope: containerRef });
+  const handleMouseLeave = () => {
+    const container = constraintsRef.current;
+    if (!container) return;
+    const pills = container.querySelectorAll(".draggable-pill");
+    pills.forEach((pill) => {
+      gsap.to(pill, {
+        x: 0,
+        y: 0,
+        duration: 0.7,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
+    });
+  };
 
   return (
     <section className="relative w-full py-24 bg-[#F5F5F7] text-[#1A1A1A] px-4 md:px-8">
@@ -128,11 +159,14 @@ export default function WhyChooseMe() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="md:col-span-2 bg-[#121214] rounded-3xl p-8 md:p-12 overflow-hidden relative flex flex-col min-h-[400px] md:min-h-[500px] justify-end shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+            className="md:col-span-2 bg-[#121214] p-8 md:p-12 overflow-hidden relative flex flex-col min-h-[400px] md:min-h-[500px] justify-end shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
             style={{ clipPath: cardClipPath }}
           >
             {/* Background Image wrapper */}
-            <div className="absolute inset-0 z-0">
+            <div 
+              className="absolute inset-0 z-0"
+              style={{ clipPath: cardClipPath }}
+            >
               <Image
                 src="/why-us.png"
                 alt="Why Choose Nexage-X"
@@ -162,7 +196,7 @@ export default function WhyChooseMe() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="bg-[#121214] rounded-3xl overflow-hidden relative flex flex-col min-h-[400px] md:min-h-[500px] shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+            className="bg-[#121214] overflow-hidden relative flex flex-col min-h-[400px] md:min-h-[500px] shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
             style={{ clipPath: cardClipPath }}
           >
             <div className="relative z-10 pt-8 px-8 md:pt-10 md:px-10 mb-6">
@@ -170,7 +204,10 @@ export default function WhyChooseMe() {
                 Design that makes sense and looks stunning
               </h3>
             </div>
-            <div className="relative flex-grow mt-auto w-full min-h-[250px] overflow-hidden">
+            <div 
+              className="relative flex-grow mt-auto w-full min-h-[250px] overflow-hidden"
+              style={{ clipPath: cardClipPath }}
+            >
               <video
                 ref={videoRefCard2}
                 src="/Web_design_gallery_fly-through_202605271835.mp4"
@@ -190,10 +227,13 @@ export default function WhyChooseMe() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="bg-[#121214] rounded-3xl overflow-hidden relative flex flex-col min-h-[380px] shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+            className="bg-[#121214] overflow-hidden relative flex flex-col min-h-[380px] shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
             style={{ clipPath: cardClipPath }}
           >
-            <div className="absolute inset-0 z-0">
+            <div 
+              className="absolute inset-0 z-0"
+              style={{ clipPath: cardClipPath }}
+            >
               <Image
                 src="/projects completed.png"
                 alt="Projects Completed"
@@ -210,11 +250,11 @@ export default function WhyChooseMe() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="bg-black rounded-3xl p-[1px] overflow-hidden relative flex flex-col min-h-[380px] shadow-[0_4px_20px_rgba(0,0,0,0.03)]"
+            className="bg-black p-[1px] overflow-hidden relative flex flex-col min-h-[380px] shadow-[0_4px_20px_rgba(0,0,0,0.03)]"
             style={{ clipPath: cardClipPath }}
           >
             <div
-              className="bg-[#e7e6e7] w-full h-full rounded-[23px] overflow-hidden flex flex-col relative flex-grow"
+              className="bg-[#e7e6e7] w-full h-full overflow-hidden flex flex-col relative flex-grow"
               style={{ clipPath: cardClipPath }}
             >
               <div className="relative z-10 pt-8 px-8 mb-6">
@@ -225,7 +265,10 @@ export default function WhyChooseMe() {
                   Easily scale as your business grows.
                 </p>
               </div>
-              <div className="relative flex-grow mt-auto w-full min-h-[200px] overflow-hidden">
+              <div 
+                className="relative flex-grow mt-auto w-full min-h-[200px] overflow-hidden"
+                style={{ clipPath: cardClipPath }}
+              >
                 <video
                   ref={videoRefCard4}
                   src="/Plant_grows_on_platforms_202605271924.mp4#t=4"
@@ -258,9 +301,8 @@ export default function WhyChooseMe() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="bg-[#121214] rounded-3xl p-8 overflow-hidden relative flex flex-col min-h-[380px] shadow-[0_10px_30px_rgba(0,0,0,0.15)] text-left"
+            className="bg-[#121214] p-8 overflow-hidden relative flex flex-col min-h-[380px] shadow-[0_10px_30px_rgba(0,0,0,0.15)] text-left"
             style={{ clipPath: cardClipPath }}
-            ref={containerRef}
           >
             <div className="relative z-10 mb-6">
               <h3 className="text-[26px] md:text-[28px] lg:text-[32px] font-sans font-bold text-white mb-2 tracking-tight">
@@ -270,70 +312,79 @@ export default function WhyChooseMe() {
                 Streamline backend workflows, scale marketplace channels, and manage shipping automatically.
               </p>
             </div>
-            
-            {/* High-End GSAP-Animated Floating Workflow Visual */}
-            <div className="relative flex-grow mt-auto w-full min-h-[180px] bg-white/[0.01] border border-white/5 rounded-2xl p-4 overflow-hidden">
+
+            {/* High-End Draggable Floating Playground Bounded Area */}
+            <div
+              ref={constraintsRef}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              className="relative flex-grow mt-auto w-full min-h-[180px] bg-white/[0.01] border border-white/5 overflow-hidden touch-none select-none"
+              style={{ clipPath: "polygon(0 0, 100% 0, 100% calc(100% - 48px), calc(100% - 48px) 100%, 0 100%)" }}
+            >
               {/* Moving cyber grid background */}
-              <div className="absolute inset-0 cyber-grid opacity-20 animate-grid-drift" />
-              
-              {/* SVG Curved Pipeline Data Flow */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 320 180" fill="none" preserveAspectRatio="none">
-                {/* Curved pipeline background */}
-                <path
-                  d="M 65 36 Q 160 36 160 90 T 255 144"
-                  stroke="rgba(255,255,255,0.03)"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
-                {/* Glowing laser data flow */}
-                <path
-                  className="flow-line"
-                  d="M 65 36 Q 160 36 160 90 T 255 144"
-                  stroke="url(#laserGradient)"
-                  strokeWidth="2.5"
-                  strokeDasharray="20 40"
-                  strokeLinecap="round"
-                />
-                <defs>
-                  <linearGradient id="laserGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#df8326" stopOpacity="0.8" />
-                    <stop offset="50%" stopColor="#C57019" stopOpacity="1.0" />
-                    <stop offset="100%" stopColor="#df8326" stopOpacity="0.8" />
-                  </linearGradient>
-                </defs>
-              </svg>
+              <div className="absolute inset-0 cyber-grid opacity-15 animate-grid-drift pointer-events-none" />
 
-              <div className="absolute inset-0 w-full h-full z-10">
-                {/* Node 1: Operations */}
-                <div className="node-1 absolute top-[12%] left-[6%] flex items-center gap-2 bg-[#16161a]/95 border border-[#C57019]/35 px-3 py-1 rounded-full text-[10px] font-mono text-[#df8326] shadow-[0_0_15px_rgba(197,112,25,0.15)]">
-                  <Cpu className="w-3.5 h-3.5 text-[#df8326]" />
-                  <span className="relative flex h-2 w-2">
-                    <span className="ripple-pulse absolute inline-flex h-full w-full rounded-full bg-[#C57019] opacity-60"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C57019]"></span>
-                  </span>
-                  Backend Automation
-                </div>
-
-                {/* Node 2: Marketplace */}
-                <div className="node-2 absolute top-[43%] left-[28%] flex items-center gap-2 bg-[#16161a]/95 border border-[#C57019]/35 px-3 py-1 rounded-full text-[10px] font-mono text-[#df8326] shadow-[0_0_15px_rgba(197,112,25,0.15)]">
-                  <ShoppingBag className="w-3.5 h-3.5 text-[#df8326]" />
-                  <span className="relative flex h-2 w-2">
-                    <span className="ripple-pulse absolute inline-flex h-full w-full rounded-full bg-[#C57019] opacity-60"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C57019]"></span>
-                  </span>
-                  Marketplace Setup
-                </div>
-
-                {/* Node 3: Fulfillment */}
-                <div className="node-3 absolute bottom-[12%] right-[6%] flex items-center gap-2 bg-[#16161a]/95 border border-[#C57019]/35 px-3 py-1 rounded-full text-[10px] font-mono text-[#df8326] shadow-[0_0_15px_rgba(197,112,25,0.15)]">
-                  <Package className="w-3.5 h-3.5 text-[#df8326]" />
-                  <span className="relative flex h-2 w-2">
-                    <span className="ripple-pulse absolute inline-flex h-full w-full rounded-full bg-[#C57019] opacity-60"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C57019]"></span>
-                  </span>
-                  Fulfillment Sync
-                </div>
-              </div>
+              {/* Floating & Draggable Services Pills (Elastic Spring Return Slots) */}
+              {services.map((svc, idx) => {
+                const IconComponent = svc.icon;
+                return (
+                  <motion.div
+                    key={idx}
+                    drag
+                    dragConstraints={constraintsRef}
+                    dragElastic={0.4}
+                    dragSnapToOrigin={true}
+                    dragTransition={{ bounceStiffness: 400, bounceDamping: 18 }}
+                    onDragStart={() => setDraggingIdx(idx)}
+                    onDragEnd={() => {
+                      setDraggingIdx(null);
+                      // Instantly reset visual evasion offset on drag end
+                      const pill = constraintsRef.current?.querySelectorAll(".draggable-pill")[idx];
+                      if (pill) {
+                        gsap.to(pill, { x: 0, y: 0, duration: 0.5, ease: "power2.out" });
+                      }
+                    }}
+                    whileDrag={{
+                      scale: 1.12,
+                      zIndex: 40,
+                      cursor: "grabbing",
+                    }}
+                    whileHover={{
+                      scale: 1.05,
+                      cursor: "grab",
+                    }}
+                    animate={{
+                      y: svc.floatAnim.y,
+                    }}
+                    transition={{
+                      y: {
+                        duration: svc.floatDuration,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: svc.floatDelay,
+                      },
+                    }}
+                    style={{
+                      position: "absolute",
+                      ...svc.initialPos,
+                    }}
+                    className="z-20 select-none cursor-grab"
+                  >
+                    {/* Skewed Container (Layer 2) - Repelled by Mouse */}
+                    <div className="draggable-pill transform -skew-x-20 bg-[#16161a]/95 border border-[#df8326]/30 px-3.5 py-2 rounded-[10px] shadow-[0_4px_15px_rgba(0,0,0,0.4)] backdrop-blur-md flex items-center gap-2.5 transition-colors duration-300 hover:border-[#df8326] hover:shadow-[0_0_20px_rgba(223,131,38,0.25)]">
+                      {/* Unskewed Content wrapper (Layer 3) */}
+                      <div className="transform skew-x-20 flex items-center gap-2.5 text-[10.5px] md:text-[11px] font-mono text-[#df8326]">
+                        <IconComponent className="w-3.5 h-3.5 text-[#df8326]" />
+                        <span className="relative flex h-1.5 w-1.5 shrink-0">
+                          <span className="absolute inline-flex h-full w-full rounded-full bg-[#C57019] opacity-75 animate-ping"></span>
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#C57019]"></span>
+                        </span>
+                        <span className="text-zinc-100 font-semibold uppercase tracking-wider font-sans whitespace-nowrap">{svc.name}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         </div>

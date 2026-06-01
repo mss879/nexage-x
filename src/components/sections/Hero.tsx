@@ -51,12 +51,12 @@ export default function Hero({ startAnimation = true }: HeroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const titleLinesRef = useRef<HTMLSpanElement[]>([]);
+  const descRef = useRef<HTMLParagraphElement>(null);
   const buttonRef = useRef<HTMLAnchorElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const socialsRef = useRef<HTMLDivElement>(null);
   const imageWrapperRef = useRef<HTMLDivElement>(null);
-  const descRef = useRef<HTMLParagraphElement>(null);
 
   const addToTitleRefs = (el: HTMLSpanElement | null) => {
     if (el && !titleLinesRef.current.includes(el)) {
@@ -70,7 +70,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
       gsap.set(cardRef.current, { scale: 0.97, opacity: 0, y: 30 });
       gsap.set(imageWrapperRef.current, { scale: 1.05, opacity: 0 });
       gsap.set(titleLinesRef.current, { y: 50, opacity: 0 });
-      gsap.set(descRef.current, { y: 20, opacity: 0 });
+      gsap.set(descRef.current, { y: 30, opacity: 0 });
       gsap.set(buttonRef.current, { scale: 0.9, opacity: 0 });
       gsap.set(navRef.current, { y: -25, opacity: 0 });
       gsap.set(logoRef.current, { y: 25, opacity: 0 });
@@ -103,20 +103,19 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           ease: "power3.out",
         }, "-=1.1");
 
-        // Narrative sub-headline entrance
         tl.to(descRef.current, {
           y: 0,
           opacity: 1,
           duration: 0.8,
           ease: "power3.out",
-        }, "-=0.7");
+        }, "-=0.8");
 
         tl.to(buttonRef.current, {
           scale: 1,
           opacity: 1,
           duration: 0.8,
           ease: "back.out(1.6)",
-        }, "-=0.6");
+        }, "-=0.7");
 
         tl.to([navRef.current, logoRef.current, socialsRef.current], {
           x: 0,
@@ -125,7 +124,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           duration: 0.8,
           stagger: 0.1,
           ease: "power3.out",
-        }, "-=0.5");
+        }, "-=0.6");
       } // End if (startAnimation)
     }, containerRef);
 
@@ -173,7 +172,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
         />
 
         {/* Foreground Content */}
-        <div className="relative z-20 w-full h-full flex flex-col justify-center items-start px-6 sm:px-12 md:px-20 lg:px-24 py-16 md:py-24 max-w-[900px] my-auto">
+        <div className="relative z-20 w-full h-full flex flex-col justify-center items-start px-6 sm:px-12 md:px-20 lg:px-24 py-16 md:py-24 max-w-[1100px] my-auto">
           {/* Mobile-only Header */}
           <div className="md:hidden flex items-center justify-between w-full mb-8 select-none">
             <Image src="/logo.png" alt="Logo" width={700} height={175} className="h-[175px] w-auto object-contain brightness-0 ml-[-24px] translate-y-[5px]" />
@@ -281,26 +280,25 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           </div>
 
           {/* Headline Typography — exact Framer text styling */}
-          <h1 className="flex flex-col font-syne text-[2.0rem] sm:text-[2.8rem] md:text-[3.5rem] lg:text-[4.2rem] xl:text-[4.8rem] leading-[1.05] tracking-tight text-[#000000] select-none font-medium mb-6">
-            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">Crafting high-performance storefronts</span>
-            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">
-              integrated with <span className="bg-gradient-to-r from-[#df8326] to-[#C57019] bg-clip-text text-transparent">automated logistics.</span>
-            </span>
+          <h1 className="flex flex-col font-syne text-[2.0rem] sm:text-[2.8rem] md:text-[3.6rem] lg:text-[4.2rem] leading-[1.05] tracking-tight text-[#000000] select-none font-medium mb-6">
+            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">Designing experiences,</span>
+            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">deploying seamless</span>
+            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5"><strong className="font-bold">logistics</strong>.</span>
           </h1>
 
-          {/* Premium Sub-headline / Brand narrative */}
+          {/* Description Paragraph */}
           <p
             ref={descRef}
-            className="text-sm sm:text-base md:text-lg lg:text-xl font-sans font-light text-zinc-700 leading-relaxed tracking-tight max-w-[620px] mb-8 select-none"
+            className="font-plus-jakarta text-[#4d4d4f] text-sm sm:text-base md:text-[1.05rem] max-w-[540px] leading-relaxed mb-10 select-none font-normal text-justify"
           >
-            A high-performance e-commerce and digital automation studio. We blend <strong className="font-semibold text-black">stunning creative design</strong>, <strong className="font-semibold text-black">robust software engineering</strong>, and <strong className="font-semibold text-[#df8326]">smart logistics automation</strong>—from launch-ready storefronts to automated shipping and scaling operations.
+            A high-performance digital automation and e-commerce studio. We build stunning custom storefronts, robust web applications, and end-to-end logistics solutions engineered to scale visionary brands.
           </p>
 
           {/* CTA button — orange gradient with top border highlight, rounded-xl (12px) */}
           <a
             ref={buttonRef}
             href="#work"
-            className="framer-m5N6O flex items-center transition-transform hover:scale-[1.03] active:scale-[0.98] shadow-[0_8px_30px_rgba(197,112,25,0.25)] select-none"
+            className="framer-m5N6O group cta-btn flex items-center shadow-[0_8px_30px_rgba(197,112,25,0.25)] select-none overflow-hidden"
             style={{
               "--border-bottom-width": "1px",
               "--border-color": "rgba(255, 255, 255, 0.2)",
@@ -325,9 +323,14 @@ export default function Hero({ startAnimation = true }: HeroProps) {
             {/* Background helpers to maintain Framer layer behaviors */}
             <div className="framer-lj3pv framer-xg4s92" style={{ background: "linear-gradient(180deg, #df8326 0%, #C57019 100%)", opacity: 1 }}></div>
 
+            {/* Premium background shimmer gloss sweep */}
+            <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none rounded-inherit z-0">
+              <div className="absolute inset-0 w-[40%] h-full bg-gradient-to-r from-transparent via-white/25 to-transparent cta-shimmer-effect" />
+            </div>
+
             <div className="framer-content-wrapper">
               <span className="text-white font-plus-jakarta font-semibold text-sm">Learn more</span>
-              <ArrowRight className="w-4 h-4 text-white" />
+              <ArrowRight className="w-4 h-4 text-white transition-transform duration-300 group-hover:translate-x-1.5" />
             </div>
           </a>
         </div>
