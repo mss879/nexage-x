@@ -64,11 +64,11 @@ export default function Navbar({ onNavClick }: NavbarProps) {
             className="flex items-center cursor-pointer"
           >
             <Image 
-              src="/logo.png"
-              alt="Nexage Logo" 
-              width={700}
-              height={175}
-              className="h-[175px] w-auto object-contain ml-[-28px] translate-y-[5px]"
+              src="/yari-logo.png"
+              alt="YARI Logo" 
+              width={840}
+              height={210}
+              className="h-[210px] w-auto object-contain ml-[-32px] translate-y-[2px]"
               priority
             />
           </div>

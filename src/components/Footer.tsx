@@ -1,8 +1,29 @@
 "use client";
 
 import React, { useState } from "react";
-import { Command, Mail, ArrowRight, Terminal, ArrowUp } from "lucide-react";
-import { motion } from "framer-motion";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+
+export function SlidingLink({ label, href }: { label: string; href: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center justify-between p-5 border-b border-r border-white/[0.08] even:border-r-0 hover:bg-white/[0.02] transition-colors duration-300 group overflow-hidden"
+    >
+      <div className="relative h-8 overflow-hidden flex flex-col">
+        {/* Original text - slides up on hover */}
+        <span className="font-mohave font-semibold text-2xl tracking-tighter uppercase text-[#eeeeee] transition-transform duration-500 ease-out group-hover:-translate-y-full">
+          {label}
+        </span>
+        {/* Copy text - slides up from below on hover */}
+        <span className="absolute left-0 top-full font-mohave font-semibold text-2xl tracking-tighter uppercase text-[#df8326] transition-transform duration-500 ease-out group-hover:-translate-y-full">
+          {label}
+        </span>
+      </div>
+      <ArrowUpRight className="w-5 h-5 text-gray-500 group-hover:text-[#df8326] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
+    </Link>
+  );
+}
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -17,182 +38,233 @@ export default function Footer() {
     }
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   const footerLinks = [
-    {
-      title: "Navigation",
-      links: [
-        { label: "Home", href: "#hero" },
-        { label: "Features", href: "#features" },
-        { label: "Interactive Lab", href: "#lab" },
-      ],
-    },
-    {
-      title: "Ecosystem",
-      links: [
-        { label: "Developers", href: "#" },
-        { label: "API Reference", href: "#" },
-        { label: "GitHub Core", href: "#" },
-      ],
-    },
-    {
-      title: "Legal",
-      links: [
-        { label: "Privacy Policy", href: "#" },
-        { label: "Terms of Service", href: "#" },
-        { label: "Security", href: "#" },
-      ],
-    },
+    { label: "About", href: "/about" },
+    { label: "Services", href: "/services" },
+    { label: "Software", href: "/services/software" },
+    { label: "Logistics", href: "/services/logistics" },
+    { label: "Blog", href: "/blog" },
+    { label: "Contact", href: "/contact" },
+  ];
+
+  const socialLinks = [
+    { label: "X/Twitter", href: "https://x.com" },
+    { label: "Instagram", href: "https://instagram.com" },
+    { label: "Linkedin", href: "https://linkedin.com" },
+    { label: "Github", href: "https://github.com" },
   ];
 
   return (
-    <footer className="relative bg-bg-surface border-t border-border-subtle mt-20">
-      {/* Background radial glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[1px] bg-gradient-to-r from-transparent via-accent-primary to-transparent opacity-50" />
-      <div className="absolute -top-[150px] left-1/2 -translate-x-1/2 w-[350px] h-[300px] bg-accent-primary/10 rounded-full blur-[100px] pointer-events-none -z-10" />
+    <footer className="relative bg-[#050508] text-[#eeeeee] w-full pt-16 pb-0 box-border overflow-hidden">
+      {/* Thin top divider glow line */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#df8326]/30 to-transparent" />
 
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
-          {/* Brand Info */}
-          <div className="lg:col-span-4 flex flex-col gap-4">
-            <div className="flex items-center gap-3 cursor-pointer group" onClick={scrollToTop}>
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-accent-primary to-accent-secondary p-[1px] shadow-[0_0_15px_rgba(139,92,246,0.2)]">
-                <div className="w-full h-full rounded-xl bg-bg-surface flex items-center justify-center">
-                  <Command className="w-5 h-5 text-neon-cyan" />
-                </div>
+      <div className="w-full relative z-10 flex flex-col">
+        
+        {/* 1. START A PROJECT - Large Full Width Row */}
+        <a 
+          href="mailto:contact@yari.com" 
+          className="w-full flex items-center justify-between px-6 md:px-10 py-10 md:py-16 border-b border-white/[0.08] hover:bg-white/[0.02] transition-all duration-300 group select-none"
+        >
+          <h2 className="font-mohave font-semibold uppercase tracking-[-0.07em] text-[8vw] md:text-[6vw] leading-none text-[#eeeeee] group-hover:text-[#df8326] transition-colors duration-300">
+            START A PROJECT
+          </h2>
+          <div className="flex items-center justify-center w-14 h-14 md:w-20 md:h-20 rounded-full border border-white/[0.08] group-hover:border-[#df8326] group-hover:bg-[#df8326] transition-all duration-500">
+            <ArrowUpRight className="w-6 h-6 md:w-10 md:h-10 text-white group-hover:text-black transition-colors duration-500" />
+          </div>
+        </a>
+
+        {/* 2. Main Bottom Layout Grid (Orange Box left, Columns + Contact right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 border-b border-white/[0.08]">
+          
+          {/* Column 1: Coppery Orange Solid Box (Stretches full height on desktop) */}
+          <div className="bg-[#df8326] text-black pt-2 pb-8 px-6 flex flex-col justify-between items-center text-center min-h-[380px] lg:min-h-full border-b lg:border-b-0 border-white/[0.08] lg:border-r">
+            <div className="flex flex-col gap-4 w-full items-center">
+              {/* Brand Logo Image */}
+              <div className="w-full max-w-[280px] md:max-w-[320px] select-none pt-0 pb-2 flex justify-center mt-[-10px] sm:mt-[-15px]">
+                <img 
+                  src="/yari-logo.png" 
+                  alt="YARI Logo" 
+                  className="w-full h-auto object-contain brightness-0" 
+                />
               </div>
-              <span className="text-lg font-bold tracking-wider font-sans">
-                NEXAGE<span className="text-neon-cyan">X</span>
-              </span>
             </div>
-            <p className="text-sm text-gray-400 max-w-sm leading-relaxed">
-              Designing spatial responsive layouts and highly performant interfaces engineered for the next generation of web applications.
-            </p>
-
-            {/* Tech Status Tag */}
-            <div className="flex items-center gap-2 text-xs font-mono text-neon-emerald mt-2">
-              <span className="w-2 h-2 rounded-full bg-neon-emerald animate-ping" />
-              <span>System Operational // v0.1.0-alpha</span>
+            
+            <div className="flex flex-col gap-2 w-full items-center">
+              <p className="text-xs font-bold uppercase tracking-wider font-mono">
+                Global Logistics & Operations Node
+              </p>
+              <p className="text-[10px] opacity-75 font-mono">
+                &copy; {new Date().getFullYear()} YARI. All Rights Reserved.
+              </p>
             </div>
           </div>
 
-          {/* Nav Columns */}
-          <div className="lg:col-span-5 grid grid-cols-3 gap-6">
-            {footerLinks.map((column, idx) => (
-              <div key={idx} className="flex flex-col gap-4">
-                <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">
-                  {column.title}
+          {/* Right Area (Spans 3 columns on desktop) */}
+          <div className="lg:col-span-3 flex flex-col">
+            
+            {/* Top Row: Links Stack, Follow Us, Newsletter */}
+            <div className="grid grid-cols-1 md:grid-cols-3">
+              
+              {/* Column 2: Navigation Links — 2 per row */}
+              <div className="grid grid-cols-2 border-b md:border-b-0 border-white/[0.08] md:border-r">
+                {footerLinks.map((link, idx) => (
+                  <SlidingLink key={idx} label={link.label} href={link.href} />
+                ))}
+              </div>
+
+              {/* Column 3: Follow Us */}
+              <div className="p-8 flex flex-col gap-6 border-b md:border-b-0 border-white/[0.08] md:border-r">
+                <h4 
+                  className="font-rock-salt text-lg text-[#df8326] select-none"
+                  style={{ filter: "url(#wobbly-follow-us)" }}
+                >
+                  Follow Us
                 </h4>
-                <ul className="flex flex-col gap-2.5">
-                  {column.links.map((link, lIdx) => (
-                    <li key={lIdx}>
+                <ul className="flex flex-col gap-4">
+                  {socialLinks.map((social, idx) => (
+                    <li key={idx}>
                       <a
-                        href={link.href}
-                        className="text-sm text-gray-400 hover:text-white transition-colors duration-300 relative group py-0.5 inline-block"
+                        href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mohave font-semibold text-2xl tracking-tighter uppercase text-[#eeeeee] hover:text-[#df8326] relative group py-0.5 inline-block"
                       >
-                        {link.label}
-                        <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-neon-cyan group-hover:w-full transition-all duration-300" />
+                        {social.label}
+                        <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#df8326] group-hover:w-full transition-all duration-300" />
                       </a>
                     </li>
                   ))}
                 </ul>
               </div>
-            ))}
+
+              {/* Column 4: Newsletter Node with floating envelope & marquee & rotated video */}
+              <div className="p-8 flex flex-col justify-between min-h-[350px] relative group/news border-b md:border-b-0 border-white/[0.08] md:border-b-0">
+                
+                {/* Clipped background elements container */}
+                <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
+                  {/* Background Marquee / Scrolling Ticker "Stay Ahead" */}
+                  <div className="absolute inset-0 flex items-center overflow-hidden pointer-events-none select-none z-10">
+                    <div className="flex gap-4 whitespace-nowrap animate-marquee text-[11vw] font-mohave font-bold uppercase text-white/[0.08]">
+                      <span>Stay Ahead &nbsp;</span>
+                      <span>Stay Ahead &nbsp;</span>
+                      <span>Stay Ahead &nbsp;</span>
+                    </div>
+                  </div>
+
+                  {/* Rotated background video card */}
+                  <div 
+                    className="absolute left-[-15px] top-[80px] w-[180px] h-[100px] rounded-lg overflow-hidden border border-white/5 z-0 pointer-events-none select-none opacity-30 group-hover/news:opacity-50 group-hover/news:scale-105 transition-all duration-700" 
+                    style={{ transform: "rotate(-16deg)" }}
+                  >
+                    <video 
+                      src="https://framerusercontent.com/assets/gtE8eL5FaBaxgb4xEEslwTr2K1o.mp4" 
+                      loop 
+                      autoPlay 
+                      muted 
+                      playsInline
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                {/* 3D Envelope rendering - outside overflow wrapper to allow border overlapping */}
+                <div className="absolute right-[-45px] bottom-[-25px] w-[210px] h-[210px] pointer-events-none opacity-95 group-hover/news:opacity-100 group-hover/news:scale-105 group-hover/news:-rotate-12 transition-transform duration-700 select-none z-30 animate-float-medium">
+                  <img
+                    src="/footer-envelope.png"
+                    alt="Newsletter Envelope Decorative"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+
+                <div className="relative z-20 flex flex-col gap-2">
+                  <h4 
+                    className="font-rock-salt text-lg text-[#df8326] select-none"
+                    style={{ filter: "url(#wobbly-newsletter)" }}
+                  >
+                    Newsletter
+                  </h4>
+                  <p className="text-sm text-gray-400 font-sans leading-relaxed">
+                    Subscribe to our newsletter for more insights.
+                  </p>
+                </div>
+
+                <form onSubmit={handleSubscribe} className="relative z-20 flex flex-col gap-3 mt-6">
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email address"
+                    className="w-full px-4 py-3 rounded-none bg-zinc-900/40 border border-white/[0.08] text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#df8326] focus:ring-1 focus:ring-[#df8326] transition-all duration-300"
+                  />
+                  <button
+                    type="submit"
+                    disabled={subscribed}
+                    className="w-full py-3 bg-zinc-800 text-white font-mono text-xs uppercase tracking-wider hover:bg-[#df8326] hover:text-black active:scale-[0.98] transition-all duration-300 cursor-pointer disabled:opacity-50"
+                  >
+                    {subscribed ? "Subscribed!" : "Subscribe"}
+                  </button>
+                </form>
+              </div>
+
+            </div>
+
+            {/* Bottom Row: Reach Out & Made By Credits */}
+            <div className="grid grid-cols-1 md:grid-cols-3 border-t border-white/[0.08]">
+              {/* Reach Out */}
+              <div className="p-8 flex flex-col gap-1.5 border-b md:border-b-0 md:border-r border-white/[0.08] md:col-span-2">
+                <h5 
+                  className="font-rock-salt text-xs text-[#df8326] select-none"
+                  style={{ filter: "url(#wobbly-reach-out)" }}
+                >
+                  Reach Out
+                </h5>
+                <a
+                  href="mailto:contact@yari.com"
+                  className="font-mohave font-semibold text-3xl md:text-4xl tracking-tighter uppercase text-[#eeeeee] hover:text-[#df8326] transition-colors duration-300"
+                >
+                  contact@yari.com
+                </a>
+              </div>
+
+              {/* Made By credit node */}
+              <div className="p-8 flex flex-col justify-center items-start md:items-end gap-1.5 md:col-span-1 select-none">
+                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                  Made By
+                </span>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 bg-[#df8326] rounded-sm transform skew-x-12" />
+                  <span className="font-mohave font-extrabold tracking-tighter uppercase text-xl text-white">
+                    YARI LABS
+                  </span>
+                </div>
+              </div>
+            </div>
+
           </div>
 
-          {/* Newsletter Input */}
-          <div className="lg:col-span-3 flex flex-col gap-4">
-            <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">
-              Newsletter Node
-            </h4>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              Receive encrypted developer notes & optimization logs.
-            </p>
-            <form onSubmit={handleSubscribe} className="relative mt-2">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="developer@domain.com"
-                className="w-full px-4 py-3 rounded-xl bg-bg-base border border-border-subtle text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary focus:shadow-[0_0_20px_rgba(139,92,246,0.15)] transition-all duration-300"
-              />
-              <button
-                type="submit"
-                disabled={subscribed}
-                className="absolute right-1.5 top-1.5 bottom-1.5 px-3.5 bg-gradient-to-r from-accent-primary to-accent-secondary text-white rounded-lg flex items-center justify-center hover:opacity-90 active:scale-95 transition-all duration-200 cursor-pointer"
-              >
-                {subscribed ? (
-                  <span className="text-xs font-mono">OK</span>
-                ) : (
-                  <ArrowRight className="w-4 h-4" />
-                )}
-              </button>
-            </form>
-          </div>
         </div>
 
-        {/* Divider */}
-        <div className="h-[1px] bg-border-subtle my-12" />
-
-        {/* Lower Row */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2.5 text-xs text-gray-500 font-mono">
-            <Terminal className="w-3.5 h-3.5" />
-            <span>&copy; {new Date().getFullYear()} NEXAGE-X CORE. SECURED.</span>
-          </div>
-
-          {/* Social Links */}
-          <div className="flex items-center gap-4">
-            {[
-              {
-                icon: (
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                  </svg>
-                ),
-                href: "#"
-              },
-              {
-                icon: (
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                  </svg>
-                ),
-                href: "#"
-              },
-              {
-                icon: (
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                  </svg>
-                ),
-                href: "#"
-              },
-            ].map((social, sIdx) => (
-              <a
-                key={sIdx}
-                href={social.href}
-                className="w-8 h-8 rounded-lg border border-border-subtle bg-bg-surface flex items-center justify-center text-gray-400 hover:text-neon-cyan hover:border-neon-cyan hover:shadow-[0_0_10px_rgba(34,211,238,0.2)] transition-all duration-300"
-              >
-                {social.icon}
-              </a>
-            ))}
-
-            {/* Scroll to Top */}
-            <button
-              onClick={scrollToTop}
-              className="w-8 h-8 rounded-lg border border-border-subtle bg-bg-surface flex items-center justify-center text-gray-400 hover:text-neon-purple hover:border-neon-purple hover:shadow-[0_0_10px_rgba(168,85,247,0.2)] transition-all duration-300 cursor-pointer ml-2"
-              title="Scroll to Top"
-            >
-              <ArrowUp className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
       </div>
+
+      {/* Wobbly SVG Filters for marker font text distortion */}
+      <svg style={{ width: 0, height: 0, position: "absolute" }} aria-hidden="true" focusable="false">
+        <defs>
+          <filter id="wobbly-follow-us" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.01331" numOctaves="4" seed="639" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+          <filter id="wobbly-newsletter" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.01331" numOctaves="4" seed="240" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="3.35" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+          <filter id="wobbly-reach-out" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.01331" numOctaves="4" seed="552" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="3.24" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </defs>
+      </svg>
     </footer>
   );
 }

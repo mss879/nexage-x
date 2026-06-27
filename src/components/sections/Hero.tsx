@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
+import { useMenu } from "@/components/menu/MenuProvider";
 
 // SVG Components for smooth, sloped transitions (S-Curves and stretched concave corners)
 const CornerOuter = ({ className, width = 40, height = 40 }: { className?: string, width?: number, height?: number }) => (
@@ -48,6 +49,7 @@ interface HeroProps {
 }
 
 export default function Hero({ startAnimation = true }: HeroProps) {
+  const { open: openMenu } = useMenu();
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const titleLinesRef = useRef<HTMLSpanElement[]>([]);
@@ -175,17 +177,12 @@ export default function Hero({ startAnimation = true }: HeroProps) {
         <div className="relative z-20 w-full h-full flex flex-col justify-center items-start px-6 sm:px-12 md:px-20 lg:px-24 py-16 md:py-24 max-w-[1100px] my-auto">
           {/* Mobile-only Header */}
           <div className="md:hidden flex items-center justify-between w-full mb-8 select-none">
-            <Image src="/logo.png" alt="Logo" width={700} height={175} className="h-[175px] w-auto object-contain brightness-0 ml-[-24px] translate-y-[5px]" />
+            <Image src="/yari-logo.png" alt="Logo" width={840} height={210} className="h-[210px] w-auto object-contain brightness-0 ml-[-30px] translate-y-[2px]" />
             <div className="flex items-center gap-4 scale-[0.82] origin-right shrink-0 relative z-30 mr-[-8px]">
               {/* 1. Menu Button */}
               <div className="framer-iny974-container" style={{ transform: "none", transformOrigin: "50% 50% 0px", opacity: 1 }}>
                 <button
-                  onClick={() => {
-                    const element = document.getElementById("features");
-                    if (element) {
-                      element.scrollIntoView({ behavior: "smooth" });
-                    }
-                  }}
+                  onClick={openMenu}
                   className="framer-m5N6O framer-uXsXm framer-cjrjU framer-55u4xr framer-v-55u4xr framer-1akrlmb"
                   style={{
                     "--border-bottom-width": "1px",
@@ -197,7 +194,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
                     "--corner-shape-fallback": "0.752",
                     backgroundColor: "rgba(0, 0, 0, 0)",
                     // @ts-ignore
-                    "corner-shape": "superellipse(1.5)",
+                    "cornerShape": "superellipse(1.5)",
                     borderBottomLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
                     borderBottomRightRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
                     borderTopLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
@@ -227,7 +224,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
               {/* 2. Connect Button */}
               <div className="framer-iny974-container" style={{ transform: "none", transformOrigin: "50% 50% 0px", opacity: 1 }}>
                 <a
-                  href="mailto:hello@nexage.com"
+                  href="mailto:hello@yari.com"
                   className="framer-m5N6O framer-uXsXm framer-cjrjU framer-55u4xr framer-v-55u4xr framer-1akrlmb"
                   style={{
                     "--border-bottom-width": "1px",
@@ -239,7 +236,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
                     "--corner-shape-fallback": "0.752",
                     backgroundColor: "rgba(0, 0, 0, 0)",
                     // @ts-ignore
-                    "corner-shape": "superellipse(1.5)",
+                    "cornerShape": "superellipse(1.5)",
                     borderBottomLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
                     borderBottomRightRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
                     borderTopLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
@@ -309,7 +306,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
               "--corner-shape-fallback": "0.752",
               background: "linear-gradient(180deg, #df8326 0%, #C57019 100%)",
               // @ts-ignore
-              "corner-shape": "superellipse(1.5)",
+              "cornerShape": "superellipse(1.5)",
               borderBottomLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
               borderBottomRightRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
               borderTopLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
@@ -344,9 +341,9 @@ export default function Hero({ startAnimation = true }: HeroProps) {
         className="hidden md:flex absolute top-[12px] left-[12px] w-[580px] h-[56px] bg-[#18181b] z-30 items-center justify-between rounded-tl-[24px] shadow-[-2px_-2px_0_0_#18181b] px-4"
       >
         {/* Left Side: Logo */}
-        <div className="relative flex items-center h-full -top-[3px] w-full">
-          <a href="#hero" className="absolute left-[-16px] top-1/2 -translate-y-[47%] flex items-center shrink-0">
-            <Image src="/logo.png" alt="Logo" width={660} height={165} className="h-[165px] w-auto object-contain" />
+        <div className="relative flex items-center h-full -top-[5px] w-full">
+          <a href="#hero" className="absolute left-[-22px] top-1/2 -translate-y-[49%] flex items-center shrink-0">
+            <Image src="/yari-logo.png" alt="Logo" width={800} height={200} className="h-[200px] w-auto object-contain" />
           </a>
         </div>
 
@@ -355,12 +352,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           {/* 1. Menu Button (Large) */}
           <div className="framer-iny974-container" style={{ transform: "none", transformOrigin: "50% 50% 0px", opacity: 1 }}>
             <button
-              onClick={() => {
-                const element = document.getElementById("features");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
+              onClick={openMenu}
               className="framer-m5N6O framer-m5N6O-large framer-uXsXm framer-cjrjU framer-55u4xr framer-v-55u4xr framer-1akrlmb"
               style={{
                 "--border-bottom-width": "1px",
@@ -372,7 +364,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
                 "--corner-shape-fallback": "0.752",
                 backgroundColor: "rgba(0, 0, 0, 0)",
                 // @ts-ignore
-                "corner-shape": "superellipse(1.5)",
+                "cornerShape": "superellipse(1.5)",
                 borderBottomLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
                 borderBottomRightRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
                 borderTopLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
@@ -402,7 +394,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           {/* 2. Connect Button */}
           <div className="framer-iny974-container" style={{ transform: "none", transformOrigin: "50% 50% 0px", opacity: 1 }}>
             <a
-              href="mailto:hello@nexage.com"
+              href="mailto:hello@yari.com"
               className="framer-m5N6O framer-m5N6O-large framer-uXsXm framer-cjrjU framer-55u4xr framer-v-55u4xr framer-1akrlmb"
               style={{
                 "--border-bottom-width": "1px",
@@ -414,7 +406,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
                 "--corner-shape-fallback": "0.752",
                 backgroundColor: "rgba(0, 0, 0, 0)",
                 // @ts-ignore
-                "corner-shape": "superellipse(1.5)",
+                "cornerShape": "superellipse(1.5)",
                 borderBottomLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
                 borderBottomRightRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
                 borderTopLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",

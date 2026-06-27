@@ -1,6 +1,6 @@
-# Nexage-X Engine Showcase
+# YARI Engine Showcase
 
-Welcome to **Nexage-X**, a cutting-edge spatial visual interface engine built on the absolute latest Next-Gen web development stack:
+Welcome to **YARI**, a cutting-edge spatial visual interface engine built on the absolute latest Next-Gen web development stack:
 - **Next.js 16 (App Router)** with Turbopack compilation.
 - **React 19 (Latest Core)** with React Compiler support.
 - **Tailwind CSS v4 (CSS-First System)** with zero-legacy configuration.

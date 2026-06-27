@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
+import { motion, useScroll, useTransform, MotionValue, useInView } from "framer-motion";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
@@ -59,7 +59,7 @@ function Cube3D({ x, y, z, type }: Cube3DProps) {
   // Completely uniform opaque gradients for ultimate rendering speed and zero color shifting during rotation
   const faceStyleClass = isGlow
     ? "bg-gradient-to-br from-[#ffd8b3] via-[#df8326] to-[#994d00] border border-[#ffb266] shadow-[0_0_25px_rgba(223,131,38,0.9)]"
-    : "bg-gradient-to-br from-[#27272a] via-[#18181b] to-[#09090b] border border-white/10 shadow-[inset_0_1px_2px_rgba(255,255,255,0.15)]";
+    : "bg-gradient-to-br from-[#ffffff] via-[#f4f4f5] to-[#d4d4d8] border border-black/[0.08] shadow-[inset_0_1.5px_2px_rgba(255,255,255,0.9)]";
 
   return (
     <div
@@ -411,6 +411,62 @@ function VolumetricIsometricGrid() {
   );
 }
 
+function DigitColumn({ digit, isInView }: { digit: number; isInView: boolean }) {
+  // 2 cycles of digits to create a complete full rotation spin effect
+  const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  
+  return (
+    <span className="relative inline-flex overflow-hidden h-[1em] leading-none align-baseline">
+      <motion.span
+        initial={{ y: 0 }}
+        animate={isInView ? { y: `-${digit + 10}em` } : { y: 0 }}
+        transition={{
+          duration: 2.4,
+          ease: [0.16, 1, 0.3, 1], // Cinematic easeOut
+          delay: Math.random() * 0.4, // Stagger each digit column
+        }}
+        className="flex flex-col absolute left-0 top-0 w-full"
+      >
+        {digits.map((d, idx) => (
+          <span key={idx} className="inline-block h-[1em] leading-none select-none text-center">
+            {d}
+          </span>
+        ))}
+      </motion.span>
+      {/* Spacer digit to preserve width/height in flow */}
+      <span className="opacity-0 select-none pointer-events-none">0</span>
+    </span>
+  );
+}
+
+function AnimatedCounter({ value }: { value: string }) {
+  const ref = React.useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  const characters = value.split("");
+
+  return (
+    <span ref={ref} className="inline-flex items-baseline font-syne select-none">
+      {characters.map((char, index) => {
+        const isDigit = /[0-9]/.test(char);
+        if (isDigit) {
+          return (
+            <DigitColumn
+              key={index}
+              digit={parseInt(char, 10)}
+              isInView={isInView}
+            />
+          );
+        }
+        return (
+          <span key={index} className="inline-block select-none leading-none">
+            {char}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
 
 export default function AboutUs() {
   const containerVariants = {
@@ -458,7 +514,7 @@ export default function AboutUs() {
   };
 
   const words = [
-    { text: "NEXAGE-X®", style: "font-semibold text-black" },
+    { text: "YARI®", style: "font-semibold text-white" },
     { text: "is", style: "" },
     { text: "a", style: "" },
     { text: "high-performance", style: "" },
@@ -474,16 +530,16 @@ export default function AboutUs() {
     { text: "We", style: "" },
     { text: "seamlessly", style: "" },
     { text: "blend", style: "" },
-    { text: "stunning", style: "font-semibold text-black" },
-    { text: "creative", style: "font-semibold text-black" },
-    { text: "design,", style: "font-semibold text-black" },
+    { text: "stunning", style: "font-semibold text-white" },
+    { text: "creative", style: "font-semibold text-white" },
+    { text: "design,", style: "font-semibold text-white" },
     { text: "robust", style: "" },
     { text: "software", style: "" },
     { text: "engineering,", style: "" },
     { text: "and", style: "" },
-    { text: "end-to-end", style: "font-semibold text-black underline decoration-[#df8326]/70 decoration-2 underline-offset-8" },
-    { text: "logistics", style: "font-semibold text-black underline decoration-[#df8326]/70 decoration-2 underline-offset-8" },
-    { text: "automation—from", style: "font-semibold text-black underline decoration-[#df8326]/70 decoration-2 underline-offset-8" },
+    { text: "end-to-end", style: "font-semibold text-white underline decoration-[#df8326]/70 decoration-2 underline-offset-8" },
+    { text: "logistics", style: "font-semibold text-white underline decoration-[#df8326]/70 decoration-2 underline-offset-8" },
+    { text: "automation—from", style: "font-semibold text-white underline decoration-[#df8326]/70 decoration-2 underline-offset-8" },
     { text: "launch-ready", style: "" },
     { text: "storefronts", style: "" },
     { text: "and", style: "" },
@@ -515,7 +571,7 @@ export default function AboutUs() {
   });
 
   return (
-    <section className="relative w-full py-24 md:py-32 bg-[#F5F5F7] text-[#1A1A1A] px-6 md:px-12 lg:px-24 overflow-hidden border-b border-black/5">
+    <section className="relative w-full py-24 md:py-32 bg-[#121214] text-white px-6 md:px-12 lg:px-24 overflow-hidden border-b border-white/[0.06]">
       <div className="max-w-7xl mx-auto">
         <motion.div
           variants={containerVariants}
@@ -535,11 +591,11 @@ export default function AboutUs() {
 
             <motion.h2 
               variants={itemVariants} 
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-syne font-medium leading-[1.05] tracking-tight uppercase text-black select-none"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-syne font-medium leading-[1.05] tracking-tight uppercase text-white select-none"
             >
               We Are <br />
               <span className="bg-gradient-to-r from-[#df8326] to-[#C57019] bg-clip-text text-transparent">
-                NEXAGE-X®
+                YARI®
               </span>
             </motion.h2>
 
@@ -557,7 +613,7 @@ export default function AboutUs() {
           <motion.div className="lg:col-span-6 lg:pt-10">
             <p 
               ref={paragraphRef}
-              className="text-lg sm:text-xl md:text-[22px] lg:text-[24px] font-sans font-light text-[#555555] leading-relaxed tracking-tight max-w-2xl text-justify md:text-left flex flex-wrap gap-x-[6px] gap-y-[4px]"
+              className="text-lg sm:text-xl md:text-[22px] lg:text-[24px] font-sans font-light text-white/50 leading-relaxed tracking-tight max-w-2xl text-justify md:text-left flex flex-wrap gap-x-[6px] gap-y-[4px]"
             >
               {words.map((word, idx) => (
                 <ScrollWord
@@ -579,7 +635,7 @@ export default function AboutUs() {
           whileInView={{ scaleX: 1, opacity: 1 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 1.2, ease: "easeInOut" }}
-          className="h-[1px] w-full bg-black/10 mt-8 mb-12 md:mt-10 md:mb-16 origin-left"
+          className="h-[1px] w-full bg-white/[0.08] mt-8 mb-12 md:mt-10 md:mb-16 origin-left"
         />
 
         {/* Bottom Row: Stats Section */}
@@ -596,10 +652,10 @@ export default function AboutUs() {
               variants={itemVariants}
               className="flex flex-col"
             >
-              <span className="text-4xl sm:text-5xl md:text-6xl font-syne font-semibold tracking-tight text-black">
-                {stat.value}
+              <span className="text-4xl sm:text-5xl md:text-6xl font-syne font-semibold tracking-tight text-white">
+                <AnimatedCounter value={stat.value} />
               </span>
-              <span className="text-xs md:text-sm font-sans tracking-wider text-[#666666] mt-3 uppercase font-medium">
+              <span className="text-xs md:text-sm font-sans tracking-wider text-white/50 mt-3 uppercase font-medium">
                 {stat.label}
               </span>
             </motion.div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Syne, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import MenuProvider from "@/components/menu/MenuProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,23 +24,23 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Nexage-X // Welcome",
-  description: "Experience Nexage-X, a responsive and high-performance visual interface built with Next.js 16 and React 19.",
+  title: "YARI // Welcome",
+  description: "Experience YARI, a responsive and high-performance visual interface built with React 19.",
   keywords: [
-    "Next.js 16",
+    "YARI",
     "React 19",
     "Framer Motion",
     "High Fidelity Web Design"
   ],
-  authors: [{ name: "Nexage-X Core Team" }],
+  authors: [{ name: "YARI Core Team" }],
   openGraph: {
-    title: "Nexage-X // Welcome",
-    description: "Experience Nexage-X, a responsive and high-performance visual interface built with Next.js 16 and React 19.",
+    title: "YARI // Welcome",
+    description: "Experience YARI, a responsive and high-performance visual interface built with React 19.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nexage-X UI Engine",
+    title: "YARI UI Engine",
     description: "Responsive and high-performance visual interface.",
   }
 };
@@ -54,7 +55,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} ${plusJakartaSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <MenuProvider>{children}</MenuProvider>
+      </body>
     </html>
   );
 }

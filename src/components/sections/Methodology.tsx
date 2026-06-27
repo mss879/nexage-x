@@ -146,12 +146,13 @@ export default function Methodology() {
     },
   ];
 
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLElement>(null);
+  const pinContainerRef = useRef<HTMLDivElement>(null);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
   // Responsive GSAP ScrollTrigger pinning and scroll deck assembly
   useGSAP(() => {
-    if (!cardsContainerRef.current || !sectionRef.current) return;
+    if (!cardsContainerRef.current || !pinContainerRef.current) return;
 
     // Register ScrollTrigger plugin on client side
     gsap.registerPlugin(ScrollTrigger);
@@ -170,7 +171,7 @@ export default function Methodology() {
       // Pinned section timeline
       const pinTimeline = gsap.timeline({
         scrollTrigger: {
-          trigger: sectionRef.current,
+          trigger: pinContainerRef.current,
           start: "top top", // Pins the section exactly when the section hits top of viewport
           end: "+=1200", // Keep it pinned for 1200px of scrolling depth
           scrub: 1.2, // Smooth scroll scrubbing
@@ -230,17 +231,17 @@ export default function Methodology() {
     });
 
     return () => mm.revert();
-  }, { scope: sectionRef });
+  }, { scope: rootRef });
 
   return (
-    <section 
-      ref={sectionRef}
-      id="methodology" 
-      className="relative w-full py-20 lg:py-10 lg:h-screen lg:max-h-screen bg-[#F5F5F7] text-[#1A1A1A] px-4 md:px-12 lg:px-24 overflow-hidden border-b border-black/5 flex flex-col justify-between box-border"
-    >
-      {/* Structural layout dotted grid lines matching Framer container wrapper */}
-      <div className="absolute top-0 bottom-0 left-6 md:left-12 lg:left-24 w-[1px] border-l border-dotted border-black/15 pointer-events-none z-0" />
-      <div className="absolute top-0 bottom-0 right-6 md:right-12 lg:right-24 w-[1px] border-r border-dotted border-black/15 pointer-events-none z-0" />
+    <section ref={rootRef} id="methodology" className="w-full relative">
+      <div 
+        ref={pinContainerRef}
+        className="relative w-full py-20 lg:py-10 lg:h-screen lg:max-h-screen bg-[#F5F5F7] text-[#1A1A1A] px-4 md:px-12 lg:px-24 overflow-hidden border-b border-black/5 flex flex-col justify-between box-border"
+      >
+        {/* Structural layout dotted grid lines matching Framer container wrapper */}
+        <div className="absolute top-0 bottom-0 left-6 md:left-12 lg:left-24 w-[1px] border-l border-dotted border-black/15 pointer-events-none z-0" />
+        <div className="absolute top-0 bottom-0 right-6 md:right-12 lg:right-24 w-[1px] border-r border-dotted border-black/15 pointer-events-none z-0" />
 
       <div className="max-w-7xl mx-auto relative z-10 w-full flex flex-col justify-between h-full">
         
@@ -332,6 +333,7 @@ export default function Methodology() {
         </div>
 
       </div>
-    </section>
+    </div>
+  </section>
   );
 }

@@ -467,8 +467,22 @@ function VolumetricCyberCubeMatrix() {
 }
 
 export default function Services() {
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<"ecommerce" | "automation">("ecommerce");
   const [expandedId, setExpandedId] = useState<string | null>(null); // Collapsed by default
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <section
+        id="what-we-do"
+        className="relative w-full py-16 md:py-20 bg-[#050508] text-white px-4 md:px-12 lg:px-24 border-b border-white/[0.04] overflow-hidden min-h-[600px]"
+      />
+    );
+  }
 
   const ecommerceServices: ServiceItem[] = [
     {
@@ -727,6 +741,21 @@ export default function Services() {
         </svg>
       ),
     },
+    {
+      id: "odoo-zoho-integration",
+      num: "012",
+      title: "Website + Odoo & Zoho Integration",
+      description: "We connect your website and storefront to Odoo ERP and tools like Zoho — unifying CRM, inventory, accounting, and order fulfilment into one synchronized system with no manual re-entry.",
+      includes: "Odoo ERP integration, Zoho CRM & Books sync, two-way product/customer/order sync, invoicing automation, inventory and stock syncing, payment reconciliation, custom Odoo modules, and API middleware between your site and back office.",
+      deliverable: "A fully integrated website wired into Odoo/Zoho with reliable two-way data sync.",
+      keywords: ["ODOO ERP", "ZOHO CRM", "TWO-WAY SYNC", "UNIFIED DATA"],
+      icon: (
+        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
+          <path d="M4 7h16M4 7l2 13h12l2-13M9 11v5M15 11v5" />
+          <circle cx="12" cy="4" r="1.6" />
+        </svg>
+      ),
+    },
   ];
 
   const handleToggle = (id: string) => {
@@ -743,7 +772,7 @@ export default function Services() {
   return (
     <section
       id="what-we-do"
-      className="relative w-full py-16 md:py-20 bg-[#050508] text-white px-4 md:px-12 lg:px-24 border-b border-white/[0.04] overflow-hidden"
+      className="relative w-full pt-24 pb-16 md:pt-32 md:pb-20 bg-[#121212] grain-texture text-white px-4 md:px-12 lg:px-24 border-b border-white/[0.04] overflow-hidden mt-[-15px] md:mt-[-25px]"
     >
       {/* Subtle background guide layers */}
       <div className="absolute inset-0 cyber-grid opacity-[0.02] pointer-events-none z-0" />
@@ -885,13 +914,13 @@ export default function Services() {
                     <motion.div
                       layout
                       animate={{
-                        backgroundColor: isExpanded ? "#df8326" : "#14171D",
+                        backgroundColor: "#ffffff",
                       }}
                       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                       style={{
                         clipPath: clipPathStyle,
                       }}
-                      className={`w-full p-8 md:p-10 flex flex-col relative transition-all duration-300 border border-white/[0.02] shadow-[0_10px_35px_rgba(0,0,0,0.25)] ${isExpanded ? "" : "hover:bg-[#1A1E26] hover:border-white/5"
+                      className={`w-full p-8 md:p-10 flex flex-col relative transition-all duration-300 border border-black/5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] ${isExpanded ? "" : "hover:bg-zinc-50"
                         }`}
                     >
 
@@ -905,9 +934,9 @@ export default function Services() {
                               width: isExpanded ? 52 : 92,
                             }}
                             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                            className="h-9 px-3 border border-dashed rounded-full flex items-center justify-center gap-2 bg-black/10 overflow-hidden transition-colors"
+                            className="h-9 px-3 border border-dashed rounded-full flex items-center justify-center gap-2 bg-black/[0.04] overflow-hidden transition-colors"
                             style={{
-                              borderColor: isExpanded ? "rgba(0, 0, 0, 0.3)" : "rgba(255, 255, 255, 0.2)",
+                              borderColor: isExpanded ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.15)",
                             }}
                           >
                             {/* Abstract Geometric Icon (Hidden dynamically in expanded state) */}
@@ -927,7 +956,7 @@ export default function Services() {
                             </AnimatePresence>
 
                             {/* Monospace Index Number */}
-                            <span className={`text-[12px] font-mono font-semibold tracking-wider transition-colors duration-300 ${isExpanded ? "text-black" : "text-white"}`}>
+                            <span className="text-[12px] font-mono font-semibold tracking-wider text-black">
                               {svc.num}
                             </span>
                           </motion.div>
@@ -936,7 +965,7 @@ export default function Services() {
                           <div
                             className="hidden md:block w-9 h-[1px] border-t border-dashed transition-all"
                             style={{
-                              borderColor: isExpanded ? "rgba(0, 0, 0, 0.2)" : "rgba(255, 255, 255, 0.12)",
+                              borderColor: isExpanded ? "rgba(0, 0, 0, 0.2)" : "rgba(0, 0, 0, 0.12)",
                             }}
                           />
                         </div>
@@ -945,7 +974,7 @@ export default function Services() {
                         <div className="flex-grow pl-[108px] md:pl-[166px] pr-8 flex flex-col items-start select-none">
 
                           {/* Service Title */}
-                          <h3 className={`text-lg sm:text-xl md:text-2xl font-mono font-medium tracking-tight transition-colors duration-300 ${isExpanded ? "text-black font-semibold" : "text-white/95"}`}>
+                          <h3 className={`text-lg sm:text-xl md:text-2xl font-mono font-medium tracking-tight text-black ${isExpanded ? "font-semibold" : ""}`}>
                             {svc.title}
                           </h3>
 
@@ -970,21 +999,21 @@ export default function Services() {
                                   className="mt-3 flex flex-col gap-3.5"
                                 >
                                   {/* Service Description (Slightly larger font size when expanded) */}
-                                  <p className={`text-[15px] md:text-[17px] font-sans font-light leading-relaxed max-w-xl text-left transition-colors duration-300 ${isExpanded ? "text-black/85 font-medium" : "text-white/90"}`}>
+                                  <p className="text-[15px] md:text-[17px] font-sans font-light leading-relaxed max-w-xl text-left text-zinc-700">
                                     {svc.description}
                                   </p>
 
                                   {/* Sub-includes (only if exists - slightly larger font size when expanded) */}
                                   {svc.includes && (
-                                    <p className={`text-[13px] md:text-[14.5px] font-sans font-light italic leading-relaxed max-w-xl text-left border-l-2 pl-3 transition-colors duration-300 ${isExpanded ? "text-black/75 border-black/25" : "text-white/80 border-white/20"}`}>
-                                      <strong className={`font-semibold not-italic transition-colors duration-300 ${isExpanded ? "text-black" : "text-white/90"}`}>Includes:</strong> {svc.includes}
+                                    <p className="text-[13px] md:text-[14.5px] font-sans font-light italic leading-relaxed max-w-xl text-left border-l-2 pl-3 border-black/15 text-zinc-600">
+                                      <strong className="font-semibold not-italic text-black">Includes:</strong> {svc.includes}
                                     </p>
                                   )}
 
                                   {/* Core Deliverable (Slightly larger font size when expanded) */}
-                                  <p className={`text-[13.5px] sm:text-[14.5px] font-mono flex items-start gap-2.5 transition-colors duration-300 ${isExpanded ? "text-black font-semibold" : "text-white/95"}`}>
-                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0 flex items-center justify-center font-mono ${isExpanded ? "text-white bg-black/80" : "text-[#df8326]/30 bg-white"}`}>DELIVERABLE</span>
-                                    <span className={`font-sans font-light transition-colors duration-300 ${isExpanded ? "text-black/85 font-medium" : "text-white/90"}`}>{svc.deliverable}</span>
+                                  <p className="text-[13.5px] sm:text-[14.5px] font-mono flex items-start gap-2.5 text-black font-semibold">
+                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0 flex items-center justify-center font-mono text-white bg-black/80">DELIVERABLE</span>
+                                    <span className="font-sans font-light text-zinc-700">{svc.deliverable}</span>
                                   </p>
                                 </motion.div>
                               </motion.div>
@@ -999,7 +1028,7 @@ export default function Services() {
                             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                             className={`w-9 h-9 md:w-10 md:h-10 rounded-full border flex items-center justify-center transition-all duration-300 ${isExpanded
                               ? "border-black/30 text-black hover:scale-105"
-                              : "border-white/10 text-white/50 group-hover:border-white/30 group-hover:text-white hover:scale-105"
+                              : "border-black/10 text-black/50 group-hover:border-black/30 group-hover:text-black hover:scale-105"
                               }`}
                           >
                             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current stroke-2">
@@ -1028,8 +1057,7 @@ export default function Services() {
                               animate={{ y: 0, opacity: 1 }}
                               exit={{ y: 10, opacity: 0 }}
                               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.12 }}
-                              className={`flex flex-wrap gap-x-6 gap-y-3 pt-6 mt-6 border-t select-none font-mono text-[11px] sm:text-[12px] transition-all duration-300 ${isExpanded ? "border-black/20 text-black/85 font-bold" : "border-white/15 text-white/90"
-                                }`}
+                              className="flex flex-wrap gap-x-6 gap-y-3 pt-6 mt-6 border-t border-black/10 select-none font-mono text-[11px] sm:text-[12px] text-zinc-600 font-semibold"
                             >
                               {svc.keywords.map((kw, kwIdx) => (
                                 <span key={kwIdx} className="tracking-[0.18em] whitespace-nowrap">

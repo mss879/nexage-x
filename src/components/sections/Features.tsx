@@ -167,7 +167,7 @@ export default function Features() {
         <div className="flex flex-col gap-4">
           <div className="inline-flex items-center gap-2 text-xs font-mono uppercase text-neon-purple tracking-widest">
             <span className="w-1.5 h-1.5 rounded-full bg-neon-purple" />
-            <span>Nexage-X Capabilities</span>
+            <span>YARI Capabilities</span>
           </div>
           <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white select-none">
             High Fidelity <br />
