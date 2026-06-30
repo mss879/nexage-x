@@ -4,9 +4,12 @@ import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 /**
- * WebGL backdrop for the fullscreen menu — a slow flowing orange/black plasma
- * (domain-warped fbm noise) with a pointer-reactive glow. Mounted only while the
- * menu is open; disposes all GPU resources on unmount.
+ * Calm WebGL backdrop for the fullscreen menu — a slow flowing orange/black
+ * plasma with a soft, gently drifting ambient glow (no pointer coupling, so it
+ * no longer "chases" the mouse). Tuned for performance: capped pixel ratio,
+ * no antialias, single-step domain warp, 4-octave fbm, and it pauses when the
+ * tab is hidden. Mounted only while the menu is open; disposes GPU resources on
+ * unmount.
  */
 export default function MenuBackdrop() {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -16,9 +19,16 @@ export default function MenuBackdrop() {
     if (!mount) return;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    const renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: false,
+      powerPreference: "low-power",
+    });
+    // Keep the fullscreen fragment shader cheap — cap DPR low (lower on touch).
+    const maxDpr = coarse ? 1 : 1.25;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
     const setSize = () => renderer.setSize(mount.clientWidth, mount.clientHeight);
     setSize();
     mount.appendChild(renderer.domElement);
@@ -28,13 +38,9 @@ export default function MenuBackdrop() {
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
-    // u_res must be in the same units as gl_FragCoord — i.e. drawing-buffer
-    // (device) pixels, not CSS pixels — otherwise the shader's vignette clips.
     const uniforms = {
       u_time: { value: 0 },
       u_res: { value: new THREE.Vector2(renderer.domElement.width, renderer.domElement.height) },
-      u_mouse: { value: new THREE.Vector2(0.5, 0.5) },
-      u_target: { value: new THREE.Vector2(0.5, 0.5) },
     };
 
     const material = new THREE.ShaderMaterial({
@@ -50,7 +56,6 @@ export default function MenuBackdrop() {
         precision highp float;
         uniform float u_time;
         uniform vec2 u_res;
-        uniform vec2 u_mouse;
         varying vec2 vUv;
 
         vec2 hash2(vec2 p){
@@ -67,30 +72,29 @@ export default function MenuBackdrop() {
         }
         float fbm(vec2 p){
           float v = 0.0; float a = 0.5;
-          for (int i = 0; i < 5; i++){ v += a * noise(p); p *= 2.02; a *= 0.5; }
+          for (int i = 0; i < 4; i++){ v += a * noise(p); p *= 2.02; a *= 0.5; }
           return v;
         }
         void main(){
           vec2 p = (gl_FragCoord.xy - 0.5 * u_res.xy) / u_res.y;
-          float t = u_time * 0.05;
+          float t = u_time * 0.04;
 
-          vec2 q = vec2(fbm(p * 1.6 + t), fbm(p * 1.6 + vec2(5.2, 1.3) - t));
-          vec2 r = vec2(fbm(p * 1.6 + 1.4 * q + vec2(1.7, 9.2) + 0.12 * t),
-                        fbm(p * 1.6 + 1.4 * q + vec2(8.3, 2.8) - 0.10 * t));
-          float f = fbm(p * 1.6 + 1.6 * r);
+          // Single-step domain warp (cheaper than the previous two-step warp).
+          vec2 q = vec2(fbm(p * 1.5 + t), fbm(p * 1.5 + vec2(5.2, 1.3) - t));
+          float f = fbm(p * 1.5 + 1.4 * q);
 
-          vec2 m = (u_mouse - 0.5) * vec2(u_res.x / u_res.y, 1.0) * 2.0;
-          float d = distance(p, m);
-          float glow = smoothstep(1.25, 0.0, d);
+          // Soft, slowly drifting ambient glow — independent of the pointer.
+          vec2 gc = vec2(sin(u_time * 0.12) * 0.22, cos(u_time * 0.09) * 0.14);
+          float glow = smoothstep(1.1, 0.0, distance(p, gc));
 
           vec3 base   = vec3(0.020, 0.020, 0.031);
-          vec3 deep   = vec3(0.32, 0.11, 0.0);
+          vec3 deep   = vec3(0.30, 0.11, 0.0);
           vec3 orange = vec3(0.874, 0.513, 0.149);
 
           vec3 col = base;
-          col = mix(col, deep,   clamp(f * f * 1.9, 0.0, 1.0));
-          col = mix(col, orange, clamp(pow(max(f, 0.0), 3.0) * 1.5 + glow * 0.45, 0.0, 1.0));
-          col += orange * glow * 0.22;
+          col = mix(col, deep,   clamp(f * f * 1.8, 0.0, 1.0));
+          col = mix(col, orange, clamp(pow(max(f, 0.0), 3.0) * 1.4 + glow * 0.16, 0.0, 1.0));
+          col += orange * glow * 0.10;
 
           float vig = smoothstep(1.55, 0.25, length(p));
           col *= vig;
@@ -109,23 +113,27 @@ export default function MenuBackdrop() {
     };
     window.addEventListener("resize", onResize);
 
-    const onMove = (e: PointerEvent) => {
-      uniforms.u_target.value.set(
-        e.clientX / window.innerWidth,
-        1 - e.clientY / window.innerHeight,
-      );
-    };
-    window.addEventListener("pointermove", onMove);
-
     const clock = new THREE.Clock();
     let raf = 0;
+    let running = true;
     const loop = () => {
+      if (!running) return;
       uniforms.u_time.value = clock.getElapsedTime();
-      // ease the pointer for a liquid feel
-      uniforms.u_mouse.value.lerp(uniforms.u_target.value, 0.06);
       renderer.render(scene, camera);
       raf = requestAnimationFrame(loop);
     };
+
+    // Pause the render loop while the tab is hidden (battery / perf friendly).
+    const onVisibility = () => {
+      if (document.hidden) {
+        running = false;
+        cancelAnimationFrame(raf);
+      } else if (!running && !reduce) {
+        running = true;
+        raf = requestAnimationFrame(loop);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
 
     if (reduce) {
       renderer.render(scene, camera);
@@ -134,9 +142,10 @@ export default function MenuBackdrop() {
     }
 
     return () => {
+      running = false;
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
-      window.removeEventListener("pointermove", onMove);
+      document.removeEventListener("visibilitychange", onVisibility);
       mesh.geometry.dispose();
       material.dispose();
       renderer.dispose();

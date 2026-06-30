@@ -121,12 +121,12 @@ export default function SiteHeader() {
 
         {/* Actions */}
         <div className="flex items-center gap-3">
-          <a
-            href="mailto:contact@yari.com"
+          <Link
+            href="/contact"
             className="hidden sm:inline-flex items-center gap-2 rounded-full border border-[#C57019]/60 px-5 py-2 text-xs font-semibold uppercase tracking-wider text-white transition-all duration-300 hover:border-[#df8326] hover:bg-[#df8326]/10"
           >
             Connect
-          </a>
+          </Link>
           <button
             onClick={open}
             className="group inline-flex items-center gap-2.5 rounded-full bg-gradient-to-b from-[#df8326] to-[#C57019] px-5 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow-[0_6px_20px_rgba(197,112,25,0.35)] transition-all duration-300 hover:scale-[1.03] active:scale-95 cursor-pointer"

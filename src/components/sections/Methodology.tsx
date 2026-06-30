@@ -37,7 +37,7 @@ function MethodCard({
 
   return (
     <div
-      className="w-full min-h-[420px] lg:min-h-[415px] lg:h-[440px] rounded-none p-[1px] relative overflow-hidden select-none group transition-all duration-500 bg-white/5 hover:bg-[#df8326]/30 shadow-[0_10px_35px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_35px_rgba(223,131,38,0.08)]"
+      className="w-full h-[430px] sm:h-[460px] lg:h-[440px] lg:min-h-[415px] rounded-none p-[1px] relative overflow-hidden select-none group transition-all duration-500 bg-white/5 hover:bg-[#df8326]/30 shadow-[0_10px_35px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_35px_rgba(223,131,38,0.08)]"
       style={{
         transformOrigin: "center bottom",
         clipPath: cardClipPath,
@@ -65,7 +65,7 @@ function MethodCard({
             loading="lazy"
             className="w-full h-full object-cover object-center filter grayscale contrast-[1.15] brightness-[0.95]"
           />
-          {/* Brand duotone gradient wash to adapt any image to NEXAGE-X® brand colors */}
+          {/* Brand duotone gradient wash to adapt any image to YARI® brand colors */}
           <div 
             className="absolute inset-0 bg-gradient-to-br from-[#df8326]/12 via-transparent to-[#C57019]/8 mix-blend-color pointer-events-none z-[1]" 
           />
@@ -259,7 +259,7 @@ export default function Methodology() {
 
             {/* Premium, ultra-bold capitalized stacked header in brand colors */}
             <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-7xl font-sans font-extrabold tracking-tighter uppercase leading-[0.88] select-none flex flex-col pt-1">
-              <span className="bg-gradient-to-r from-[#df8326] to-[#C57019] bg-clip-text text-transparent">NEXAGE-X®</span>
+              <span className="bg-gradient-to-r from-[#df8326] to-[#C57019] bg-clip-text text-transparent">YARI®</span>
               <span className="text-[#1A1A1A]">METHOD</span>
             </h2>
           </div>
@@ -276,7 +276,7 @@ export default function Methodology() {
         {/* Methodology Cards Grid Row (Decoupled wrappers for GSAP ScrollTrigger) */}
         <div 
           ref={cardsContainerRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-2 z-10 relative w-full lg:mt-16 lg:my-auto"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-2 z-10 relative w-full mt-10 sm:mt-12 lg:mt-16 lg:my-auto"
         >
           {cards.map((card, idx) => (
             <div key={idx} className="methodology-card-wrapper w-full origin-bottom will-change-[transform,opacity]">

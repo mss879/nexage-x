@@ -4,6 +4,7 @@ import React, { useRef } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import Logo from "@/components/ui/Logo";
 
 interface PreloaderProps {
   onActiveReveal: () => void;
@@ -169,39 +170,41 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
   // 3D Shape Creation for the YARI Logo (Silver V and Split Gold Stems)
   const createVShape = () => {
     const shape = new THREE.Shape();
-    // Counter-Clockwise path for the V shape (exact 0.12 gap relative to gold branches)
-    shape.moveTo(-1.99, 1.8);
-    shape.lineTo(-1.34, 1.8);
-    shape.lineTo(0, 0.46);
-    shape.lineTo(1.34, 1.8);
-    shape.lineTo(1.99, 1.8);
-    shape.lineTo(0, -0.19);
+    // Compact, sharp silver chevron (arms shortened ~35% along their axis from
+    // the central dip, keeping angle/thickness) with a central DOWNWARD spike
+    // (outer apex at y=0.17) nestling between the gold tips.
+    shape.moveTo(-1.08, 1.15);
+    shape.lineTo(-0.64, 1.15);
+    shape.lineTo(0, 0.54);
+    shape.lineTo(0.64, 1.15);
+    shape.lineTo(1.08, 1.15);
+    shape.lineTo(0, 0.17);
     shape.closePath();
     return shape;
   };
 
   const createLeftStemShape = () => {
     const shape = new THREE.Shape();
-    // Counter-Clockwise path for the left gold column (constant ribbon width of 0.20)
-    shape.moveTo(-0.06, -1.9);
-    shape.lineTo(-0.06, -0.3);
-    shape.lineTo(-0.66, 0.3);
-    shape.lineTo(-0.943, 0.3);
-    shape.lineTo(-0.26, -0.383);
-    shape.lineTo(-0.26, -1.6);
-    shape.closePath();
+    // Left gold prong: a CLOSE vertical leg (inner edge x=-0.06, so only a 0.12 gap
+    // between the two legs) whose top forks up-and-out to a point. The inner prong
+    // edge runs PARALLEL to the silver V's surface with the same 0.12 gap.
+    shape.moveTo(-0.62, 0.55);   // prong tip — faces up-left / outward
+    shape.lineTo(-0.06, 0.063);  // inner edge bend (parallel-to-silver edge meets the vertical leg)
+    shape.lineTo(-0.06, -1.39);  // bottom-inner tip — faces down-in
+    shape.lineTo(-0.26, -1.05);  // bottom-outer
+    shape.lineTo(-0.26, 0.0);    // outer leg edge (vertical)
+    shape.closePath();           // outer prong edge up to the tip
     return shape;
   };
 
   const createRightStemShape = () => {
     const shape = new THREE.Shape();
-    // Counter-Clockwise path for the right gold column (constant ribbon width of 0.20)
-    shape.moveTo(0.06, -1.9);
-    shape.lineTo(0.26, -1.6);
-    shape.lineTo(0.26, -0.383);
-    shape.lineTo(0.943, 0.3);
-    shape.lineTo(0.66, 0.3);
-    shape.lineTo(0.06, -0.3);
+    // Right gold prong (mirror of the left).
+    shape.moveTo(0.62, 0.55);
+    shape.lineTo(0.06, 0.063);
+    shape.lineTo(0.06, -1.39);
+    shape.lineTo(0.26, -1.05);
+    shape.lineTo(0.26, 0.0);
     shape.closePath();
     return shape;
   };
@@ -394,7 +397,7 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
     const extrudeSettings = {
       depth: 0.22,
       bevelEnabled: true,
-      bevelSegments: 3,             
+      bevelSegments: 3,
       steps: 1,
       bevelSize: 0.015,             // Sharper bevel prevents gap widening at sharp bottom corners
       bevelThickness: 0.015
@@ -428,60 +431,52 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
 
     // 1. Sample silver V shape (400 points)
     const vPerp = new THREE.Vector2(0.707, 0.707);
-    
+
     for (let i = 0; i < 200; i++) {
       const t = i / 199;
-      // Left branch centerline: x = -1.665 * t, y = 0.135 + 1.665 * t
-      const lx_c = -1.665 * t;
-      const ly_c = 0.135 + 1.665 * t;
-      const offset = (Math.random() - 0.5) * 0.46; // perpendicular width
+      // Left branch centerline: from the central spike (0, 0.355) to the
+      // shortened top corner (-0.86, 1.15) — matches the trimmed silver chevron.
+      const lx_c = -0.86 * t;
+      const ly_c = 0.355 + 0.795 * t;
+      const offset = (Math.random() - 0.5) * 0.50; // perpendicular width
       const rx = lx_c + offset * vPerp.x;
       const ry = ly_c + offset * vPerp.y;
       const rz = (Math.random() - 0.5) * 0.22;
       silverTargets.push(new THREE.Vector3(rx, ry, rz));
 
-      // Right branch centerline: x = 1.665 * t, y = 0.135 + 1.665 * t
-      const rx_c = 1.665 * t;
-      const ry_c = 0.135 + 1.665 * t;
+      // Right branch centerline: mirror of the left
+      const rx_c = 0.86 * t;
+      const ry_c = 0.355 + 0.795 * t;
       const rx2 = rx_c + offset * (-vPerp.x);
       const ry2 = ry_c + offset * vPerp.y;
       const rz2 = (Math.random() - 0.5) * 0.22;
       silverTargets.push(new THREE.Vector3(rx2, ry2, rz2));
     }
 
-    // 2. Sample Left and Right Gold stems (400 points each)
-    const goldPerp = new THREE.Vector2(0.707, 0.707);
-
+    // 2. Sample Left and Right Gold prongs (400 points each): a close vertical leg
+    //    plus an up-and-out prong that runs parallel to the silver V surface.
     const sampleGoldColumn = (isLeft: boolean) => {
       const sign = isLeft ? -1 : 1;
 
-      // a. Stem vertical part (150 points)
-      for (let i = 0; i < 150; i++) {
-        const t = i / 149;
-        const rx = sign * 0.16 + (Math.random() - 0.5) * 0.2;
-        const ry = -1.6 + 1.26 * t;
+      // a. Vertical leg (250 points) — centered at x=0.16, width 0.20, y -1.39 to 0.05
+      for (let i = 0; i < 250; i++) {
+        const t = i / 249;
+        const rx = sign * 0.16 + (Math.random() - 0.5) * 0.20;
+        const ry = -1.39 + 1.44 * t;
         const rz = (Math.random() - 0.5) * 0.22;
         goldTargets.push(new THREE.Vector3(rx, ry, rz));
       }
 
-      // b. Bottom tip part (50 points)
-      for (let i = 0; i < 50; i++) {
-        const t = i / 49;
-        const factor = 1.0 - t;
-        const rx = sign * (0.16 - 0.10 * t) + (Math.random() - 0.5) * 0.2 * factor;
-        const ry = -1.6 - 0.3 * t;
-        const rz = (Math.random() - 0.5) * 0.22 * factor;
-        goldTargets.push(new THREE.Vector3(rx, ry, rz));
-      }
-
-      // c. Branch part (200 points)
-      for (let i = 0; i < 200; i++) {
-        const t = i / 199;
-        const lx_c = sign * (0.16 + 0.64 * t);
-        const ly_c = -0.34 + 0.64 * t;
-        const offset = (Math.random() - 0.5) * 0.14;
-        const rx = lx_c + offset * (isLeft ? goldPerp.x : -goldPerp.x);
-        const ry = ly_c + offset * goldPerp.y;
+      // b. Up-and-out prong (150 points) — from the bend (0.16, 0.0) to the tip (0.55, 0.52),
+      //    width tapering toward the point.
+      for (let i = 0; i < 150; i++) {
+        const t = i / 149;
+        const cx = 0.16 + 0.39 * t;
+        const cy = 0.0 + 0.52 * t;
+        const halfW = 0.10 * (1 - 0.6 * t);
+        const off = (Math.random() * 2 - 1) * halfW;
+        const rx = sign * (cx + off * 0.8);
+        const ry = cy + off * -0.6;
         const rz = (Math.random() - 0.5) * 0.22;
         goldTargets.push(new THREE.Vector3(rx, ry, rz));
       }
@@ -568,7 +563,7 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
 
     const silverPixelPoints = new THREE.Points(silverGeometry, silverPixelMaterial);
     const goldPixelPoints = new THREE.Points(goldGeometry, goldPixelMaterial);
-    
+
     logoGroup.add(silverPixelPoints);
     logoGroup.add(goldPixelPoints);
 
@@ -592,7 +587,7 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
     // 2. Crystallization Transition
     tl.set(solidMeshes, { visible: true }, 1.35);
 
-    tl.fromTo([meshV.scale, meshLeftStem.scale, meshRightStem.scale], 
+    tl.fromTo([meshV.scale, meshLeftStem.scale, meshRightStem.scale],
       { x: 0.1, y: 0.1, z: 0.1 },
       { x: 1.0, y: 1.0, z: 1.0, duration: 0.85, ease: "back.out(1.5)" },
       1.35
@@ -613,18 +608,11 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
     }, 2.1);
 
     // Type "YARi" letters sequentially
-    tl.to(".yari-char", {
-      opacity: 1,
-      duration: 0.08,
-      stagger: 0.12,
-      ease: "none"
-    }, 2.5);
-
-    // Bouncy pop-in of the gold dot on the 'I'
-    tl.fromTo(".yari-dot",
-      { opacity: 0, scale: 0 },
-      { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" },
-      2.9
+    // Fade in the YARi logo image
+    tl.fromTo(".yari-logo",
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" },
+      2.5
     );
 
     // Face the front of the screen perfectly (0 base tilt)
@@ -859,7 +847,7 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
       />
 
       {/* Welcome to YARi Text Overlay */}
-      <div 
+      <div
         ref={textRef}
         className="absolute bottom-[20%] flex flex-col items-center gap-3 pointer-events-none select-none z-10 opacity-0"
       >
@@ -870,26 +858,12 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
             </span>
           ))}
         </span>
-        <div className="flex items-center gap-1 text-4xl md:text-5xl font-syncopate font-bold tracking-[0.25em]">
-          <span className="yari-char opacity-0" style={silverStyle}>Y</span>
-          <span className="yari-char opacity-0" style={goldStyle}>A</span>
-          <span className="yari-char opacity-0" style={silverStyle}>R</span>
-          <span 
-            className="yari-char opacity-0 relative inline-block text-transparent" 
-            style={{ ...silverStyle, letterSpacing: "0px" }}
-          >
-            I
-            <span 
-              className="yari-dot opacity-0 absolute w-[0.22em] h-[0.22em] rounded-xs shadow-[0_2px_8px_rgba(229,169,59,0.4)]" 
-              style={{ 
-                background: "linear-gradient(135deg, #a67c1e 0%, #c59b35 50%, #5c3a00 100%)",
-                top: "-0.15em", 
-                left: "50%", 
-                transform: "translateX(-50%)" 
-              }} 
-            />
-          </span>
-        </div>
+        <img 
+          src="/yari-logo-text.png" 
+          alt="YARI"
+          className="yari-logo opacity-0 h-9 sm:h-11 md:h-[48px] w-auto object-contain select-none" 
+          draggable={false}
+        />
       </div>
     </div>
   );

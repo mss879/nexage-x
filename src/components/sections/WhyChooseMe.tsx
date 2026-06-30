@@ -169,7 +169,7 @@ export default function WhyChooseMe() {
             >
               <Image
                 src="/why-us.png"
-                alt="Why Choose Nexage-X"
+                alt="Why Choose YARI"
                 fill
                 className="object-cover"
                 style={{ objectPosition: "center" }}

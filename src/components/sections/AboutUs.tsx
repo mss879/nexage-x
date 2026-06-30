@@ -66,9 +66,9 @@ function Cube3D({ x, y, z, type }: Cube3DProps) {
       className={`absolute cube-3d cube-x-${x} cube-y-${y} cube-z-${z} ${isGlow ? "cube-glow" : "cube-dark"}`}
       style={{
         transform: `translate3d(
-          calc(${x} * (48px + var(--hover-offset, 0) * 1px)),
-          calc(${y} * (48px + var(--hover-offset, 0) * 1px)),
-          calc(${z} * (48px + var(--hover-offset, 0) * 1px))
+          calc(${x} * (42px + var(--hover-offset, 0) * 1px)),
+          calc(${y} * (42px + var(--hover-offset, 0) * 1px)),
+          calc(${z} * (42px + var(--hover-offset, 0) * 1px))
         )`,
         transformStyle: "preserve-3d",
         width: `${size}px`,
@@ -80,7 +80,7 @@ function Cube3D({ x, y, z, type }: Cube3DProps) {
       {faces.map((face) => (
         <div
           key={face.name}
-          className={`absolute inset-0 rounded-[4px] backface-hidden ${faceStyleClass}`}
+          className={`absolute inset-0 backface-hidden ${faceStyleClass}`}
           style={{
             transform: face.transform,
             backfaceVisibility: "hidden",

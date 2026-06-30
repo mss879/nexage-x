@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
+import Logo from "@/components/ui/Logo";
 import { useMenu } from "@/components/menu/MenuProvider";
 
 // SVG Components for smooth, sloped transitions (S-Curves and stretched concave corners)
@@ -43,6 +44,15 @@ const SCurveRight = ({ className, width = 88, height = 56 }: { className?: strin
   </svg>
 );
 
+
+// Superellipse corner radii — identical to the desktop nav buttons, so the
+// mobile Menu/Connect buttons share the exact same (skewed) shape.
+const SKEW_BTN_STYLE = {
+  // @ts-ignore — corner-shape is a newer CSS property used across the design
+  cornerShape: "superellipse(1.5)",
+  "--corner-shape-fallback": "0.752",
+  borderRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
+} as React.CSSProperties;
 
 interface HeroProps {
   startAnimation?: boolean;
@@ -175,109 +185,43 @@ export default function Hero({ startAnimation = true }: HeroProps) {
 
         {/* Foreground Content */}
         <div className="relative z-20 w-full h-full flex flex-col justify-center items-start px-6 sm:px-12 md:px-20 lg:px-24 py-16 md:py-24 max-w-[1100px] my-auto">
-          {/* Mobile-only Header */}
-          <div className="md:hidden flex items-center justify-between w-full mb-8 select-none">
-            <Image src="/yari-logo.png" alt="Logo" width={840} height={210} className="h-[210px] w-auto object-contain brightness-0 ml-[-30px] translate-y-[2px]" />
-            <div className="flex items-center gap-4 scale-[0.82] origin-right shrink-0 relative z-30 mr-[-8px]">
-              {/* 1. Menu Button */}
-              <div className="framer-iny974-container" style={{ transform: "none", transformOrigin: "50% 50% 0px", opacity: 1 }}>
-                <button
-                  onClick={openMenu}
-                  className="framer-m5N6O framer-uXsXm framer-cjrjU framer-55u4xr framer-v-55u4xr framer-1akrlmb"
-                  style={{
-                    "--border-bottom-width": "1px",
-                    "--border-color": "#C57019",
-                    "--border-left-width": "1px",
-                    "--border-right-width": "1px",
-                    "--border-style": "solid",
-                    "--border-top-width": "1px",
-                    "--corner-shape-fallback": "0.752",
-                    backgroundColor: "rgba(0, 0, 0, 0)",
-                    // @ts-ignore
-                    "cornerShape": "superellipse(1.5)",
-                    borderBottomLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
-                    borderBottomRightRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
-                    borderTopLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
-                    borderTopRightRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
-                    willChange: "auto",
-                    transform: "none",
-                    transformOrigin: "50% 50% 0px",
-                    opacity: 1,
-                  } as React.CSSProperties}
-                >
-                  <div className="framer-lj3pv framer-xg4s92" style={{ "--1bgoogp": "#C57019" } as React.CSSProperties}></div>
-                  <div className="framer-lj3pv framer-1qnijj" style={{ "--1bgoogp": "rgb(24, 24, 27)" } as React.CSSProperties}></div>
-                  <div className="framer-BfnQD framer-1lyy2do" style={{ "--1bgoogp": "#C57019" } as React.CSSProperties}></div>
-                  <div className="framer-BfnQD framer-o7xx3e" style={{ "--1bgoogp": "rgb(24, 24, 27)" } as React.CSSProperties}></div>
-
-                  <div className="framer-content-wrapper">
-                    <div className="framer-1e87nka" data-framer-component-type="RichTextContainer" style={{ "--extracted-r6o4lv": "rgb(255, 255, 255)" } as React.CSSProperties}>
-                      <p className="framer-text">Menu</p>
-                    </div>
-                    <svg className="framer-IvaS8 framer-gq87w0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                  </div>
-                </button>
-              </div>
-
-              {/* 2. Connect Button */}
-              <div className="framer-iny974-container" style={{ transform: "none", transformOrigin: "50% 50% 0px", opacity: 1 }}>
-                <a
-                  href="mailto:hello@yari.com"
-                  className="framer-m5N6O framer-uXsXm framer-cjrjU framer-55u4xr framer-v-55u4xr framer-1akrlmb"
-                  style={{
-                    "--border-bottom-width": "1px",
-                    "--border-color": "#C57019",
-                    "--border-left-width": "1px",
-                    "--border-right-width": "1px",
-                    "--border-style": "solid",
-                    "--border-top-width": "1px",
-                    "--corner-shape-fallback": "0.752",
-                    backgroundColor: "rgba(0, 0, 0, 0)",
-                    // @ts-ignore
-                    "cornerShape": "superellipse(1.5)",
-                    borderBottomLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
-                    borderBottomRightRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
-                    borderTopLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
-                    borderTopRightRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
-                    willChange: "auto",
-                    transform: "none",
-                    transformOrigin: "50% 50% 0px",
-                    opacity: 1,
-                  } as React.CSSProperties}
-                >
-                  <div className="framer-lj3pv framer-xg4s92" style={{ "--1bgoogp": "#C57019" } as React.CSSProperties}></div>
-                  <div className="framer-lj3pv framer-1qnijj" style={{ "--1bgoogp": "rgb(24, 24, 27)" } as React.CSSProperties}></div>
-                  <div className="framer-BfnQD framer-1lyy2do" style={{ "--1bgoogp": "#C57019" } as React.CSSProperties}></div>
-                  <div className="framer-BfnQD framer-o7xx3e" style={{ "--1bgoogp": "rgb(24, 24, 27)" } as React.CSSProperties}></div>
-
-                  <div className="framer-content-wrapper">
-                    <div className="framer-1e87nka" data-framer-component-type="RichTextContainer" style={{ "--extracted-r6o4lv": "rgb(255, 255, 255)" } as React.CSSProperties}>
-                      <p className="framer-text">Connect</p>
-                    </div>
-                    <svg
-                      className="framer-IvaS8 framer-gq87w0"
-                      role="presentation"
-                      viewBox="0 0 24 24"
-                      style={{
-                        "--8azvrr": 1,
-                        "--ed7zm5": "var(--token-2c617c6c-bc75-483c-a1b2-b392deca402c, rgb(255, 255, 255))",
-                        transform: "none",
-                        transformOrigin: "50% 50% 0px",
-                        opacity: 1,
-                      } as React.CSSProperties}
-                    >
-                      <path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                </a>
-              </div>
+          {/* Mobile-only Header — pinned to the top of the hero */}
+          <div className="md:hidden absolute top-0 inset-x-0 z-30 flex items-center justify-between px-5 pt-5 select-none">
+            <a href="#hero" className="shrink-0 -ml-2.5">
+              <Logo className="h-9 w-[112px]" imgClassName="brightness-0" />
+            </a>
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Menu — solid, skewed to match the desktop button shape */}
+              <button
+                onClick={openMenu}
+                style={SKEW_BTN_STYLE}
+                className="-skew-x-[20deg] bg-gradient-to-b from-[#df8326] to-[#C57019] px-4 py-2 shadow-[0_6px_18px_rgba(197,112,25,0.35)] transition-transform active:scale-95"
+              >
+                <span className="flex skew-x-[20deg] items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-wider text-white">
+                  Menu
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </span>
+              </button>
+              {/* Connect — solid, skewed to match the desktop button shape */}
+              <a
+                href="/contact"
+                style={SKEW_BTN_STYLE}
+                className="-skew-x-[20deg] bg-gradient-to-b from-[#df8326] to-[#C57019] px-4 py-2 shadow-[0_6px_18px_rgba(197,112,25,0.35)] transition-transform active:scale-95"
+              >
+                <span className="flex skew-x-[20deg] items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-white">
+                  Connect
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                    <path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </a>
             </div>
           </div>
 
           {/* Headline Typography — exact Framer text styling */}
-          <h1 className="flex flex-col font-syne text-[2.0rem] sm:text-[2.8rem] md:text-[3.6rem] lg:text-[4.2rem] leading-[1.05] tracking-tight text-[#000000] select-none font-medium mb-6">
+          <h1 className="flex flex-col font-syne text-[1.5rem] sm:text-[2.8rem] md:text-[3.6rem] lg:text-[4.2rem] leading-[1.08] sm:leading-[1.05] tracking-tight text-[#000000] select-none font-medium mb-6">
             <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">Designing experiences,</span>
             <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">deploying seamless</span>
             <span ref={addToTitleRefs} className="block overflow-hidden py-0.5"><strong className="font-bold">logistics</strong>.</span>
@@ -286,7 +230,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           {/* Description Paragraph */}
           <p
             ref={descRef}
-            className="font-plus-jakarta text-[#4d4d4f] text-sm sm:text-base md:text-[1.05rem] max-w-[540px] leading-relaxed mb-10 select-none font-normal text-justify"
+            className="font-plus-jakarta text-[#4d4d4f] text-sm sm:text-base md:text-[1.05rem] max-w-[540px] leading-relaxed mb-10 select-none font-normal text-left md:text-justify"
           >
             A high-performance digital automation and e-commerce studio. We build stunning custom storefronts, robust web applications, and end-to-end logistics solutions engineered to scale visionary brands.
           </p>
@@ -394,7 +338,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           {/* 2. Connect Button */}
           <div className="framer-iny974-container" style={{ transform: "none", transformOrigin: "50% 50% 0px", opacity: 1 }}>
             <a
-              href="mailto:hello@yari.com"
+              href="/contact"
               className="framer-m5N6O framer-m5N6O-large framer-uXsXm framer-cjrjU framer-55u4xr framer-v-55u4xr framer-1akrlmb"
               style={{
                 "--border-bottom-width": "1px",

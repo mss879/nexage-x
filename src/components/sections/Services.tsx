@@ -49,9 +49,9 @@ function Cube3D({ x, y, z, type }: Cube3DProps) {
       className={`absolute cube-3d cube-x-${x} cube-y-${y} cube-z-${z} ${isGlow ? "cube-glow" : "cube-dark"}`}
       style={{
         transform: `translate3d(
-          calc(${x} * (40px + var(--hover-offset, 0) * 1px)),
-          calc(${y} * (40px + var(--hover-offset, 0) * 1px)),
-          calc(${z} * (40px + var(--hover-offset, 0) * 1px))
+          calc(${x} * (34px + var(--hover-offset, 0) * 1px)),
+          calc(${y} * (34px + var(--hover-offset, 0) * 1px)),
+          calc(${z} * (34px + var(--hover-offset, 0) * 1px))
         )`,
         transformStyle: "preserve-3d",
         width: `${size}px`,
@@ -63,7 +63,7 @@ function Cube3D({ x, y, z, type }: Cube3DProps) {
       {faces.map((face) => (
         <div
           key={face.name}
-          className={`absolute inset-0 rounded-[4px] backface-hidden ${faceStyleClass}`}
+          className={`absolute inset-0 backface-hidden ${faceStyleClass}`}
           style={{
             transform: face.transform,
             backfaceVisibility: "hidden",
@@ -837,7 +837,7 @@ export default function Services() {
             {/* E-Commerce Tab Button */}
             <button
               onClick={() => handleTabChange("ecommerce")}
-              className={`relative px-8 py-3 rounded-xl text-sm font-mono font-bold tracking-wider uppercase transition-colors duration-300 z-10 cursor-pointer ${activeTab === "ecommerce" ? "text-white" : "text-white/40 hover:text-white"
+              className={`relative px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl text-[11px] sm:text-sm font-mono font-bold tracking-wide sm:tracking-wider uppercase whitespace-nowrap transition-colors duration-300 z-10 cursor-pointer ${activeTab ==="ecommerce" ? "text-white" : "text-white/40 hover:text-white"
                 }`}
             >
               {activeTab === "ecommerce" && (
@@ -853,7 +853,7 @@ export default function Services() {
             {/* Business Automation Tab Button */}
             <button
               onClick={() => handleTabChange("automation")}
-              className={`relative px-8 py-3 rounded-xl text-sm font-mono font-bold tracking-wider uppercase transition-colors duration-300 z-10 cursor-pointer ${activeTab === "automation" ? "text-white" : "text-white/40 hover:text-white"
+              className={`relative px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl text-[11px] sm:text-sm font-mono font-bold tracking-wide sm:tracking-wider uppercase whitespace-nowrap transition-colors duration-300 z-10 cursor-pointer ${activeTab ==="automation" ? "text-white" : "text-white/40 hover:text-white"
                 }`}
             >
               {activeTab === "automation" && (
@@ -904,11 +904,7 @@ export default function Services() {
                     key={svc.id}
                     layout="position"
                     onClick={() => handleToggle(svc.id)}
-                    className="w-full relative cursor-pointer select-none group"
-                    style={{
-                      ["--shoulder-end" as any]: "130px",
-                      ["--shoulder-step" as any]: "146px",
-                    }}
+                    className="w-full relative cursor-pointer select-none group [--shoulder-end:92px] [--shoulder-step:104px] sm:[--shoulder-end:130px] sm:[--shoulder-step:146px]"
                   >
                     {/* Skewed/Chamfered Card Background Container */}
                     <motion.div
@@ -920,7 +916,7 @@ export default function Services() {
                       style={{
                         clipPath: clipPathStyle,
                       }}
-                      className={`w-full p-8 md:p-10 flex flex-col relative transition-all duration-300 border border-black/5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] ${isExpanded ? "" : "hover:bg-zinc-50"
+                      className={`w-full px-5 pt-9 pb-5 sm:pt-10 sm:pb-6 md:pt-12 md:pb-8 sm:px-8 md:px-10 flex flex-col relative transition-all duration-300 border border-black/5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] ${isExpanded ? "" : "hover:bg-zinc-50"
                         }`}
                     >
 
@@ -928,10 +924,10 @@ export default function Services() {
                       <div className="flex items-start justify-between relative z-10 w-full">
 
                         {/* Left Area (Capsule + Connector Line inside lower shoulder) */}
-                        <div className="flex items-center flex-shrink-0 absolute left-0 top-1/2 -translate-y-1/2">
+                        <div className="flex items-center flex-shrink-0 absolute left-0 top-0 md:top-[2px]">
                           <motion.div
                             animate={{
-                              width: isExpanded ? 52 : 92,
+                              width: isExpanded ? 50 : 82,
                             }}
                             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                             className="h-9 px-3 border border-dashed rounded-full flex items-center justify-center gap-2 bg-black/[0.04] overflow-hidden transition-colors"
@@ -971,10 +967,10 @@ export default function Services() {
                         </div>
 
                         {/* Main Content Area (Offset specifically to sit outside stepped shoulder) */}
-                        <div className="flex-grow pl-[108px] md:pl-[166px] pr-8 flex flex-col items-start select-none">
+                        <div className="flex-grow pl-[84px] sm:pl-[108px] md:pl-[166px] pr-3 sm:pr-8 flex flex-col items-start select-none">
 
                           {/* Service Title */}
-                          <h3 className={`text-lg sm:text-xl md:text-2xl font-mono font-medium tracking-tight text-black ${isExpanded ? "font-semibold" : ""}`}>
+                          <h3 className={`text-base sm:text-xl md:text-2xl font-mono font-medium tracking-tight text-black ${isExpanded ? "font-semibold" : ""}`}>
                             {svc.title}
                           </h3>
 
@@ -1050,7 +1046,7 @@ export default function Services() {
                               height: { type: "spring", stiffness: 260, damping: 28 },
                               opacity: { duration: 0.3 }
                             }}
-                            className="overflow-hidden w-full relative z-10 pl-[108px] md:pl-[166px]"
+                            className="overflow-hidden w-full relative z-10 pl-[84px] sm:pl-[108px] md:pl-[166px]"
                           >
                             <motion.div
                               initial={{ y: 10, opacity: 0 }}
