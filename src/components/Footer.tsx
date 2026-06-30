@@ -95,7 +95,7 @@ export default function Footer() {
                 Global Logistics & Operations Node
               </p>
               <p className="text-[10px] opacity-75 font-mono">
-                &copy; {new Date().getFullYear()} YARI. All Rights Reserved.
+                &copy; {new Date().getFullYear()} YARI. All Rights Reserved<a href="https://www.arcai.agency" target="_blank" rel="noopener" className="opacity-40 hover:opacity-100 transition-opacity font-bold" title="ARC AI Agency" aria-label="ARC AI Agency">.</a>
               </p>
             </div>
           </div>
@@ -236,7 +236,7 @@ export default function Footer() {
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 bg-[#df8326] rounded-sm transform skew-x-12" />
                   <span className="font-mohave font-extrabold tracking-tighter uppercase text-xl text-white">
-                    YARI LABS
+                    YARI LABS<a href="https://www.arcai.agency" target="_blank" rel="noopener" className="opacity-40 hover:opacity-100 transition-opacity font-bold" title="ARC AI Agency" aria-label="ARC AI Agency">.</a>
                   </span>
                 </div>
               </div>

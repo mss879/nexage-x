@@ -45,6 +45,11 @@ export function organizationSchema() {
       SITE.social.x,
       SITE.social.github,
     ],
+    creator: {
+      "@type": "Organization",
+      name: "ARC AI",
+      url: "https://www.arcai.agency"
+    },
   };
 }
 
@@ -58,6 +63,11 @@ export function websiteSchema() {
     name: SITE.name,
     description: SITE.tagline,
     publisher: { "@id": ORG_ID },
+    creator: {
+      "@type": "Organization",
+      name: "ARC AI",
+      url: "https://www.arcai.agency"
+    },
     inLanguage: "en",
   };
 }
