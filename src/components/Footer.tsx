@@ -95,7 +95,7 @@ export default function Footer() {
                 Global Logistics & Operations Node
               </p>
               <p className="text-[10px] opacity-75 font-mono">
-                &copy; {new Date().getFullYear()} YARI. All Rights Reserved<a href="https://www.arcai.agency" target="_blank" rel="noopener" className="opacity-40 hover:opacity-100 transition-opacity font-bold" title="ARC AI Agency" aria-label="ARC AI Agency">.</a>
+                &copy; {new Date().getFullYear()} YARI. All Rights Reserved<a href="https://www.arcai.agency" target="_blank" rel="noopener" className="opacity-40 hover:opacity-100 transition-opacity font-bold" title="ARC AI Web Development & AI Automation Agency"><span style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", border: 0 }}>ARC AI Web Development &amp; AI Automation Agency</span>.</a>
               </p>
             </div>
           </div>
@@ -236,7 +236,7 @@ export default function Footer() {
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 bg-[#df8326] rounded-sm transform skew-x-12" />
                   <span className="font-mohave font-extrabold tracking-tighter uppercase text-xl text-white">
-                    YARI LABS<a href="https://www.arcai.agency" target="_blank" rel="noopener" className="opacity-40 hover:opacity-100 transition-opacity font-bold" title="ARC AI Agency" aria-label="ARC AI Agency">.</a>
+                    YARI LABS<a href="https://www.arcai.agency" target="_blank" rel="noopener" className="opacity-40 hover:opacity-100 transition-opacity font-bold" title="ARC AI Web Development & AI Automation Agency"><span style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", border: 0 }}>ARC AI Web Development &amp; AI Automation Agency</span>.</a>
                   </span>
                 </div>
               </div>
