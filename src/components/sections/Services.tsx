@@ -925,12 +925,8 @@ export default function Services() {
 
                         {/* Left Area (Capsule + Connector Line inside lower shoulder) */}
                         <div className="flex items-center flex-shrink-0 absolute left-0 top-0 md:top-[2px]">
-                          <motion.div
-                            animate={{
-                              width: isExpanded ? 50 : 82,
-                            }}
-                            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                            className="h-9 px-3 border border-dashed rounded-full flex items-center justify-center gap-2 bg-black/[0.04] overflow-hidden transition-colors"
+                          <div
+                            className={`h-7 sm:h-9 px-2 sm:px-3 border border-dashed rounded-full flex items-center justify-center gap-1.5 sm:gap-2 bg-black/[0.04] overflow-hidden transition-[width,border-color] duration-[450ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isExpanded ? "w-[46px] sm:w-[50px]" : "w-[64px] sm:w-[82px]"}`}
                             style={{
                               borderColor: isExpanded ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.15)",
                             }}
@@ -944,7 +940,7 @@ export default function Services() {
                                   animate={{ opacity: 1, scale: 1 }}
                                   exit={{ opacity: 0, scale: 0 }}
                                   transition={{ duration: 0.25 }}
-                                  className="text-[#df8326] flex-shrink-0"
+                                  className="text-[#df8326] flex-shrink-0 [&_svg]:w-3 [&_svg]:h-3 sm:[&_svg]:w-3.5 sm:[&_svg]:h-3.5"
                                 >
                                   {svc.icon}
                                 </motion.div>
@@ -952,10 +948,10 @@ export default function Services() {
                             </AnimatePresence>
 
                             {/* Monospace Index Number */}
-                            <span className="text-[12px] font-mono font-semibold tracking-wider text-black">
+                            <span className="text-[10px] sm:text-[12px] font-mono font-semibold tracking-wider text-black">
                               {svc.num}
                             </span>
-                          </motion.div>
+                          </div>
 
                           {/* Dashed connector line ending at shoulder slant boundary */}
                           <div
@@ -967,7 +963,7 @@ export default function Services() {
                         </div>
 
                         {/* Main Content Area (Offset specifically to sit outside stepped shoulder) */}
-                        <div className="flex-grow pl-[84px] sm:pl-[108px] md:pl-[166px] pr-3 sm:pr-8 flex flex-col items-start select-none">
+                        <div className="flex-grow pl-[72px] sm:pl-[108px] md:pl-[166px] pr-3 sm:pr-8 flex flex-col items-start select-none">
 
                           {/* Service Title */}
                           <h3 className={`text-base sm:text-xl md:text-2xl font-mono font-medium tracking-tight text-black ${isExpanded ? "font-semibold" : ""}`}>
