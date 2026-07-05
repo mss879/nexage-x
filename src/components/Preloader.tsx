@@ -213,7 +213,7 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
       // Lower pixel-ratio cap on small screens — biggest mobile fill-rate win
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, w < 768 ? 1.5 : 2));
       renderer.setSize(w, h);
-      parentGroup.scale.setScalar(w < 768 ? 0.62 : 0.95);
+      parentGroup.scale.setScalar(w < 768 ? 0.52 : 0.80);
     };
     window.addEventListener("resize", handleResize);
     handleResize();
