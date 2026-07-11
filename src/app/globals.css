@@ -1,14 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@400;500;700;800&family=Orbitron:wght@400;500;700;800;900&family=Rock+Salt&family=Mohave:wght@600&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans', var(--font-plus-jakarta), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  /* Font families come from next/font in app/layout.tsx (self-hosted,
+     no render-blocking Google Fonts request) via the *-next variables. */
+  --font-sans: var(--font-plus-jakarta-next), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
-  --font-syne: 'Syne', sans-serif;
-  --font-orbitron: 'Orbitron', sans-serif;
-  --font-plus-jakarta: 'Plus Jakarta Sans', sans-serif;
-  --font-mohave: 'Mohave', sans-serif;
-  --font-rock-salt: 'Rock Salt', cursive;
+  --font-syne: var(--font-syne-next), sans-serif;
+  --font-orbitron: var(--font-orbitron-next), sans-serif;
+  --font-plus-jakarta: var(--font-plus-jakarta-next), sans-serif;
+  --font-mohave: var(--font-mohave-next), sans-serif;
+  --font-rock-salt: var(--font-rock-salt-next), cursive;
 
   /* Cyber Dark Theme Colors */
   --color-bg-base: #050508;

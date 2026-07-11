@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import gsap from "gsap";
@@ -124,11 +125,13 @@ function PortfolioCard({ project, index }: { project: ProjectData; index: number
       {/* Image Container */}
       <div className="relative mx-5 mb-6 rounded-xl overflow-hidden bg-[#1a1a1d]">
         <div className="relative w-full aspect-[2/1] overflow-hidden">
-          <img
+          <Image
             src={project.image}
             alt={project.title}
+            width={1600}
+            height={800}
+            sizes="(max-width: 768px) 100vw, 700px"
             className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-            loading="lazy"
           />
           {/* Soft vignette overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />

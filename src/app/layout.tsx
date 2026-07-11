@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Syne, Plus_Jakarta_Sans } from "next/font/google";
+import {
+  Geist_Mono,
+  Syne,
+  Plus_Jakarta_Sans,
+  Orbitron,
+  Mohave,
+  Rock_Salt,
+} from "next/font/google";
 import "./globals.css";
 import MenuProvider from "@/components/menu/MenuProvider";
 import JsonLd from "@/components/seo/JsonLd";
@@ -10,24 +17,48 @@ import {
   professionalServiceSchema,
 } from "@/lib/structured-data";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
+// All site fonts are self-hosted via next/font (zero render-blocking requests,
+// automatic preload + size-adjusted fallbacks). globals.css maps the design
+// tokens (--font-syne, --font-mohave, …) onto these variables.
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const syne = Syne({
-  variable: "--font-syne",
+  variable: "--font-syne-next",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
+  variable: "--font-plus-jakarta-next",
   subsets: ["latin"],
+  display: "swap",
+});
+
+// Accent fonts used below the fold — self-hosted but not preloaded
+const orbitron = Orbitron({
+  variable: "--font-orbitron-next",
+  subsets: ["latin"],
+  display: "swap",
+  preload: false,
+});
+
+const mohave = Mohave({
+  variable: "--font-mohave-next",
+  subsets: ["latin"],
+  display: "swap",
+  preload: false,
+});
+
+const rockSalt = Rock_Salt({
+  variable: "--font-rock-salt-next",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -85,7 +116,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} ${plusJakartaSans.variable} h-full antialiased`}
+      className={`${geistMono.variable} ${syne.variable} ${plusJakartaSans.variable} ${orbitron.variable} ${mohave.variable} ${rockSalt.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <JsonLd

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -58,11 +59,12 @@ function MethodCard({
             clipPath: cardClipPath,
           }}
         >
-          <img 
-            src={imageUrl} 
+          <Image
+            src={imageUrl}
             alt={title}
-            decoding="auto"
-            loading="lazy"
+            width={1024}
+            height={1024}
+            sizes="(max-width: 768px) 100vw, 700px"
             className="w-full h-full object-cover object-center filter grayscale contrast-[1.15] brightness-[0.95]"
           />
           {/* Brand duotone gradient wash to adapt any image to YARI® brand colors */}

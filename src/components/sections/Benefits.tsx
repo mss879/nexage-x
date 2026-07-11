@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 export default function Benefits() {
@@ -106,9 +107,12 @@ export default function Benefits() {
 
                 {/* Team member portrait image */}
                 <div className="relative w-full h-[280px] overflow-hidden mt-auto">
-                  <img
+                  <Image
                     src="/logistics-coordinator.png"
                     alt="Forward-Thinking Logistics Headshot"
+                    width={1024}
+                    height={1024}
+                    sizes="(max-width: 768px) 100vw, 700px"
                     className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
                   />
                 </div>
@@ -145,9 +149,12 @@ export default function Benefits() {
 
                 {/* Glass centerpiece render card */}
                 <div className="relative w-full overflow-hidden bg-[#0a0a0f] border border-white/[0.08] shadow-lg rounded-[20px] aspect-[16/10]">
-                  <img
+                  <Image
                     src="/logistics-centerpiece.png"
                     alt="Logistics that Moves Brands Cargo Carrier"
+                    width={1024}
+                    height={1024}
+                    sizes="(max-width: 768px) 100vw, 700px"
                     className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-103"
                   />
                 </div>
@@ -199,9 +206,12 @@ export default function Benefits() {
 
                 {/* Exhibition art gallery render card */}
                 <div className="relative w-full overflow-hidden bg-[#0a0a0f] border border-white/[0.08] shadow-lg rounded-[16px] aspect-[4/3]">
-                  <img
+                  <Image
                     src="/logistics-network.png"
                     alt="Fleet in Motion Global Map Dashboard"
+                    width={1024}
+                    height={1024}
+                    sizes="(max-width: 768px) 100vw, 700px"
                     className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-103"
                   />
                 </div>

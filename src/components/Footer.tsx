@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 
 export function SlidingLink({ label, href }: { label: string; href: string }) {
@@ -82,10 +83,13 @@ export default function Footer() {
             <div className="flex flex-col gap-4 w-full items-center">
               {/* Brand Logo Image */}
               <div className="w-full max-w-[280px] md:max-w-[320px] select-none pt-0 pb-2 flex justify-center mt-[-10px] sm:mt-[-15px]">
-                <img 
-                  src="/yari-logo.png" 
-                  alt="YARI Logo" 
-                  className="w-full h-auto object-contain brightness-0" 
+                <Image
+                  src="/yari-logo.png"
+                  alt="YARI Logo"
+                  width={640}
+                  height={640}
+                  sizes="320px"
+                  className="w-full h-auto object-contain brightness-0"
                 />
               </div>
             </div>
@@ -170,9 +174,12 @@ export default function Footer() {
 
                 {/* 3D Envelope rendering - outside overflow wrapper to allow border overlapping */}
                 <div className="absolute right-[-45px] bottom-[-25px] w-[210px] h-[210px] pointer-events-none opacity-95 group-hover/news:opacity-100 group-hover/news:scale-105 group-hover/news:-rotate-12 transition-transform duration-700 select-none z-30 animate-float-medium">
-                  <img
+                  <Image
                     src="/footer-envelope.png"
                     alt="Newsletter Envelope Decorative"
+                    width={420}
+                    height={420}
+                    sizes="210px"
                     className="w-full h-full object-contain"
                   />
                 </div>
