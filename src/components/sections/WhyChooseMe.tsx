@@ -6,11 +6,13 @@ import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ShoppingBag, Package, RefreshCw } from "lucide-react";
 
+// Pill positions are responsive classes: stacked with safe margins inside the
+// narrow mobile playground, original scattered layout from md: up.
 const services = [
   {
     name: "Fulfillment Sync",
     icon: Package,
-    initialPos: { bottom: "10%", left: "45%" },
+    posClass: "bottom-[10%] left-[6%] md:left-[45%]",
     floatAnim: { y: [0, -6, 0] },
     floatDuration: 4.2,
     floatDelay: 0.3,
@@ -18,7 +20,7 @@ const services = [
   {
     name: "Marketplace Setup",
     icon: ShoppingBag,
-    initialPos: { top: "45%", left: "20%" },
+    posClass: "top-[45%] left-[6%] md:left-[20%]",
     floatAnim: { y: [0, -5, 0] },
     floatDuration: 3.8,
     floatDelay: 0.5,
@@ -26,7 +28,7 @@ const services = [
   {
     name: "Supply Chain",
     icon: RefreshCw,
-    initialPos: { top: "15%", right: "8%" },
+    posClass: "top-[12%] right-[5%] md:top-[15%] md:right-[8%]",
     floatAnim: { y: [0, -6, 0] },
     floatDuration: 3.9,
     floatDelay: 0.7,
@@ -318,7 +320,7 @@ export default function WhyChooseMe() {
               ref={constraintsRef}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              className="relative flex-grow mt-auto w-full min-h-[180px] bg-white/[0.01] border border-white/5 overflow-hidden touch-none select-none"
+              className="relative flex-grow mt-auto w-full min-h-[220px] md:min-h-[180px] bg-white/[0.01] border border-white/5 overflow-hidden touch-none select-none"
               style={{ clipPath: "polygon(0 0, 100% 0, 100% calc(100% - 48px), calc(100% - 48px) 100%, 0 100%)" }}
             >
               {/* Moving cyber grid background */}
@@ -364,16 +366,12 @@ export default function WhyChooseMe() {
                         delay: svc.floatDelay,
                       },
                     }}
-                    style={{
-                      position: "absolute",
-                      ...svc.initialPos,
-                    }}
-                    className="z-20 select-none cursor-grab"
+                    className={`absolute z-20 select-none cursor-grab ${svc.posClass}`}
                   >
                     {/* Skewed Container (Layer 2) - Repelled by Mouse */}
-                    <div className="draggable-pill transform -skew-x-20 bg-[#16161a]/95 border border-[#df8326]/30 px-3.5 py-2 rounded-[10px] shadow-[0_4px_15px_rgba(0,0,0,0.4)] backdrop-blur-md flex items-center gap-2.5 transition-colors duration-300 hover:border-[#df8326] hover:shadow-[0_0_20px_rgba(223,131,38,0.25)]">
+                    <div className="draggable-pill transform -skew-x-20 bg-[#16161a]/95 border border-[#df8326]/30 px-3 py-1.5 md:px-3.5 md:py-2 rounded-[10px] shadow-[0_4px_15px_rgba(0,0,0,0.4)] backdrop-blur-md flex items-center gap-2 md:gap-2.5 transition-colors duration-300 hover:border-[#df8326] hover:shadow-[0_0_20px_rgba(223,131,38,0.25)]">
                       {/* Unskewed Content wrapper (Layer 3) */}
-                      <div className="transform skew-x-20 flex items-center gap-2.5 text-[10.5px] md:text-[11px] font-mono text-[#df8326]">
+                      <div className="transform skew-x-20 flex items-center gap-2 md:gap-2.5 text-[10.5px] md:text-[11px] font-mono text-[#df8326]">
                         <IconComponent className="w-3.5 h-3.5 text-[#df8326]" />
                         <span className="relative flex h-1.5 w-1.5 shrink-0">
                           <span className="absolute inline-flex h-full w-full rounded-full bg-[#C57019] opacity-75 animate-ping"></span>

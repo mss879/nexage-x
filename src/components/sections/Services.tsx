@@ -926,7 +926,7 @@ export default function Services() {
                         {/* Left Area (Capsule + Connector Line inside lower shoulder) */}
                         <div className="flex items-center flex-shrink-0 absolute left-0 top-0 md:top-[2px]">
                           <div
-                            className={`h-7 sm:h-9 px-2 sm:px-3 border border-dashed rounded-full flex items-center justify-center gap-1.5 sm:gap-2 bg-black/[0.04] overflow-hidden transition-[width,border-color] duration-[450ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isExpanded ? "w-[46px] sm:w-[50px]" : "w-[64px] sm:w-[82px]"}`}
+                            className={`h-6 sm:h-9 px-2 sm:px-3 border border-dashed rounded-full flex items-center justify-center gap-1.5 sm:gap-2 bg-black/[0.04] overflow-hidden transition-[width,border-color] duration-[450ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isExpanded ? "w-[42px] sm:w-[50px]" : "w-[58px] sm:w-[82px]"}`}
                             style={{
                               borderColor: isExpanded ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.15)",
                             }}
@@ -948,7 +948,7 @@ export default function Services() {
                             </AnimatePresence>
 
                             {/* Monospace Index Number */}
-                            <span className="text-[10px] sm:text-[12px] font-mono font-semibold tracking-wider text-black">
+                            <span className="text-[9px] sm:text-[12px] font-mono font-semibold tracking-wider text-black">
                               {svc.num}
                             </span>
                           </div>
@@ -963,10 +963,10 @@ export default function Services() {
                         </div>
 
                         {/* Main Content Area (Offset specifically to sit outside stepped shoulder) */}
-                        <div className="flex-grow pl-[72px] sm:pl-[108px] md:pl-[166px] pr-3 sm:pr-8 flex flex-col items-start select-none">
+                        <div className="flex-grow pl-[66px] sm:pl-[108px] md:pl-[166px] pr-2 sm:pr-8 flex flex-col items-start select-none">
 
                           {/* Service Title */}
-                          <h3 className={`text-base sm:text-xl md:text-2xl font-mono font-medium tracking-tight text-black ${isExpanded ? "font-semibold" : ""}`}>
+                          <h3 className={`text-[15px] leading-6 sm:leading-normal sm:text-xl md:text-2xl font-mono font-medium tracking-tight text-black ${isExpanded ? "font-semibold" : ""}`}>
                             {svc.title}
                           </h3>
 
@@ -1014,16 +1014,16 @@ export default function Services() {
                         </div>
 
                         {/* Right action button */}
-                        <div className="flex-shrink-0">
+                        <div className="flex-shrink-0 -mt-1 sm:mt-0">
                           <motion.div
                             animate={{ rotate: isExpanded ? 45 : 0 }}
                             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                            className={`w-9 h-9 md:w-10 md:h-10 rounded-full border flex items-center justify-center transition-all duration-300 ${isExpanded
+                            className={`w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full border flex items-center justify-center transition-all duration-300 ${isExpanded
                               ? "border-black/30 text-black hover:scale-105"
                               : "border-black/10 text-black/50 group-hover:border-black/30 group-hover:text-black hover:scale-105"
                               }`}
                           >
-                            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current stroke-2">
+                            <svg viewBox="0 0 24 24" className="w-4 h-4 sm:w-5 sm:h-5 fill-none stroke-current stroke-2">
                               <line x1="12" y1="5" x2="12" y2="19" />
                               <line x1="5" y1="12" x2="19" y2="12" />
                             </svg>
@@ -1042,7 +1042,7 @@ export default function Services() {
                               height: { type: "spring", stiffness: 260, damping: 28 },
                               opacity: { duration: 0.3 }
                             }}
-                            className="overflow-hidden w-full relative z-10 pl-[84px] sm:pl-[108px] md:pl-[166px]"
+                            className="overflow-hidden w-full relative z-10 pl-[66px] sm:pl-[108px] md:pl-[166px]"
                           >
                             <motion.div
                               initial={{ y: 10, opacity: 0 }}

@@ -66,6 +66,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
   const descRef = useRef<HTMLParagraphElement>(null);
   const buttonRef = useRef<HTMLAnchorElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
+  const mobileNavRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const socialsRef = useRef<HTMLDivElement>(null);
   const imageWrapperRef = useRef<HTMLDivElement>(null);
@@ -84,7 +85,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
       gsap.set(titleLinesRef.current, { y: 50, opacity: 0 });
       gsap.set(descRef.current, { y: 30, opacity: 0 });
       gsap.set(buttonRef.current, { scale: 0.9, opacity: 0 });
-      gsap.set(navRef.current, { y: -25, opacity: 0 });
+      gsap.set([navRef.current, mobileNavRef.current], { y: -25, opacity: 0 });
       gsap.set(logoRef.current, { y: 25, opacity: 0 });
       gsap.set(socialsRef.current, { x: 25, opacity: 0 });
 
@@ -129,7 +130,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           ease: "back.out(1.6)",
         }, "-=0.7");
 
-        tl.to([navRef.current, logoRef.current, socialsRef.current], {
+        tl.to([navRef.current, mobileNavRef.current, logoRef.current, socialsRef.current], {
           x: 0,
           y: 0,
           opacity: 1,
@@ -147,13 +148,48 @@ export default function Hero({ startAnimation = true }: HeroProps) {
     <section
       id="hero"
       ref={containerRef}
-      className="relative w-full h-screen bg-[#18181b] p-3 flex flex-col justify-center items-center overflow-hidden font-sans"
+      className="relative w-full h-screen bg-[#18181b] max-md:bg-[#050508] p-0 md:p-3 flex flex-col justify-center items-center overflow-hidden font-sans"
     >
-      {/* 1. Main Light-Grey Card — sits inside the dark frame with padding */}
+      {/* Mobile-only black navbar — real logo left, Menu/Connect right */}
+      <div
+        ref={mobileNavRef}
+        className="md:hidden w-full h-[60px] shrink-0 bg-[#050508] z-30 flex items-center justify-between pl-3 pr-3 select-none"
+      >
+        <a href="#hero" className="shrink-0 -ml-1.5">
+          <Logo className="h-10 w-[124px]" />
+        </a>
+        <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            onClick={openMenu}
+            style={SKEW_BTN_STYLE}
+            className="-skew-x-[20deg] bg-gradient-to-b from-[#df8326] to-[#C57019] px-4 py-2 shadow-[0_6px_18px_rgba(197,112,25,0.35)] transition-transform active:scale-95"
+          >
+            <span className="flex skew-x-[20deg] items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-wider text-white">
+              Menu
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </span>
+          </button>
+          <a
+            href="/contact"
+            style={SKEW_BTN_STYLE}
+            className="-skew-x-[20deg] bg-gradient-to-b from-[#df8326] to-[#C57019] px-4 py-2 shadow-[0_6px_18px_rgba(197,112,25,0.35)] transition-transform active:scale-95"
+          >
+            <span className="flex skew-x-[20deg] items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-white">
+              Connect
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                <path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      {/* 1. Main Light-Grey Card — full-bleed on mobile, framed with padding on md+ */}
       <div
         ref={cardRef}
-        className="relative w-full h-full bg-[#dfdfe1] overflow-hidden flex items-center z-10"
-        style={{ borderRadius: "24px" }} // Beautiful rounded corners framing the card
+        className="relative w-full h-full bg-[#dfdfe1] overflow-hidden flex items-center z-10 rounded-none md:rounded-[24px]"
       >
         {/* Full background video — matching Framer's full-bleed layout */}
         <div
@@ -184,44 +220,9 @@ export default function Hero({ startAnimation = true }: HeroProps) {
         />
 
         {/* Foreground Content */}
-        <div className="relative z-20 w-full h-full flex flex-col justify-center items-start px-6 sm:px-12 md:px-20 lg:px-24 py-16 md:py-24 max-w-[1100px] my-auto">
-          {/* Mobile-only Header — pinned to the top of the hero */}
-          <div className="md:hidden absolute top-0 inset-x-0 z-30 flex items-center justify-between px-5 pt-5 select-none">
-            <a href="#hero" className="shrink-0 -ml-2.5">
-              <Logo className="h-9 w-[112px]" imgClassName="brightness-0" />
-            </a>
-            <div className="flex items-center gap-3 shrink-0">
-              {/* Menu — solid, skewed to match the desktop button shape */}
-              <button
-                onClick={openMenu}
-                style={SKEW_BTN_STYLE}
-                className="-skew-x-[20deg] bg-gradient-to-b from-[#df8326] to-[#C57019] px-4 py-2 shadow-[0_6px_18px_rgba(197,112,25,0.35)] transition-transform active:scale-95"
-              >
-                <span className="flex skew-x-[20deg] items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-wider text-white">
-                  Menu
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                </span>
-              </button>
-              {/* Connect — solid, skewed to match the desktop button shape */}
-              <a
-                href="/contact"
-                style={SKEW_BTN_STYLE}
-                className="-skew-x-[20deg] bg-gradient-to-b from-[#df8326] to-[#C57019] px-4 py-2 shadow-[0_6px_18px_rgba(197,112,25,0.35)] transition-transform active:scale-95"
-              >
-                <span className="flex skew-x-[20deg] items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-white">
-                  Connect
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                    <path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-              </a>
-            </div>
-          </div>
-
+        <div className="relative z-20 w-full h-full flex flex-col justify-center items-center md:items-start text-center md:text-left px-6 sm:px-12 md:px-20 lg:px-24 py-16 md:py-24 max-w-[1100px] my-auto">
           {/* Headline Typography — exact Framer text styling */}
-          <h1 className="flex flex-col font-syne text-[1.5rem] sm:text-[2.8rem] md:text-[3.6rem] lg:text-[4.2rem] leading-[1.08] sm:leading-[1.05] tracking-tight text-[#000000] select-none font-medium mb-6">
+          <h1 className="flex flex-col font-syne text-[1.85rem] sm:text-[2.8rem] md:text-[3.6rem] lg:text-[4.2rem] leading-[1.12] sm:leading-[1.05] tracking-tight text-[#000000] select-none font-medium mb-6">
             <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">Designing experiences,</span>
             <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">deploying seamless</span>
             <span ref={addToTitleRefs} className="block overflow-hidden py-0.5"><strong className="font-bold">logistics</strong>.</span>
@@ -230,9 +231,15 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           {/* Description Paragraph */}
           <p
             ref={descRef}
-            className="font-plus-jakarta text-[#4d4d4f] text-sm sm:text-base md:text-[1.05rem] max-w-[540px] leading-relaxed mb-10 select-none font-normal text-left md:text-justify"
+            className="font-plus-jakarta text-[#4d4d4f] text-sm sm:text-base md:text-[1.05rem] max-w-[540px] leading-relaxed mb-10 select-none font-normal text-center md:text-justify"
           >
-            A high-performance digital automation and e-commerce studio. We build stunning custom storefronts, robust web applications, and end-to-end logistics solutions engineered to scale visionary brands.
+            {/* Short copy on mobile, full copy on md+ — same key points */}
+            <span className="md:hidden">
+              A high-performance digital automation &amp; e-commerce studio — custom storefronts, robust web apps and end-to-end logistics that scale visionary brands.
+            </span>
+            <span className="hidden md:inline">
+              A high-performance digital automation and e-commerce studio. We build stunning custom storefronts, robust web applications, and end-to-end logistics solutions engineered to scale visionary brands.
+            </span>
           </p>
 
           {/* CTA button — orange gradient with top border highlight, rounded-xl (12px) */}
