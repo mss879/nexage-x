@@ -33,6 +33,24 @@ export default function HeroWithPreloader() {
 
   return (
     <>
+      {/* SSR-painted shield: the Preloader is a client-only chunk (three.js),
+          so without this the server-rendered hero flashes before it mounts.
+          The shield is in the initial HTML, covering the hero from the very
+          first paint, and unmounts when the preloader reveals (onActiveReveal
+          or the fallback timer). Hidden for no-JS visitors so the page never
+          stays black without JavaScript. */}
+      {!isPreloaded && (
+        <>
+          <div
+            id="preloader-shield"
+            className="fixed inset-0 z-[99] bg-[#050508] pointer-events-none"
+          />
+          <noscript>
+            <style>{`#preloader-shield{display:none}`}</style>
+          </noscript>
+        </>
+      )}
+
       {/* Preloader — always mounted on client, hidden via CSS to prevent DOM removal race conditions */}
       <div
         className={`${showPreloader ? "" : "pointer-events-none invisible"}`}
