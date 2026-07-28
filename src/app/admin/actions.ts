@@ -1,12 +1,20 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+import { isAllowedAdmin } from "@/lib/admin";
+import { checkRateLimit, clientIpFrom } from "@/lib/rate-limit";
+
+const STAGES = ["Lead", "Contacted", "Qualified", "Proposal", "Won", "Lost"] as const;
+const INQUIRY_STATUSES = ["new", "converted", "archived"] as const;
 
 /**
  * Log in administrative users securely using Supabase Auth.
+ * Attempts are rate-limited per IP and errors are kept generic so the
+ * response never confirms whether an account exists.
  */
-export async function loginAdmin(prevState: any, formData: FormData) {
+export async function loginAdmin(prevState: unknown, formData: FormData) {
   const email = formData.get("email")?.toString().trim();
   const password = formData.get("password")?.toString();
 
@@ -14,16 +22,26 @@ export async function loginAdmin(prevState: any, formData: FormData) {
     return { success: false, error: "Please enter both email and password." };
   }
 
+  const ip = clientIpFrom(await headers());
+  if (!checkRateLimit(`admin-login:${ip}`, 5, 15 * 60 * 1000)) {
+    return { success: false, error: "Too many login attempts. Please try again later." };
+  }
+
   try {
     const supabase = await createClient();
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      // Return custom friendly message or raw error message
-      return { success: false, error: error.message };
+      return { success: false, error: "Invalid email or password." };
+    }
+
+    // Even with valid credentials, only allowlisted admins may enter.
+    if (!isAllowedAdmin(data.user?.email)) {
+      await supabase.auth.signOut();
+      return { success: false, error: "This account is not authorized to access the admin portal." };
     }
 
     return { success: true };
@@ -48,13 +66,13 @@ export async function logoutAdmin() {
 }
 
 /**
- * Check if the user is authenticated. Throws an error or returns false if not.
+ * Check that the caller is an authenticated, allowlisted admin.
  * Used internally inside actions to secure database writes.
  */
 async function checkAuth() {
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) {
+  if (error || !user || !isAllowedAdmin(user.email)) {
     throw new Error("Unauthorized access");
   }
   return supabase;
@@ -73,6 +91,33 @@ interface LeadInput {
   notes?: string;
 }
 
+function cleanString(value: unknown, maxLen: number): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.length > maxLen) return null;
+  return trimmed;
+}
+
+function cleanInterests(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((i): i is string => typeof i === "string")
+    .map((i) => i.trim())
+    .filter((i) => i.length > 0 && i.length <= 40)
+    .slice(0, 12);
+}
+
+function cleanValue(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) return 0;
+  return Math.min(value, 999_999_999);
+}
+
+function cleanStage(value: unknown): (typeof STAGES)[number] {
+  return STAGES.includes(value as (typeof STAGES)[number])
+    ? (value as (typeof STAGES)[number])
+    : "Lead";
+}
+
 /**
  * Creates a new CRM Lead manually.
  */
@@ -80,24 +125,29 @@ export async function createLead(input: LeadInput) {
   try {
     const supabase = await checkAuth();
 
+    const name = cleanString(input?.name, 100);
+    if (!name) {
+      return { success: false, error: "Lead name is required (max 100 characters)." };
+    }
+
     const { error } = await supabase.from("leads").insert({
-      name: input.name.trim(),
-      email: input.email?.trim() || null,
-      company: input.company?.trim() || null,
-      budget: input.budget?.trim() || null,
-      message: input.message?.trim() || null,
-      interests: input.interests || [],
-      stage: input.stage || "Lead",
-      value: input.value || 0,
-      notes: input.notes || null,
+      name,
+      email: cleanString(input.email, 254),
+      company: cleanString(input.company, 100),
+      budget: cleanString(input.budget, 50),
+      message: cleanString(input.message, 2000),
+      interests: cleanInterests(input.interests),
+      stage: cleanStage(input.stage),
+      value: cleanValue(input.value),
+      notes: cleanString(input.notes, 2000),
     });
 
     if (error) throw error;
     revalidatePath("/admin/crm");
     return { success: true };
-  } catch (err: any) {
+  } catch (err) {
     console.error("Create lead error:", err);
-    return { success: false, error: err.message || "Failed to create lead." };
+    return { success: false, error: "Failed to create lead." };
   }
 }
 
@@ -108,16 +158,24 @@ export async function updateLead(id: string, updates: Partial<LeadInput>) {
   try {
     const supabase = await checkAuth();
 
-    const cleanUpdates: any = {};
-    if (updates.name !== undefined) cleanUpdates.name = updates.name.trim();
-    if (updates.email !== undefined) cleanUpdates.email = updates.email.trim() || null;
-    if (updates.company !== undefined) cleanUpdates.company = updates.company.trim() || null;
-    if (updates.budget !== undefined) cleanUpdates.budget = updates.budget.trim() || null;
-    if (updates.message !== undefined) cleanUpdates.message = updates.message.trim() || null;
-    if (updates.interests !== undefined) cleanUpdates.interests = updates.interests;
-    if (updates.stage !== undefined) cleanUpdates.stage = updates.stage;
-    if (updates.value !== undefined) cleanUpdates.value = updates.value;
-    if (updates.notes !== undefined) cleanUpdates.notes = updates.notes;
+    if (typeof id !== "string" || !id) {
+      return { success: false, error: "Invalid lead id." };
+    }
+
+    const cleanUpdates: Record<string, unknown> = {};
+    if (updates.name !== undefined) {
+      const name = cleanString(updates.name, 100);
+      if (!name) return { success: false, error: "Lead name is required (max 100 characters)." };
+      cleanUpdates.name = name;
+    }
+    if (updates.email !== undefined) cleanUpdates.email = cleanString(updates.email, 254);
+    if (updates.company !== undefined) cleanUpdates.company = cleanString(updates.company, 100);
+    if (updates.budget !== undefined) cleanUpdates.budget = cleanString(updates.budget, 50);
+    if (updates.message !== undefined) cleanUpdates.message = cleanString(updates.message, 2000);
+    if (updates.interests !== undefined) cleanUpdates.interests = cleanInterests(updates.interests);
+    if (updates.stage !== undefined) cleanUpdates.stage = cleanStage(updates.stage);
+    if (updates.value !== undefined) cleanUpdates.value = cleanValue(updates.value);
+    if (updates.notes !== undefined) cleanUpdates.notes = cleanString(updates.notes, 2000);
 
     const { error } = await supabase
       .from("leads")
@@ -127,9 +185,9 @@ export async function updateLead(id: string, updates: Partial<LeadInput>) {
     if (error) throw error;
     revalidatePath("/admin/crm");
     return { success: true };
-  } catch (err: any) {
+  } catch (err) {
     console.error("Update lead error:", err);
-    return { success: false, error: err.message || "Failed to update lead." };
+    return { success: false, error: "Failed to update lead." };
   }
 }
 
@@ -140,6 +198,10 @@ export async function deleteLead(id: string) {
   try {
     const supabase = await checkAuth();
 
+    if (typeof id !== "string" || !id) {
+      return { success: false, error: "Invalid lead id." };
+    }
+
     const { error } = await supabase
       .from("leads")
       .delete()
@@ -148,9 +210,9 @@ export async function deleteLead(id: string) {
     if (error) throw error;
     revalidatePath("/admin/crm");
     return { success: true };
-  } catch (err: any) {
+  } catch (err) {
     console.error("Delete lead error:", err);
-    return { success: false, error: err.message || "Failed to delete lead." };
+    return { success: false, error: "Failed to delete lead." };
   }
 }
 
@@ -163,6 +225,13 @@ export async function updateInquiryStatus(id: string, status: "new" | "converted
   try {
     const supabase = await checkAuth();
 
+    if (typeof id !== "string" || !id) {
+      return { success: false, error: "Invalid inquiry id." };
+    }
+    if (!INQUIRY_STATUSES.includes(status)) {
+      return { success: false, error: "Invalid inquiry status." };
+    }
+
     const { error } = await supabase
       .from("inquiries")
       .update({ status })
@@ -171,9 +240,9 @@ export async function updateInquiryStatus(id: string, status: "new" | "converted
     if (error) throw error;
     revalidatePath("/admin/inquiries");
     return { success: true };
-  } catch (err: any) {
+  } catch (err) {
     console.error("Update inquiry status error:", err);
-    return { success: false, error: err.message || "Failed to update inquiry." };
+    return { success: false, error: "Failed to update inquiry." };
   }
 }
 
@@ -183,6 +252,10 @@ export async function updateInquiryStatus(id: string, status: "new" | "converted
 export async function convertInquiryToLead(inquiryId: string) {
   try {
     const supabase = await checkAuth();
+
+    if (typeof inquiryId !== "string" || !inquiryId) {
+      return { success: false, error: "Invalid inquiry id." };
+    }
 
     // 1. Fetch original inquiry
     const { data: inquiry, error: fetchError } = await supabase
@@ -222,8 +295,38 @@ export async function convertInquiryToLead(inquiryId: string) {
     revalidatePath("/admin/inquiries");
     revalidatePath("/admin/crm");
     return { success: true };
-  } catch (err: any) {
+  } catch (err) {
     console.error("Convert inquiry error:", err);
-    return { success: false, error: err.message || "Failed to convert inquiry to lead." };
+    return { success: false, error: "Failed to convert inquiry to lead." };
+  }
+}
+
+// ── Newsletter Subscribers Actions ───────────────────────────────────────────
+export async function deleteSubscriber(id: string) {
+  try {
+    const supabase = await checkAuth();
+    const { error } = await supabase.from("newsletter_subscribers").delete().eq("id", id);
+    if (error) throw error;
+    revalidatePath("/admin/subscribers");
+    return { success: true };
+  } catch (err) {
+    console.error("Delete subscriber error:", err);
+    return { success: false, error: "Failed to delete subscriber." };
+  }
+}
+
+export async function updateSubscriberStatus(id: string, status: "active" | "unsubscribed") {
+  try {
+    const supabase = await checkAuth();
+    const { error } = await supabase
+      .from("newsletter_subscribers")
+      .update({ status })
+      .eq("id", id);
+    if (error) throw error;
+    revalidatePath("/admin/subscribers");
+    return { success: true };
+  } catch (err) {
+    console.error("Update subscriber status error:", err);
+    return { success: false, error: "Failed to update subscriber status." };
   }
 }

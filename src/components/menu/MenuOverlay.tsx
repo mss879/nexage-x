@@ -7,6 +7,7 @@ import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ArrowUpRight, Plus } from "lucide-react";
 import Logo from "@/components/ui/Logo";
 import { SITE } from "@/lib/site";
+import { SocialIconsRow } from "@/components/ui/SocialIcons";
 
 interface MenuOverlayProps {
   open: boolean;
@@ -111,19 +112,19 @@ export default function MenuOverlay({ open, onClose }: MenuOverlayProps) {
           initial="hidden"
           animate="show"
           exit="exit"
-          className="fixed inset-0 z-[100] overflow-y-auto"
+          className="fixed inset-0 z-[100] overflow-y-auto bg-[#050505] text-white min-h-screen"
           aria-modal="true"
           role="dialog"
         >
-          {/* ── Backdrop (pure CSS — no WebGL) ───────────────────── */}
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-[#050505]" />
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(125%_120%_at_88%_8%,rgba(223,131,38,0.18),transparent_55%)]" />
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(100%_100%_at_0%_100%,rgba(223,131,38,0.07),transparent_55%)]" />
-          <div className="pointer-events-none absolute inset-0 -z-10 cyber-grid opacity-[0.05]" />
-          <div className="grain-texture pointer-events-none absolute inset-0 -z-10" />
+          {/* ── Backdrop (fixed to viewport so it never leaves gaps on scroll) ────── */}
+          <div className="pointer-events-none fixed inset-0 -z-10 bg-[#050505]" />
+          <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(125%_120%_at_88%_8%,rgba(223,131,38,0.18),transparent_55%)]" />
+          <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(100%_100%_at_0%_100%,rgba(223,131,38,0.07),transparent_55%)]" />
+          <div className="pointer-events-none fixed inset-0 -z-10 cyber-grid opacity-[0.05]" />
+          <div className="grain-texture pointer-events-none fixed inset-0 -z-10" />
 
           {/* ── Top bar ──────────────────────────────────────────── */}
-          <div className="relative z-10 flex items-center justify-between px-6 py-6 md:px-12">
+          <div className="sticky top-0 z-20 flex items-center justify-between bg-[#050505]/90 px-6 py-6 backdrop-blur-md md:relative md:bg-transparent md:backdrop-blur-none md:px-12">
             <motion.div variants={riseV}>
               <Link href="/" onClick={onClose} aria-label="Home">
                 <Logo className="h-9 w-[118px]" />
@@ -147,7 +148,7 @@ export default function MenuOverlay({ open, onClose }: MenuOverlayProps) {
           </div>
 
           {/* ── Body ─────────────────────────────────────────────── */}
-          <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 content-center gap-12 px-6 pb-16 pt-4 md:px-12 lg:min-h-[calc(100vh-92px)] lg:grid-cols-12 lg:gap-20 lg:pb-12 lg:pt-0">
+          <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 content-center gap-10 px-6 pb-28 pt-4 sm:gap-12 md:px-12 lg:min-h-[calc(100vh-92px)] lg:grid-cols-12 lg:gap-20 lg:pb-12 lg:pt-0">
             {/* Navigation */}
             <motion.nav variants={navV} className="lg:col-span-7 flex flex-col">
               {NAV_LINKS.map((link) => {
@@ -269,19 +270,8 @@ export default function MenuOverlay({ open, onClose }: MenuOverlayProps) {
                     <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </Link>
 
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/[0.08] pt-6">
-                    {SOCIALS.map((s) => (
-                      <a
-                        key={s.label}
-                        href={s.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group relative inline-block py-0.5 font-mohave text-base font-semibold uppercase tracking-tighter text-zinc-300 transition-colors hover:text-[#df8326]"
-                      >
-                        {s.label}
-                        <span className="absolute bottom-0 left-0 h-[1.5px] w-0 bg-[#df8326] transition-all duration-300 group-hover:w-full" />
-                      </a>
-                    ))}
+                  <div className="border-t border-white/[0.08] pt-6">
+                    <SocialIconsRow className="flex flex-wrap items-center gap-3" />
                   </div>
 
                   <div className="flex w-fit items-center gap-2.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-4 py-2">

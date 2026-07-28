@@ -25,6 +25,8 @@ export default function ContactForm() {
     message: "",
   });
   const [interests, setInterests] = useState<string[]>([]);
+  // Honeypot: hidden from humans, so any value here flags an automated bot.
+  const [honeypot, setHoneypot] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -48,6 +50,7 @@ export default function ContactForm() {
       budget: form.budget,
       message: form.message,
       interests,
+      website: honeypot,
     });
 
     setIsSubmitting(false);
@@ -74,7 +77,7 @@ export default function ContactForm() {
               Message received
             </h3>
             <p className="max-w-sm font-sans text-sm leading-relaxed text-zinc-400">
-              Thanks{form.name ? `, ${form.name.split(" ")[0]}` : ""}. We'll be in touch within
+              Thanks{form.name ? `, ${form.name.split(" ")[0]}` : ""}. We&apos;ll be in touch within
               one business day. Watch your inbox.
             </p>
             <button
@@ -91,6 +94,19 @@ export default function ContactForm() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            {/* Honeypot field — visually hidden and skipped by keyboard users */}
+            <div aria-hidden="true" className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden">
+              <label htmlFor="contact-website">Website</label>
+              <input
+                id="contact-website"
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+              />
+            </div>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">

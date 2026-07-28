@@ -224,8 +224,8 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           {/* Headline Typography — exact Framer text styling */}
           <h1 className="flex flex-col font-syne text-[1.85rem] sm:text-[2.8rem] md:text-[3.6rem] lg:text-[4.2rem] leading-[1.12] sm:leading-[1.05] tracking-tight text-[#000000] select-none font-medium mb-6">
             <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">Designing experiences,</span>
-            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">deploying seamless</span>
-            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5"><strong className="font-bold">logistics</strong>.</span>
+            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">building scalable</span>
+            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5"><strong className="font-bold">technology</strong>.</span>
           </h1>
 
           {/* Description Paragraph */}
@@ -235,10 +235,10 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           >
             {/* Short copy on mobile, full copy on md+ — same key points */}
             <span className="md:hidden">
-              A high-performance digital automation &amp; e-commerce studio — custom storefronts, robust web apps and end-to-end logistics that scale visionary brands.
+              A high-performance technology &amp; software studio — custom storefronts, robust web applications and intelligent digital systems that scale visionary brands.
             </span>
             <span className="hidden md:inline">
-              A high-performance digital automation and e-commerce studio. We build stunning custom storefronts, robust web applications, and end-to-end logistics solutions engineered to scale visionary brands.
+              A high-performance technology and software studio. We build stunning custom storefronts, robust web applications, and intelligent digital systems engineered to scale visionary brands.
             </span>
           </p>
 

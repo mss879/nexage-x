@@ -6,6 +6,7 @@ import Reveal from "@/components/ui/Reveal";
 import ContactHero from "@/components/sections/ContactHero";
 import ContactForm from "@/components/sections/ContactForm";
 import ContactFAQs from "@/components/sections/ContactFAQs";
+import { SocialIconsRow } from "@/components/ui/SocialIcons";
 
 export default function ContactContent() {
   return (
@@ -56,18 +57,7 @@ export default function ContactContent() {
 
               <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#df8326]/[0.1] via-[#0a0a0d] to-[#0a0a0d] p-6">
                 <span className="font-rock-salt text-base text-[#df8326]">Follow along</span>
-                <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
-                  {["Instagram", "LinkedIn", "X / Twitter", "GitHub"].map((s) => (
-                    <a
-                      key={s}
-                      href="#"
-                      className="group relative inline-block py-0.5 font-mohave text-lg font-semibold uppercase tracking-tighter text-zinc-200 transition-colors hover:text-[#df8326]"
-                    >
-                      {s}
-                      <span className="absolute bottom-0 left-0 h-[1.5px] w-0 bg-[#df8326] transition-all duration-300 group-hover:w-full" />
-                    </a>
-                  ))}
-                </div>
+                <SocialIconsRow className="mt-4 flex flex-wrap gap-3" />
               </div>
             </div>
           </Reveal>

@@ -9,6 +9,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import MenuProvider from "@/components/menu/MenuProvider";
+import AiChatWidget from "@/components/AiChatWidget";
 import JsonLd from "@/components/seo/JsonLd";
 import { SITE, SITE_URL, PRIMARY_KEYWORDS } from "@/lib/site";
 import {
@@ -126,7 +127,10 @@ export default function RootLayout({
             professionalServiceSchema(),
           ]}
         />
-        <MenuProvider>{children}</MenuProvider>
+        <MenuProvider>
+          {children}
+          <AiChatWidget />
+        </MenuProvider>
       </body>
     </html>
   );

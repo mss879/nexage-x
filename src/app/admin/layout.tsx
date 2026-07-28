@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "YARI Admin Portal",
   description: "Authorized access to contact inquiries and CRM pipeline.",
+  robots: { index: false, follow: false },
 };
 
 export default function AdminRootLayout({

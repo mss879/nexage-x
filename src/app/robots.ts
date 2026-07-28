@@ -7,8 +7,8 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        // Next.js internals + any future private/api segments.
-        disallow: ["/_next/", "/api/"],
+        // Next.js internals, the admin backend, + any future private/api segments.
+        disallow: ["/_next/", "/api/", "/admin", "/admin/"],
       },
     ],
     sitemap: absoluteUrl("/sitemap.xml"),

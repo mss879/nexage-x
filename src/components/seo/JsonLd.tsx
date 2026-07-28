@@ -16,8 +16,9 @@ export default function JsonLd({ data }: { data: Schema | Schema[] }) {
         <script
           key={i}
           type="application/ld+json"
-          // Structured data is trusted, build-time content — safe to inline.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+          // Structured data is trusted, build-time content; escaping "<"
+          // guards against </script> breakout if content ever includes HTML.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(item).replace(/</g, "\\u003c") }}
         />
       ))}
     </>

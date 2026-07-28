@@ -34,7 +34,9 @@ export const SITE = {
   logo: "/yari-logo.png",
   social: {
     instagram: "https://instagram.com",
+    facebook: "https://facebook.com",
     linkedin: "https://linkedin.com",
+    youtube: "https://youtube.com",
     x: "https://x.com",
     github: "https://github.com",
   },

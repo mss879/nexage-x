@@ -147,8 +147,7 @@ export default function PreloaderAssembly({ onActiveReveal, onComplete }: Preloa
       tl.set([canvasRef.current, hudRef.current], { autoAlpha: 0 }, 0);
       tl.set(".yari-logo", { y: 0 }, 0);
       tl.to(textRef.current, { opacity: 1, duration: 0.3 }, 0.1);
-      tl.to(".welcome-char", { opacity: 1, duration: 0.25 }, 0.15);
-      tl.to(".yari-logo", { opacity: 1, duration: 0.35 }, 0.3);
+      tl.to(".yari-logo", { opacity: 1, duration: 0.35 }, 0.2);
       tl.add(() => onActiveReveal(), 1.4);
       tl.to(containerRef.current, { opacity: 0, duration: 0.6, ease: "power2.inOut" }, 1.45);
     };
@@ -477,8 +476,7 @@ export default function PreloaderAssembly({ onActiveReveal, onComplete }: Preloa
 
     // 4. Wordmark
     tl.to(textRef.current, { opacity: 1, duration: 0.1 }, T_WORDMARK);
-    tl.to(".welcome-char", { opacity: 1, duration: 0.03, stagger: 0.035, ease: "none" }, T_WORDMARK);
-    tl.to(".yari-logo", { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, T_WORDMARK + 0.2);
+    tl.to(".yari-logo", { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, T_WORDMARK + 0.1);
 
     // 5. HUD + wordmark out
     tl.to([hudRef.current, textRef.current], { autoAlpha: 0, y: -8, duration: 0.35, ease: "power2.in" }, T_HUD_OUT);
@@ -600,18 +598,11 @@ export default function PreloaderAssembly({ onActiveReveal, onComplete }: Preloa
         </div>
       </div>
 
-      {/* Welcome to YARI wordmark */}
+      {/* YARI wordmark */}
       <div
         ref={textRef}
-        className="absolute bottom-[18%] left-0 right-0 z-10 flex flex-col items-center gap-3 pointer-events-none select-none opacity-0"
+        className="absolute bottom-[18%] left-0 right-0 z-10 flex flex-col items-center pointer-events-none select-none opacity-0"
       >
-        <span className="text-sm md:text-base font-sans tracking-[0.5em] text-[#8e9aa8] uppercase flex justify-center">
-          {"WELCOME TO".split("").map((char, index) => (
-            <span key={index} className="welcome-char opacity-0 inline-block">
-              {char === " " ? " " : char}
-            </span>
-          ))}
-        </span>
         <img
           src="/yari-logo-text.png"
           alt="YARI"

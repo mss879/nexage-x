@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isAllowedAdmin } from "@/lib/admin";
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
@@ -38,17 +39,20 @@ export async function proxy(request: NextRequest) {
 
   const url = request.nextUrl.clone();
 
-  // Route protection for administrative backend
+  // Route protection for administrative backend. A session alone is not
+  // enough — the account must also be on the ADMIN_EMAILS allowlist.
+  const isAdmin = !!user && isAllowedAdmin(user.email);
+
   if (url.pathname.startsWith("/admin")) {
     if (url.pathname === "/admin/login") {
       // Redirect logged-in admin away from login page to CRM
-      if (user) {
+      if (isAdmin) {
         url.pathname = "/admin";
         return NextResponse.redirect(url);
       }
     } else {
-      // Redirect logged-out user to admin login
-      if (!user) {
+      // Redirect logged-out or non-admin users to admin login
+      if (!isAdmin) {
         url.pathname = "/admin/login";
         return NextResponse.redirect(url);
       }

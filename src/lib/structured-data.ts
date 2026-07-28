@@ -41,7 +41,9 @@ export function organizationSchema() {
     })),
     sameAs: [
       SITE.social.instagram,
+      SITE.social.facebook,
       SITE.social.linkedin,
+      SITE.social.youtube,
       SITE.social.x,
       SITE.social.github,
     ],

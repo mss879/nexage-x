@@ -3,7 +3,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Loader2 } from "lucide-react";
+import Logo from "@/components/ui/Logo";
+import { SocialIconsRow } from "@/components/ui/SocialIcons";
+import { subscribeNewsletter } from "@/app/actions/newsletter";
 
 export function SlidingLink({ label, href }: { label: string; href: string }) {
   return (
@@ -28,14 +31,29 @@ export function SlidingLink({ label, href }: { label: string; href: string }) {
 
 export default function Footer() {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+  const [feedbackMsg, setFeedbackMsg] = useState("");
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
+    if (!email.trim() || loading) return;
+    setLoading(true);
+    setFeedbackMsg("");
+
+    const res = await subscribeNewsletter(email);
+    setLoading(false);
+
+    if (res.success) {
       setSubscribed(true);
+      setFeedbackMsg(res.message || "Subscribed!");
       setEmail("");
-      setTimeout(() => setSubscribed(false), 3000);
+      setTimeout(() => {
+        setSubscribed(false);
+        setFeedbackMsg("");
+      }, 4000);
+    } else {
+      setFeedbackMsg(res.error || "Subscription failed.");
     }
   };
 
@@ -46,13 +64,6 @@ export default function Footer() {
     { label: "Logistics", href: "/services/logistics" },
     { label: "Blog", href: "/blog" },
     { label: "Contact", href: "/contact" },
-  ];
-
-  const socialLinks = [
-    { label: "X/Twitter", href: "https://x.com" },
-    { label: "Instagram", href: "https://instagram.com" },
-    { label: "Linkedin", href: "https://linkedin.com" },
-    { label: "Github", href: "https://github.com" },
   ];
 
   return (
@@ -79,23 +90,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 lg:grid-cols-4 border-b border-white/[0.08]">
           
           {/* Column 1: Coppery Orange Solid Box (Stretches full height on desktop) */}
-          <div className="bg-[#df8326] text-black pt-2 pb-8 px-6 flex flex-col justify-between items-center text-center min-h-[380px] lg:min-h-full border-b lg:border-b-0 border-white/[0.08] lg:border-r">
-            <div className="flex flex-col gap-4 w-full items-center">
-              {/* Brand Logo Image */}
-              <div className="w-full max-w-[280px] md:max-w-[320px] select-none pt-0 pb-2 flex justify-center mt-[-10px] sm:mt-[-15px]">
-                <Image
-                  src="/yari-logo.png"
-                  alt="YARI Logo"
-                  width={640}
-                  height={640}
-                  sizes="320px"
-                  className="w-full h-auto object-contain brightness-0"
-                />
-              </div>
+          <div className="bg-[#df8326] text-black py-3.5 sm:py-4 lg:py-6 px-4 sm:px-6 flex flex-col justify-between items-center text-center gap-2.5 sm:gap-3.5 min-h-0 lg:min-h-full border-b lg:border-b-0 border-white/[0.08] lg:border-r">
+            <div className="flex flex-col items-center justify-center py-1 overflow-hidden">
+              <Logo
+                className="h-16 sm:h-22 md:h-26 lg:h-28 w-[220px] sm:w-[300px] md:w-[360px] lg:w-[400px]"
+                imgClassName="brightness-0"
+              />
             </div>
             
-            <div className="flex flex-col gap-2 w-full items-center">
-              <p className="text-xs font-bold uppercase tracking-wider font-mono">
+            <div className="flex flex-col gap-1 w-full items-center">
+              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider font-mono">
                 Global Logistics & Operations Node
               </p>
               <p className="text-[10px] opacity-75 font-mono">
@@ -118,32 +122,18 @@ export default function Footer() {
               </div>
 
               {/* Column 3: Follow Us */}
-              <div className="p-8 flex flex-col gap-6 border-b md:border-b-0 border-white/[0.08] md:border-r">
+              <div className="p-5 sm:p-6 md:p-8 flex flex-col gap-4 md:gap-6 border-b md:border-b-0 border-white/[0.08] md:border-r">
                 <h4 
-                  className="font-rock-salt text-lg text-[#df8326] select-none"
+                  className="font-rock-salt text-base sm:text-lg text-[#df8326] select-none"
                   style={{ filter: "url(#wobbly-follow-us)" }}
                 >
                   Follow Us
                 </h4>
-                <ul className="flex flex-col gap-4">
-                  {socialLinks.map((social, idx) => (
-                    <li key={idx}>
-                      <a
-                        href={social.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-mohave font-semibold text-2xl tracking-tighter uppercase text-[#eeeeee] hover:text-[#df8326] relative group py-0.5 inline-block"
-                      >
-                        {social.label}
-                        <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#df8326] group-hover:w-full transition-all duration-300" />
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+                <SocialIconsRow className="flex flex-wrap items-center gap-2.5 sm:gap-3" />
               </div>
 
               {/* Column 4: Newsletter Node with floating envelope & marquee & rotated video */}
-              <div className="p-8 flex flex-col justify-between min-h-[350px] relative group/news border-b md:border-b-0 border-white/[0.08] md:border-b-0">
+              <div className="p-5 sm:p-6 md:p-8 flex flex-col justify-between min-h-[260px] md:min-h-[350px] relative group/news border-b md:border-b-0 border-white/[0.08]">
                 
                 {/* Clipped background elements container */}
                 <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
@@ -202,16 +192,30 @@ export default function Footer() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading || subscribed}
                     placeholder="Email address"
-                    className="w-full px-4 py-3 rounded-none bg-zinc-900/40 border border-white/[0.08] text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#df8326] focus:ring-1 focus:ring-[#df8326] transition-all duration-300"
+                    className="w-full px-4 py-3 rounded-none bg-zinc-900/40 border border-white/[0.08] text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#df8326] focus:ring-1 focus:ring-[#df8326] transition-all duration-300 disabled:opacity-60"
                   />
                   <button
                     type="submit"
-                    disabled={subscribed}
-                    className="w-full py-3 bg-zinc-800 text-white font-mono text-xs uppercase tracking-wider hover:bg-[#df8326] hover:text-black active:scale-[0.98] transition-all duration-300 cursor-pointer disabled:opacity-50"
+                    disabled={loading || subscribed}
+                    className="w-full py-3 bg-zinc-800 text-white font-mono text-xs uppercase tracking-wider hover:bg-[#df8326] hover:text-black active:scale-[0.98] transition-all duration-300 cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
                   >
-                    {subscribed ? "Subscribed!" : "Subscribe"}
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Subscribing...
+                      </>
+                    ) : subscribed ? (
+                      "Subscribed!"
+                    ) : (
+                      "Subscribe"
+                    )}
                   </button>
+                  {feedbackMsg && (
+                    <p className={`text-xs font-mono mt-1 ${subscribed ? "text-[#34d399]" : "text-amber-400"}`}>
+                      {feedbackMsg}
+                    </p>
+                  )}
                 </form>
               </div>
 
@@ -220,7 +224,7 @@ export default function Footer() {
             {/* Bottom Row: Reach Out & Made By Credits */}
             <div className="grid grid-cols-1 md:grid-cols-3 border-t border-white/[0.08]">
               {/* Reach Out */}
-              <div className="p-8 flex flex-col gap-1.5 border-b md:border-b-0 md:border-r border-white/[0.08] md:col-span-2">
+              <div className="p-5 sm:p-6 md:p-8 flex flex-col gap-1.5 border-b md:border-b-0 md:border-r border-white/[0.08] md:col-span-2">
                 <h5 
                   className="font-rock-salt text-xs text-[#df8326] select-none"
                   style={{ filter: "url(#wobbly-reach-out)" }}
@@ -229,14 +233,14 @@ export default function Footer() {
                 </h5>
                 <a
                   href="mailto:contact@yari.com"
-                  className="font-mohave font-semibold text-3xl md:text-4xl tracking-tighter uppercase text-[#eeeeee] hover:text-[#df8326] transition-colors duration-300"
+                  className="font-mohave font-semibold text-2xl sm:text-3xl md:text-4xl tracking-tighter uppercase text-[#eeeeee] hover:text-[#df8326] transition-colors duration-300"
                 >
                   contact@yari.com
                 </a>
               </div>
 
               {/* Made By credit node */}
-              <div className="p-8 flex flex-col justify-center items-start md:items-end gap-1.5 md:col-span-1 select-none">
+              <div className="p-5 sm:p-6 md:p-8 flex flex-col justify-center items-start md:items-end gap-1.5 md:col-span-1 select-none">
                 <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
                   Made By
                 </span>
