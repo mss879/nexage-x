@@ -90,7 +90,7 @@ export default function ArticleHero({ post }: { post: Post }) {
           <span style={{ color: accent }}>{post.category}</span>
         </nav>
 
-        <h1 className="font-syne text-[2.1rem] font-bold leading-[1.05] tracking-tight sm:text-[2.8rem] md:text-[3.4rem]">
+        <h1 className="font-michroma text-[1.8rem] font-normal leading-[1.2] tracking-tight sm:text-[2.4rem] md:text-[2.9rem]">
           <span className="art-hero-line block">{post.title}</span>
         </h1>
 

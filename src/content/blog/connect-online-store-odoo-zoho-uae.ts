@@ -9,6 +9,8 @@ export const post: Post = {
   category: "Automation",
   pillar: false,
   featured: false,
+  cover: "/images/blog/connect-online-store-odoo-zoho-uae.jpg",
+  coverAlt: "Two black server modules linked by glowing copper data cables, representing an online store syncing with an ERP",
   date: "2026-06-06",
   updated: "2026-06-06",
   readTime: "12 min",

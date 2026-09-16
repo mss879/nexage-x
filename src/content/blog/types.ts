@@ -54,6 +54,10 @@ export interface Post {
   keywords: string[];
   /** Short card/summary excerpt. */
   excerpt: string;
+  /** 16:9 cover image (public path) shown on the blog index. */
+  cover: string;
+  /** Alt text describing the cover image. */
+  coverAlt: string;
   /** Opening paragraphs shown above the table of contents. */
   intro: string[];
   sections: Section[];

@@ -9,6 +9,8 @@ export const post: Post = {
   category: "Software",
   pillar: true,
   featured: true,
+  cover: "/images/blog/ecommerce-website-development-dubai.jpg",
+  coverAlt: "A smartphone and laptop showing an online storefront, with the Dubai skyline glowing in copper light behind them",
   date: "2026-06-24",
   updated: "2026-06-24",
   readTime: "14 min",

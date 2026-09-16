@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, Loader2 } from "lucide-react";
-import Logo from "@/components/ui/Logo";
 import { SocialIconsRow } from "@/components/ui/SocialIcons";
 import { subscribeNewsletter } from "@/app/actions/newsletter";
 
@@ -78,7 +77,7 @@ export default function Footer() {
           href="mailto:contact@yari.com" 
           className="w-full flex items-center justify-between px-6 md:px-10 py-10 md:py-16 border-b border-white/[0.08] hover:bg-white/[0.02] transition-all duration-300 group select-none"
         >
-          <h2 className="font-mohave font-semibold uppercase tracking-[-0.07em] text-[8vw] md:text-[6vw] leading-none text-[#eeeeee] group-hover:text-[#df8326] transition-colors duration-300">
+          <h2 className="font-michroma font-normal uppercase tracking-tight text-[5.6vw] md:text-[4.6vw] leading-none text-[#eeeeee] group-hover:text-[#df8326] transition-colors duration-300">
             START A PROJECT
           </h2>
           <div className="flex items-center justify-center w-14 h-14 md:w-20 md:h-20 rounded-full border border-white/[0.08] group-hover:border-[#df8326] group-hover:bg-[#df8326] transition-all duration-500">
@@ -89,19 +88,27 @@ export default function Footer() {
         {/* 2. Main Bottom Layout Grid (Orange Box left, Columns + Contact right) */}
         <div className="grid grid-cols-1 lg:grid-cols-4 border-b border-white/[0.08]">
           
-          {/* Column 1: Coppery Orange Solid Box (Stretches full height on desktop) */}
-          <div className="bg-[#df8326] text-black py-3.5 sm:py-4 lg:py-6 px-4 sm:px-6 flex flex-col justify-between items-center text-center gap-2.5 sm:gap-3.5 min-h-0 lg:min-h-full border-b lg:border-b-0 border-white/[0.08] lg:border-r">
-            <div className="flex flex-col items-center justify-center py-1 overflow-hidden">
-              <Logo
-                className="h-16 sm:h-22 md:h-26 lg:h-28 w-[220px] sm:w-[300px] md:w-[360px] lg:w-[400px]"
-                imgClassName="brightness-0"
+          {/* Column 1: Coppery Orange Solid Box (Stretches full height on desktop) —
+              logo + tagline are one lockup centred in the free space, copyright is a strip on the bottom edge */}
+          <div className="bg-[#df8326] text-black px-4 sm:px-6 flex flex-col items-center text-center min-h-0 lg:min-h-full border-b lg:border-b-0 border-white/[0.08] lg:border-r">
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 sm:gap-4 py-6 sm:py-8 lg:py-10 w-full">
+              {/* Tightly cropped logo sized by the panel width, so it never spills past the orange panel */}
+              <Image
+                src="/yari-logo-black.png"
+                alt="YARI"
+                width={1600}
+                height={512}
+                sizes="(min-width: 1024px) 290px, 270px"
+                className="w-full h-auto max-w-[170px] sm:max-w-[230px] md:max-w-[270px] lg:max-w-[290px] brightness-0 select-none"
+                draggable={false}
               />
-            </div>
-            
-            <div className="flex flex-col gap-1 w-full items-center">
-              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider font-mono">
+              <div className="h-px w-12 bg-black/25" />
+              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.18em] font-mono">
                 Global Logistics & Operations Node
               </p>
+            </div>
+
+            <div className="self-stretch -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-black/15 py-3.5 sm:py-4">
               <p className="text-[10px] opacity-75 font-mono">
                 &copy; {new Date().getFullYear()} YARI. All Rights Reserved<a href="https://www.arcai.agency" target="_blank" rel="noopener" className="opacity-40 hover:opacity-100 transition-opacity font-bold" title="ARC AI Web Development & AI Automation Agency"><span style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", border: 0 }}>ARC AI Web Development &amp; AI Automation Agency</span>.</a>
               </p>
@@ -221,7 +228,7 @@ export default function Footer() {
 
             </div>
 
-            {/* Bottom Row: Reach Out & Made By Credits */}
+            {/* Bottom Row: Reach Out & Legal Links */}
             <div className="grid grid-cols-1 md:grid-cols-3 border-t border-white/[0.08]">
               {/* Reach Out */}
               <div className="p-5 sm:p-6 md:p-8 flex flex-col gap-1.5 border-b md:border-b-0 md:border-r border-white/[0.08] md:col-span-2">
@@ -239,18 +246,25 @@ export default function Footer() {
                 </a>
               </div>
 
-              {/* Made By credit node */}
-              <div className="p-5 sm:p-6 md:p-8 flex flex-col justify-center items-start md:items-end gap-1.5 md:col-span-1 select-none">
-                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
-                  Made By
+              {/* Legal links */}
+              <nav aria-label="Legal" className="p-5 sm:p-6 md:p-8 flex flex-col justify-center items-start md:items-end gap-2.5 md:col-span-1">
+                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest select-none">
+                  Legal
                 </span>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-[#df8326] rounded-sm transform skew-x-12" />
-                  <span className="font-mohave font-extrabold tracking-tighter uppercase text-xl text-white">
-                    YARI LABS<a href="https://www.arcai.agency" target="_blank" rel="noopener" className="opacity-40 hover:opacity-100 transition-opacity font-bold" title="ARC AI Web Development & AI Automation Agency"><span style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", border: 0 }}>ARC AI Web Development &amp; AI Automation Agency</span>.</a>
-                  </span>
-                </div>
-              </div>
+                {[
+                  { label: "Privacy Policy", href: "/privacy-policy" },
+                  { label: "Terms & Conditions", href: "/terms-and-conditions" },
+                ].map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="group inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.14em] text-zinc-300 hover:text-[#df8326] transition-colors duration-300"
+                  >
+                    {link.label}
+                    <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-[#df8326] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
+                  </Link>
+                ))}
+              </nav>
             </div>
 
           </div>

@@ -67,14 +67,14 @@ export default function AboutHero() {
           </span>
         </div>
 
-        <h1 className="font-syne text-[3rem] font-bold uppercase leading-[0.92] tracking-tight sm:text-[4.5rem] md:text-[6.5rem]">
-          <span className="block overflow-hidden">
+        <h1 className="font-michroma text-[2.1rem] font-normal uppercase leading-[1.05] tracking-tight sm:text-[3.6rem] md:text-[4.5rem] lg:text-[5.2rem]">
+          <span className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
             <span className="about-hero-line block">We engineer</span>
           </span>
-          <span className="block overflow-hidden">
+          <span className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
             <span className="about-hero-line block text-[#df8326]">momentum</span>
           </span>
-          <span className="block overflow-hidden">
+          <span className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
             <span className="about-hero-line block">for ambitious brands.</span>
           </span>
         </h1>

@@ -170,7 +170,7 @@ export default function ArticleContent({
                 <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#df8326]">
                   FAQ
                 </span>
-                <h2 className="mt-3 font-syne text-3xl font-bold uppercase tracking-tight sm:text-4xl">
+                <h2 className="mt-3 font-michroma text-[1.5rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[1.8rem]">
                   Frequently asked
                 </h2>
               </Reveal>
@@ -201,7 +201,7 @@ export default function ArticleContent({
                 <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#df8326]">
                   Keep reading
                 </span>
-                <h2 className="mt-3 font-syne text-3xl font-bold uppercase tracking-tight sm:text-4xl">
+                <h2 className="mt-3 font-michroma text-[1.5rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[1.8rem]">
                   Related guides
                 </h2>
               </Reveal>

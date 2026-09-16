@@ -62,7 +62,7 @@ export default function AboutContent() {
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-32">
               <span className="font-rock-salt text-base text-[#df8326]">Our belief</span>
-              <h2 className="mt-5 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight sm:text-5xl">
+              <h2 className="mt-5 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[2.4rem]">
                 Craft is a competitive advantage.
               </h2>
             </div>
@@ -119,7 +119,7 @@ export default function AboutContent() {
             <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#df8326]">
               What we master
             </span>
-            <h2 className="mt-4 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight sm:text-5xl">
+            <h2 className="mt-4 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[2.4rem]">
               Four disciplines, one team.
             </h2>
           </Reveal>
@@ -174,7 +174,7 @@ export default function AboutContent() {
         <div className="mx-auto max-w-7xl">
           <Reveal className="mb-16 max-w-2xl">
             <span className="font-rock-salt text-base text-[#df8326]">Where we&apos;re going</span>
-            <h2 className="mt-4 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight sm:text-5xl">
+            <h2 className="mt-4 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[2.4rem]">
               Vision &amp; Mission.
             </h2>
           </Reveal>

@@ -9,6 +9,8 @@ export const post: Post = {
   category: "Logistics",
   pillar: true,
   featured: false,
+  cover: "/images/blog/ecommerce-fulfilment-logistics-dubai.jpg",
+  coverAlt: "Black parcels sealed with copper tape moving along a conveyor, with delivery light trails through a city at night",
   date: "2026-06-18",
   updated: "2026-06-18",
   readTime: "13 min",

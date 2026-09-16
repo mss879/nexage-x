@@ -809,7 +809,7 @@ export default function Services() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-4xl sm:text-5xl md:text-6xl font-syne font-medium tracking-tight uppercase leading-[1.05] mt-2 select-none"
+              className="text-[1.8rem] sm:text-[2.4rem] md:text-[3rem] font-michroma font-normal tracking-tight uppercase leading-[1.2] mt-2 select-none"
             >
               Design <br />
               Services That <br />
@@ -885,17 +885,21 @@ export default function Services() {
               {currentServices.map((svc, idx) => {
                 const isExpanded = expandedId === svc.id;
 
-                // Responsive geometric polygon cuts:
-                // Desktop: Stepped left shoulder
-                // Mobile: Standard symmetric left-corner chamfers to prevent squeeze
+                // Responsive geometric polygon cuts, mirrored left and right:
+                // stepped top shoulder + chamfered corners on both sides
+                // (the shoulder width shrinks on mobile via the CSS vars below)
                 const clipPathStyle = `polygon(
-                  0px 32px, 
-                  16px 16px, 
-                  var(--shoulder-end, 130px) 16px, 
-                  var(--shoulder-step, 146px) 0px, 
-                  100% 0px, 
-                  100% 100%, 
-                  16px 100%, 
+                  0px 32px,
+                  16px 16px,
+                  var(--shoulder-end, 130px) 16px,
+                  var(--shoulder-step, 146px) 0px,
+                  calc(100% - var(--shoulder-step, 146px)) 0px,
+                  calc(100% - var(--shoulder-end, 130px)) 16px,
+                  calc(100% - 16px) 16px,
+                  100% 32px,
+                  100% calc(100% - 16px),
+                  calc(100% - 16px) 100%,
+                  16px 100%,
                   0px calc(100% - 16px)
                 )`;
 

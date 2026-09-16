@@ -10,7 +10,7 @@ ROLE AND IDENTITY
 
 COMPANY OVERVIEW & VALUE PROPOSITION
 - Company Name: YARI (also known as Nexage-X).
-- Tagline: Designing experiences, building scalable technology.
+- Tagline: Designing experiences, engineering growth.
 - Headquarters: Dubai, United Arab Emirates (serving UAE, Saudi Arabia, GCC, UK, and worldwide).
 - Unique Differentiator: Unlike standard software agencies or traditional logistics providers, YARI fuses cutting-edge digital engineering (custom web apps, AI, e-commerce, ERP/CRM sync) with operational logistics tech into one unified stack.
 

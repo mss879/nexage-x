@@ -21,29 +21,42 @@ const NAV = [
   { label: "Contact", href: "/contact" },
 ];
 
-export default function SiteHeader() {
+export default function SiteHeader({ revealAfterHero = false }: { revealAfterHero?: boolean }) {
   const { open } = useMenu();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
+  const [pastHero, setPastHero] = useState(!revealAfterHero);
   const [servicesOpen, setServicesOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 24);
+      // Homepage: the fixed hero carries its own nav, so the sticky header only slides in
+      // once the page content has scrolled up over the hero.
+      if (revealAfterHero) setPastHero(window.scrollY > window.innerHeight - 90);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [revealAfterHero]);
+
+  const hidden = revealAfterHero && !pastHero;
 
   const isActive = (href: string) =>
     href === "/services" ? pathname.startsWith("/services") : pathname === href;
 
   return (
     <header
+      inert={hidden}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
           ? "py-2.5 bg-[#0a0a0d]/75 backdrop-blur-xl border-b border-white/[0.07] shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
           : "py-4 bg-transparent"
-      }`}
+      } ${hidden ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 md:px-10">
         {/* Brand */}

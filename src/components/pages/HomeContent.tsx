@@ -1,4 +1,5 @@
 import React from "react";
+import SiteHeader from "@/components/SiteHeader";
 import HeroWithPreloader from "@/components/sections/HeroWithPreloader";
 import AboutUs from "@/components/sections/AboutUs";
 import Services from "@/components/sections/Services";
@@ -10,9 +11,13 @@ import Benefits from "@/components/sections/Benefits";
 import Values from "@/components/sections/Values";
 import Footer from "@/components/Footer";
 
+const SHOW_PORTFOLIO = false;
+
 export default function HomeContent() {
   return (
     <main className="relative min-h-screen w-full bg-[#050508] overflow-x-hidden">
+      {/* Sticky header — stays hidden over the hero (which has its own nav) and slides in on scroll */}
+      <SiteHeader revealAfterHero />
       <HeroWithPreloader />
       
       {/* Scroll Stack Overlay Container (Starts 100vh down, covers fixed Hero on scroll) */}
@@ -29,8 +34,8 @@ export default function HomeContent() {
         {/* Section 4: Services (What We Do) */}
         <Services />
 
-        {/* Section: Projects (Recent Work Showcase) */}
-        <Projects />
+        {/* Section: Projects (Recent Work Showcase) — hidden for now, flip SHOW_PORTFOLIO to bring it back */}
+        {SHOW_PORTFOLIO && <Projects />}
 
         {/* Section: Our Values (WebGL aurora + GSAP) — sits above the process */}
         <Values />

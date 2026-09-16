@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   Geist_Mono,
   Syne,
+  Michroma,
   Plus_Jakarta_Sans,
   Orbitron,
   Mohave,
@@ -36,6 +37,14 @@ const syne = Syne({
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-next",
   subsets: ["latin"],
+  display: "swap",
+});
+
+// Hero headline — the extended geometric face closest to the YARI wordmark
+const michroma = Michroma({
+  variable: "--font-michroma-next",
+  subsets: ["latin"],
+  weight: "400",
   display: "swap",
 });
 
@@ -117,7 +126,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistMono.variable} ${syne.variable} ${plusJakartaSans.variable} ${orbitron.variable} ${mohave.variable} ${rockSalt.variable} h-full antialiased`}
+      className={`${geistMono.variable} ${syne.variable} ${michroma.variable} ${plusJakartaSans.variable} ${orbitron.variable} ${mohave.variable} ${rockSalt.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <JsonLd

@@ -142,7 +142,7 @@ export default function SoftwareServicesContent() {
         <div className="mx-auto max-w-7xl">
           <Reveal className="mx-auto mb-16 max-w-3xl text-center">
             <span className="font-rock-salt text-base text-[#df8326]">Spotlight integration</span>
-            <h2 className="mt-4 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight sm:text-5xl">
+            <h2 className="mt-4 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[2.4rem]">
               Your website, fused with Odoo & Zoho.
             </h2>
             <p className="mt-6 font-sans text-base leading-relaxed text-zinc-400 md:text-lg">
@@ -231,7 +231,7 @@ export default function SoftwareServicesContent() {
         <div className="mx-auto max-w-7xl">
           <Reveal className="mb-16 max-w-2xl">
             <span className="font-rock-salt text-base text-[#df8326]">How we build</span>
-            <h2 className="mt-4 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight sm:text-5xl">
+            <h2 className="mt-4 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[2.4rem]">
               From brief to launch.
             </h2>
           </Reveal>

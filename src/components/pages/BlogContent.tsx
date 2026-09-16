@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
@@ -35,20 +36,18 @@ export default function BlogContent() {
         <Reveal y={40} className="mx-auto max-w-7xl">
           <Link href={`/blog/${featured.slug}`} className="group block">
             <article className="relative grid grid-cols-1 overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0a0a0d] lg:grid-cols-2">
-              <div className="relative min-h-[260px] overflow-hidden lg:min-h-full">
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: `radial-gradient(120% 120% at 30% 10%, ${featAccent}4d 0%, transparent 55%), linear-gradient(135deg,#15100a 0%,#0a0a0d 100%)`,
-                  }}
+              <div className="relative aspect-[16/9] overflow-hidden bg-[#101015] lg:aspect-auto lg:min-h-full">
+                <Image
+                  src={featured.cover}
+                  alt={featured.coverAlt}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 640px"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 cyber-grid opacity-[0.06]" />
-                <span className="absolute bottom-6 right-6 font-mohave text-[7rem] font-bold uppercase leading-none tracking-tighter text-white/[0.05]">
-                  YARI
-                </span>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/0 to-black/20" />
                 <span
-                  className="absolute left-6 top-6 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em]"
-                  style={{ color: featAccent, borderColor: `${featAccent}80`, backgroundColor: `${featAccent}1a` }}
+                  className="absolute left-6 top-6 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] backdrop-blur-sm"
+                  style={{ color: featAccent, borderColor: `${featAccent}80`, backgroundColor: "rgba(10, 10, 13, 0.65)" }}
                 >
                   Featured · {featured.category}
                 </span>

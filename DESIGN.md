@@ -11,7 +11,8 @@ new pages. Every color, font, and motion value on new pages must trace back to t
 
 ## 2. Direction
 Dark, cinematic "cyber-atelier". Near-black canvas, a dark `#18181b` frame motif, coppery-orange
-energy, condensed uppercase display type, glass panels, grain, marquees, and GSAP/3D motion.
+energy, extended geometric display type (Michroma, echoing the wordmark), glass panels, grain,
+marquees, and GSAP/3D motion.
 Taste lane: **gpt-tasteskill** (cinematic, scroll-triggered). Never flat, never generic.
 
 ## 3. Color tokens
@@ -35,19 +36,40 @@ CTA gradient: `linear-gradient(180deg,#df8326 0%,#C57019 100%)`. Text selection 
 `rgba(139,92,246,*)` and `rgba(223,131,38,*)`.
 
 ## 4. Typography
-- **Display / headings**: `Syne` (medium/bold), tight tracking, often UPPERCASE.
-- **Condensed display**: `Mohave` — huge uppercase, `tracking-tighter` (footer, big numerals).
-- **Body**: `Plus Jakarta Sans`.
+- **Display / headings**: `Michroma` (`font-michroma`) — the extended geometric face that echoes the
+  logo wordmark. Used for every page-hero `h1`, every section `h2`, the footer "Start a project" line
+  and button labels (hero Menu/Connect, Learn more). **400 is its only weight**: headings are
+  `font-normal`; button labels use synthesized bold. `tracking-tight`; UPPERCASE section titles,
+  sentence case for the homepage hero and article titles.
+  - It is ~25% wider than the old Syne display: size headings ≈0.8× the Syne scale, and check that the
+    longest single word still fits the column at 360px and 768px.
+  - Its tall ascent metrics push commas/descenders below the line box: use leading ≥1.05 (uppercase)
+    or ≥1.15 (sentence case), and give masked line reveals (`overflow-hidden` spans) `pb-[0.1em] -mb-[0.1em]`.
+- **Sub-headings / card titles**: `Syne` or `Plus Jakarta Sans` bold (not Michroma).
+- **Condensed display**: `Mohave` — huge uppercase numerals, marquees, footer nav links, `tracking-tighter`.
+- **Body**: `Plus Jakarta Sans`. Card/intro descriptions that are justified use `text-justify hyphens-auto`.
 - **Labels / mono**: `font-mono` uppercase, `tracking-[0.15–0.22em]`, 11–13px.
 - **Handwritten accent**: `Rock Salt` (with wobbly SVG turbulence filter) — section eyebrows.
-Scale (display): clamp from ~2rem mobile → 4.2rem+ desktop; condensed hero up to `text-[8vw]`.
+Scale (display): ~2.1rem mobile → 5.2rem desktop for page heroes; section `h2` 1.8rem → 2.4rem.
+
+## 4a. Logo & icon
+- `public/yari-logo.png` — silver + gold, for dark surfaces. `public/yari-logo-black.png` — black + gold
+  (tightly cropped) for light surfaces; add `brightness-0` for a solid black mark on the orange panel.
+- Y mark: vector `components/ui/YMark.tsx` (traced from the logo). Favicon set in `app/` (`favicon.ico`,
+  `icon.png`, `apple-icon.png`) = white Y mark on a black square.
 
 ## 5. Primitives & states
 - **Skewed "framer" button** (`.framer-m5N6O`): `skewX(-20deg)`, orange border, content
   counter-skewed; hover lift + shimmer (`.cta-btn`, `.cta-shimmer-effect`).
 - **Glass panel** (`.glassmorphism`): blur(16px) + hairline border.
 - **Tag badge**: pill, pulsing orange dot + mono uppercase label.
-- **Cards**: chamfered / clip-path polygon shoulders, big radius (24px) frames, grain texture.
+- **3D tile** (`components/ui/Tile3D.tsx`, `.tile-3d-*` in globals.css): glossy face, extruded body,
+  tinted ground glow, staggered 4.5s float (paused under reduced motion); `size` prop scales it. Variants
+  are the social brands — the only social icon style (hero strip, footer, menu overlay, contact page).
+- **Floating 3D render** (`.float-render`): transparent 3D gold icon image (Higgsfield GPT Image 2,
+  `public/images/values/*`) bobbing on the same rhythm over a gold ground glow — Values cards.
+- **Cards**: chamfered / clip-path polygon shoulders (mirrored left and right, e.g. Services accordion),
+  big radius (24px) frames, grain texture.
 - States: every interactive element has default / hover (orange shift + lift) / focus-visible
   (orange ring) / active (scale 0.98). Sliding-text links (label slides up, orange copy follows).
 

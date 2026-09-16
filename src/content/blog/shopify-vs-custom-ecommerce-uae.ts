@@ -9,6 +9,8 @@ export const post: Post = {
   category: "Software",
   pillar: false,
   featured: false,
+  cover: "/images/blog/shopify-vs-custom-ecommerce-uae.jpg",
+  coverAlt: "A stack of identical modular blocks beside a custom-machined copper sculpture, representing template versus custom builds",
   date: "2026-06-12",
   updated: "2026-06-12",
   readTime: "11 min",

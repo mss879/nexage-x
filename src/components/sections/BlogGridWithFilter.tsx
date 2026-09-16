@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import { type Post, type Category } from "@/content/blog";
@@ -24,29 +25,28 @@ function PostCard({ post }: { post: Post }) {
   return (
     <Link href={`/blog/${post.slug}`} className="group block h-full">
       <article className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0a0a0d] transition-all duration-500 hover:border-white/20 hover:bg-[#101015]">
-        {/* visual band */}
-        <div className="relative h-40 overflow-hidden">
-          <div
-            className="absolute inset-0 opacity-90"
-            style={{
-              background: `radial-gradient(120% 120% at 20% 0%, ${accent}33 0%, transparent 55%), linear-gradient(135deg, #101015 0%, #0a0a0d 100%)`,
-            }}
+        {/* cover image (generated with Higgsfield) */}
+        <div className="relative aspect-[16/9] overflow-hidden bg-[#101015]">
+          <Image
+            src={post.cover}
+            alt={post.coverAlt}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 420px"
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          <div className="absolute inset-0 cyber-grid opacity-[0.06]" />
+          {/* keeps the pills legible over bright parts of the image */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/0 to-black/25" />
           <span
-            className="absolute left-5 top-5 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em]"
-            style={{ color: accent, borderColor: `${accent}55`, backgroundColor: `${accent}14` }}
+            className="absolute left-5 top-5 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] backdrop-blur-sm"
+            style={{ color: accent, borderColor: `${accent}66`, backgroundColor: "rgba(10, 10, 13, 0.65)" }}
           >
             {post.category}
           </span>
           {post.pillar && (
-            <span className="absolute right-5 top-5 rounded-full border border-white/15 bg-black/30 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-300">
+            <span className="absolute right-5 top-5 rounded-full border border-white/15 bg-black/55 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-200 backdrop-blur-sm">
               Pillar
             </span>
           )}
-          <span className="absolute bottom-4 right-5 font-mohave text-5xl font-bold uppercase tracking-tighter text-white/[0.06]">
-            YARI
-          </span>
         </div>
 
         <div className="flex flex-1 flex-col gap-3 p-6">
@@ -105,7 +105,7 @@ export default function BlogGridWithFilter({ posts }: { posts: Post[] }) {
             <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#df8326]">
               Browse by topic
             </span>
-            <h2 className="mt-3 font-syne text-3xl font-bold uppercase tracking-tight sm:text-4xl">
+            <h2 className="mt-3 font-michroma text-[1.5rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[1.8rem]">
               What we write about.
             </h2>
           </Reveal>

@@ -33,7 +33,7 @@ export default function ContactFAQs() {
           <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#df8326]">
             FAQ
           </span>
-          <h2 className="mt-4 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight sm:text-5xl">
+          <h2 className="mt-4 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[2.4rem]">
             Questions, answered.
           </h2>
         </Reveal>

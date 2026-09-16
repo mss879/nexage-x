@@ -69,7 +69,7 @@ export default function ContactContent() {
         <div className="mx-auto max-w-7xl">
           <Reveal className="mb-14 max-w-2xl">
             <span className="font-rock-salt text-base text-[#df8326]">What happens next</span>
-            <h2 className="mt-4 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight sm:text-5xl">
+            <h2 className="mt-4 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[2.4rem]">
               After you hit send.
             </h2>
           </Reveal>
@@ -103,7 +103,7 @@ export default function ContactContent() {
             <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#df8326]">
               Or reach us directly
             </span>
-            <h2 className="mt-4 font-syne text-3xl font-bold uppercase tracking-tight sm:text-4xl">
+            <h2 className="mt-4 font-michroma text-[1.5rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[1.8rem]">
               Prefer to skip the form?
             </h2>
           </Reveal>

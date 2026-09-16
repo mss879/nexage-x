@@ -2,7 +2,8 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Headset, X, Send, Sparkles, RefreshCw, CheckCircle2, User } from "lucide-react";
+import { X, Send, Sparkles, RefreshCw, CheckCircle2, User } from "lucide-react";
+import YMark from "@/components/ui/YMark";
 import gsap from "gsap";
 
 interface Message {
@@ -237,7 +238,7 @@ export default function AiChatWidget() {
                 transition={{ duration: 0.15 }}
                 className="relative z-10 flex items-center justify-center"
               >
-                <Headset className="h-8 w-8 text-white drop-shadow-[0_2px_10px_rgba(223,131,38,0.9)]" />
+                <YMark className="h-7 w-7 text-white drop-shadow-[0_2px_10px_rgba(223,131,38,0.9)]" />
                 <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-[#0a0a0e]" />
@@ -265,7 +266,7 @@ export default function AiChatWidget() {
             <div className="flex items-center justify-between border-b border-white/15 bg-[#14141e]/90 px-5 py-4">
               <div className="flex items-center gap-3.5">
                 <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#df8326] via-[#c57019] to-[#8f4b0b] text-white shadow-[0_4px_15px_rgba(197,112,25,0.5)] border border-white/30">
-                  <Headset className="h-5.5 w-5.5 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]" />
+                  <YMark className="h-4.5 w-4.5 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]" />
                   <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-[#0c0c12]" />
                 </div>
                 <div>
@@ -318,7 +319,7 @@ export default function AiChatWidget() {
                 >
                   {msg.role === "assistant" && (
                     <div className="h-8 w-8 shrink-0 rounded-xl bg-[#df8326]/20 border border-[#df8326]/40 flex items-center justify-center text-[#df8326] mt-0.5 shadow-sm">
-                      <Headset className="h-4 w-4 text-[#f5b93f]" />
+                      <YMark className="h-3.5 w-3.5 text-[#f5b93f]" />
                     </div>
                   )}
 

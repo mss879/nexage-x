@@ -132,7 +132,7 @@ export default function ServicesContent() {
         <div className="mx-auto max-w-7xl">
           <Reveal className="mb-16 max-w-2xl">
             <span className="font-rock-salt text-base text-[#df8326]">How we work</span>
-            <h2 className="mt-4 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight sm:text-5xl">
+            <h2 className="mt-4 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[2.4rem]">
               A clear path from idea to scale.
             </h2>
           </Reveal>
@@ -159,7 +159,7 @@ export default function ServicesContent() {
         <div className="mx-auto max-w-7xl">
           <Reveal className="mb-16 max-w-2xl">
             <span className="font-rock-salt text-base text-[#df8326]">Why YARI</span>
-            <h2 className="mt-4 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight sm:text-5xl">
+            <h2 className="mt-4 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[2.4rem]">
               One team, end to end.
             </h2>
             <p className="mt-5 font-sans text-base leading-relaxed text-zinc-400 md:text-lg">

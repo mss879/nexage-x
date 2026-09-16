@@ -56,11 +56,11 @@ export default function BlogHero() {
             The Journal
           </span>
         </div>
-        <h1 className="font-syne text-[3rem] font-bold uppercase leading-[0.92] tracking-tight sm:text-[4.5rem] md:text-[6rem]">
-          <span className="block overflow-hidden">
+        <h1 className="font-michroma text-[2.1rem] font-normal uppercase leading-[1.05] tracking-tight sm:text-[3.6rem] md:text-[4.6rem] lg:text-[4.8rem]">
+          <span className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
             <span className="blog-hero-line block">E-commerce in Dubai,</span>
           </span>
-          <span className="block overflow-hidden">
+          <span className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
             <span className="blog-hero-line block text-[#df8326]">explained.</span>
           </span>
         </h1>

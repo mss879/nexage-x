@@ -188,7 +188,7 @@ export default function Projects() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-16 md:mb-20"
         >
-          <h2 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-syne font-semibold text-white tracking-tight leading-[0.95] select-none">
+          <h2 className="text-[3rem] sm:text-[3.6rem] md:text-[4.8rem] lg:text-[6.4rem] font-michroma font-normal text-white tracking-tight leading-[1.05] select-none">
             Portfolio
           </h2>
         </motion.div>

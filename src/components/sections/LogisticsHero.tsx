@@ -61,11 +61,11 @@ export default function LogisticsHero() {
           </span>
         </div>
 
-        <h1 className="font-syne text-[2.6rem] font-bold uppercase leading-[0.92] tracking-tight sm:text-[4rem] md:text-[6rem]">
-          <span className="block overflow-hidden">
+        <h1 className="font-michroma text-[2.1rem] font-normal uppercase leading-[1.05] tracking-tight sm:text-[3.2rem] md:text-[4.8rem]">
+          <span className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
             <span className="lg-hero-line block">From click</span>
           </span>
-          <span className="block overflow-hidden">
+          <span className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
             <span className="lg-hero-line block">
               to <span className="text-[#df8326]">doorstep.</span>
             </span>

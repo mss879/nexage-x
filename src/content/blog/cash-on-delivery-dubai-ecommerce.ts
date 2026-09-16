@@ -9,6 +9,8 @@ export const post: Post = {
   category: "Logistics",
   pillar: false,
   featured: false,
+  cover: "/images/blog/cash-on-delivery-dubai-ecommerce.jpg",
+  coverAlt: "A black parcel with a copper ribbon beside gold coins and a card payment terminal, with a glowing checkmark above",
   date: "2026-05-30",
   updated: "2026-05-30",
   readTime: "11 min",

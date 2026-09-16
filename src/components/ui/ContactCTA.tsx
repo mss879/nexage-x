@@ -24,7 +24,7 @@ export default function ContactCTA({
 
       <Reveal className="relative z-10 mx-auto flex max-w-4xl flex-col items-center text-center">
         <span className="font-rock-salt text-base text-[#df8326]">{eyebrow}</span>
-        <h2 className="mt-5 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight text-white sm:text-5xl md:text-6xl">
+        <h2 className="mt-5 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight text-white sm:text-[2.4rem] md:text-[3rem]">
           {title}
         </h2>
         <p className="mt-6 max-w-xl font-sans text-base leading-relaxed text-zinc-400 md:text-lg">

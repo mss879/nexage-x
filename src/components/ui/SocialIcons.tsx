@@ -1,19 +1,22 @@
 import React from "react";
 import { SITE } from "@/lib/site";
+import Tile3D from "@/components/ui/Tile3D";
+
+// White brand glyphs, drawn to sit on the coloured 3D tiles below (viewBox 24)
 
 export function InstagramIcon({ className = "w-5 h-5" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.1} aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="5.5" />
+      <circle cx="12" cy="12" r="4.1" />
+      <circle cx="17.4" cy="6.6" r="1.15" fill="currentColor" stroke="none" />
     </svg>
   );
 }
 
 export function FacebookIcon({ className = "w-5 h-5" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
     </svg>
   );
@@ -21,15 +24,15 @@ export function FacebookIcon({ className = "w-5 h-5" }: { className?: string }) 
 
 export function LinkedinIcon({ className = "w-5 h-5" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.064 2.064 0 1 1 0-4.128 2.064 2.064 0 0 1 0 4.128zm1.782 13.019H3.555V9h3.564v11.452z" />
     </svg>
   );
 }
 
 export function YoutubeIcon({ className = "w-5 h-5" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
     </svg>
   );
@@ -37,7 +40,7 @@ export function YoutubeIcon({ className = "w-5 h-5" }: { className?: string }) {
 
 export function XIcon({ className = "w-5 h-5" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
     </svg>
   );
@@ -45,25 +48,27 @@ export function XIcon({ className = "w-5 h-5" }: { className?: string }) {
 
 export function GithubIcon({ className = "w-5 h-5" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
     </svg>
   );
 }
 
+// `variant` picks the tile's brand colours (.tile-3d-<variant> in globals.css);
+// `glyph` sizes each mark so they read equally heavy on a 42px tile.
 export const SOCIAL_LIST = [
-  { label: "Instagram", href: SITE.social.instagram, icon: InstagramIcon },
-  { label: "Facebook", href: SITE.social.facebook, icon: FacebookIcon },
-  { label: "LinkedIn", href: SITE.social.linkedin, icon: LinkedinIcon },
-  { label: "YouTube", href: SITE.social.youtube, icon: YoutubeIcon },
-  { label: "X / Twitter", href: SITE.social.x, icon: XIcon },
-  { label: "GitHub", href: SITE.social.github, icon: GithubIcon },
+  { label: "Instagram", href: SITE.social.instagram, icon: InstagramIcon, variant: "insta", glyph: "w-[23px] h-[23px]" },
+  { label: "Facebook", href: SITE.social.facebook, icon: FacebookIcon, variant: "facebook", glyph: "w-[22px] h-[22px]" },
+  { label: "LinkedIn", href: SITE.social.linkedin, icon: LinkedinIcon, variant: "linkedin", glyph: "w-[21px] h-[21px]" },
+  { label: "YouTube", href: SITE.social.youtube, icon: YoutubeIcon, variant: "youtube", glyph: "w-[22px] h-[22px]" },
+  { label: "X / Twitter", href: SITE.social.x, icon: XIcon, variant: "x", glyph: "w-[19px] h-[19px]" },
+  { label: "GitHub", href: SITE.social.github, icon: GithubIcon, variant: "github", glyph: "w-[22px] h-[22px]" },
 ];
 
 export function SocialIconsRow({ className = "flex flex-wrap items-center gap-2.5 sm:gap-3" }: { className?: string }) {
   return (
     <div className={className}>
-      {SOCIAL_LIST.map((social) => {
+      {SOCIAL_LIST.map((social, idx) => {
         const IconComponent = social.icon;
         return (
           <a
@@ -73,9 +78,11 @@ export function SocialIconsRow({ className = "flex flex-wrap items-center gap-2.
             rel="noopener noreferrer"
             aria-label={social.label}
             title={social.label}
-            className="group relative flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-zinc-300 transition-all duration-300 hover:scale-105 hover:border-[#df8326] hover:bg-[#df8326]/10 hover:text-[#df8326] hover:shadow-[0_0_15px_rgba(223,131,38,0.3)] active:scale-95"
+            className="relative inline-flex rounded-xl pt-1 pb-5 transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#df8326]"
           >
-            <IconComponent className="h-4.5 w-4.5 sm:h-5 sm:w-5 transition-transform duration-300 group-hover:scale-110" />
+            <Tile3D variant={social.variant} delay={-idx * 0.75}>
+              <IconComponent className={social.glyph} />
+            </Tile3D>
           </a>
         );
       })}

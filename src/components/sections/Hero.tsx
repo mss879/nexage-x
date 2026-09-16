@@ -5,6 +5,8 @@ import gsap from "gsap";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Logo from "@/components/ui/Logo";
+import { SOCIAL_LIST } from "@/components/ui/SocialIcons";
+import Tile3D from "@/components/ui/Tile3D";
 import { useMenu } from "@/components/menu/MenuProvider";
 
 // SVG Components for smooth, sloped transitions (S-Curves and stretched concave corners)
@@ -53,6 +55,9 @@ const SKEW_BTN_STYLE = {
   "--corner-shape-fallback": "0.752",
   borderRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
 } as React.CSSProperties;
+
+// The hero's social strip has room for three of the shared floating 3D tiles
+const HERO_SOCIALS = SOCIAL_LIST.filter((social) => ["insta", "linkedin", "x"].includes(social.variant));
 
 interface HeroProps {
   startAnimation?: boolean;
@@ -162,9 +167,9 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           <button
             onClick={openMenu}
             style={SKEW_BTN_STYLE}
-            className="-skew-x-[20deg] bg-gradient-to-b from-[#df8326] to-[#C57019] px-4 py-2 shadow-[0_6px_18px_rgba(197,112,25,0.35)] transition-transform active:scale-95"
+            className="-skew-x-[20deg] bg-gradient-to-b from-[#df8326] to-[#C57019] px-3 py-2 shadow-[0_6px_18px_rgba(197,112,25,0.35)] transition-transform active:scale-95"
           >
-            <span className="flex skew-x-[20deg] items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-wider text-white">
+            <span className="flex skew-x-[20deg] items-center gap-2 font-michroma text-[10px] font-bold whitespace-nowrap text-white">
               Menu
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
@@ -174,9 +179,9 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           <a
             href="/contact"
             style={SKEW_BTN_STYLE}
-            className="-skew-x-[20deg] bg-gradient-to-b from-[#df8326] to-[#C57019] px-4 py-2 shadow-[0_6px_18px_rgba(197,112,25,0.35)] transition-transform active:scale-95"
+            className="-skew-x-[20deg] bg-gradient-to-b from-[#df8326] to-[#C57019] px-3 py-2 shadow-[0_6px_18px_rgba(197,112,25,0.35)] transition-transform active:scale-95"
           >
-            <span className="flex skew-x-[20deg] items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-white">
+            <span className="flex skew-x-[20deg] items-center gap-1.5 font-michroma text-[10px] font-bold whitespace-nowrap text-white">
               Connect
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
                 <path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
@@ -220,12 +225,13 @@ export default function Hero({ startAnimation = true }: HeroProps) {
         />
 
         {/* Foreground Content */}
-        <div className="relative z-20 w-full h-full flex flex-col justify-center items-center md:items-start text-center md:text-left px-6 sm:px-12 md:px-20 lg:px-24 py-16 md:py-24 max-w-[1100px] my-auto">
-          {/* Headline Typography — exact Framer text styling */}
-          <h1 className="flex flex-col font-syne text-[1.85rem] sm:text-[2.8rem] md:text-[3.6rem] lg:text-[4.2rem] leading-[1.12] sm:leading-[1.05] tracking-tight text-[#000000] select-none font-medium mb-6">
-            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">Designing experiences,</span>
-            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5">building scalable</span>
-            <span ref={addToTitleRefs} className="block overflow-hidden py-0.5"><strong className="font-bold">technology</strong>.</span>
+        <div className="relative z-20 w-full h-full flex flex-col justify-center items-center md:items-start text-center md:text-left px-6 sm:px-12 md:px-14 lg:px-16 py-16 md:py-24 max-w-[1100px] my-auto">
+          {/* Headline Typography — Michroma echoes the logo wordmark. Its tall ascent metrics
+              push descenders below the line box, so the lines must not clip overflow; the
+              md:-ml offsets its left side bearing so the ink lines up with the logo's edge. */}
+          <h1 className="flex flex-col font-michroma text-[1.4rem] sm:text-[2.3rem] md:text-[2.6rem] lg:text-[3.2rem] leading-[1.2] sm:leading-[1.15] tracking-tight text-[#000000] select-none font-normal mb-6 md:-ml-[0.09em]">
+            <span ref={addToTitleRefs} className="block py-0.5">Designing experiences,</span>
+            <span ref={addToTitleRefs} className="block py-0.5">engineering growth.</span>
           </h1>
 
           {/* Description Paragraph */}
@@ -277,7 +283,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
             </div>
 
             <div className="framer-content-wrapper">
-              <span className="text-white font-plus-jakarta font-semibold text-sm">Learn more</span>
+              <span className="text-white font-michroma font-bold text-[13px]">Learn more</span>
               <ArrowRight className="w-4 h-4 text-white transition-transform duration-300 group-hover:translate-x-1.5" />
             </div>
           </a>
@@ -286,34 +292,33 @@ export default function Hero({ startAnimation = true }: HeroProps) {
 
       {/* --- ABSOLUTE OVERLAYS (The Cutouts - OUTSIDE CARD FOR PERFECT CORNERS) --- */}
 
-      {/* A. Top-Left Nav Block */}
+      {/* A. Top Nav — sits on the light card itself (no cutout): logo left, Menu & Connect right.
+          Left padding matches the hero content's (md:px-14 lg:px-16) so the logo and text share one edge. */}
       <div
         ref={navRef}
-        className="hidden md:flex absolute top-[12px] left-[12px] w-[580px] h-[56px] bg-[#18181b] z-30 items-center justify-between rounded-tl-[24px] shadow-[-2px_-2px_0_0_#18181b] px-4"
+        className="hidden md:flex absolute top-[12px] left-[12px] right-[12px] z-30 items-center justify-between pl-14 lg:pl-16 pr-8 pt-6"
       >
-        {/* Left Side: Logo */}
-        <div className="relative flex items-center h-full -top-[5px] w-full">
-          <a href="#hero" className="absolute left-[-22px] top-1/2 -translate-y-[49%] flex items-center shrink-0">
-            <Image src="/yari-logo.png" alt="Logo" width={800} height={200} className="h-[200px] w-auto object-contain" />
-          </a>
-        </div>
+        {/* Logo — black & gold variant for the light card */}
+        <a href="#hero" className="flex items-center shrink-0">
+          <Image src="/yari-logo-black.png" alt="YARI" width={188} height={60} className="h-[60px] w-[188px] object-contain select-none" draggable={false} />
+        </a>
 
-        {/* Right Side: Two Skewed Buttons (Menu & Connect) aligned far right */}
-        <div className="flex items-center gap-5 shrink-0 mr-[-18px] translate-x-[6px] -top-[6px] relative z-40">
+        {/* Two Skewed Buttons (Menu & Connect) aligned far right */}
+        <div className="flex items-center gap-5 shrink-0">
           {/* 1. Menu Button (Large) */}
           <div className="framer-iny974-container" style={{ transform: "none", transformOrigin: "50% 50% 0px", opacity: 1 }}>
             <button
               onClick={openMenu}
-              className="framer-m5N6O framer-m5N6O-large framer-uXsXm framer-cjrjU framer-55u4xr framer-v-55u4xr framer-1akrlmb"
+              className="framer-m5N6O framer-m5N6O-large framer-m5N6O-gold framer-uXsXm framer-cjrjU framer-55u4xr framer-v-55u4xr framer-1akrlmb shadow-[0_8px_30px_rgba(197,112,25,0.25)]"
               style={{
                 "--border-bottom-width": "1px",
-                "--border-color": "#C57019",
+                "--border-color": "rgba(255, 255, 255, 0.2)",
                 "--border-left-width": "1px",
                 "--border-right-width": "1px",
                 "--border-style": "solid",
                 "--border-top-width": "1px",
                 "--corner-shape-fallback": "0.752",
-                backgroundColor: "rgba(0, 0, 0, 0)",
+                background: "linear-gradient(180deg, #df8326 0%, #C57019 100%)",
                 // @ts-ignore
                 "cornerShape": "superellipse(1.5)",
                 borderBottomLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
@@ -346,16 +351,16 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           <div className="framer-iny974-container" style={{ transform: "none", transformOrigin: "50% 50% 0px", opacity: 1 }}>
             <a
               href="/contact"
-              className="framer-m5N6O framer-m5N6O-large framer-uXsXm framer-cjrjU framer-55u4xr framer-v-55u4xr framer-1akrlmb"
+              className="framer-m5N6O framer-m5N6O-large framer-m5N6O-gold framer-uXsXm framer-cjrjU framer-55u4xr framer-v-55u4xr framer-1akrlmb shadow-[0_8px_30px_rgba(197,112,25,0.25)]"
               style={{
                 "--border-bottom-width": "1px",
-                "--border-color": "#C57019",
+                "--border-color": "rgba(255, 255, 255, 0.2)",
                 "--border-left-width": "1px",
                 "--border-right-width": "1px",
                 "--border-style": "solid",
                 "--border-top-width": "1px",
                 "--corner-shape-fallback": "0.752",
-                backgroundColor: "rgba(0, 0, 0, 0)",
+                background: "linear-gradient(180deg, #df8326 0%, #C57019 100%)",
                 // @ts-ignore
                 "cornerShape": "superellipse(1.5)",
                 borderBottomLeftRadius: "calc(10px*var(--one-if-corner-shape-supported,var(--corner-shape-fallback,1)))",
@@ -395,10 +400,6 @@ export default function Hero({ startAnimation = true }: HeroProps) {
             </a>
           </div>
         </div>
-
-        {/* S-Curve on the right, standard concave corner on the bottom-left */}
-        <SCurveTop className="absolute top-0 -right-[31.5px]" width={32} height={56} />
-        <CornerOuter className="absolute -bottom-[39.5px] left-0" width={40} height={40} />
       </div>
 
       {/* B. Bottom-Left Name Block — Trusted by Ticker */}
@@ -487,39 +488,26 @@ export default function Hero({ startAnimation = true }: HeroProps) {
         ref={socialsRef}
         className="hidden md:flex absolute bottom-[12px] right-[8px] w-[88px] h-[310px] bg-[#18181b] z-30 flex-col items-center justify-center gap-2 py-3 rounded-br-[24px] shadow-[2px_2px_0_0_#18181b]"
       >
-        {/* Instagram */}
-        <a
-          href="https://instagram.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="social-btn social-btn-insta relative left-[6px] -top-[24px] w-[76px] h-[92px] flex items-center justify-center rounded-[12px] bg-[#27272a] text-white border-[3px] border-[#C57019] z-10"
-        >
-          <svg className="social-icon w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-          </svg>
-        </a>
-
-        {/* LinkedIn */}
-        <a
-          href="https://linkedin.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="social-btn social-btn-linkedin relative left-[6px] -top-[24px] w-[76px] h-[92px] flex items-center justify-center rounded-[12px] bg-[#27272a] text-white border-[3px] border-[#C57019] z-10"
-        >
-          <span className="social-icon font-syne font-bold text-[20px]">in</span>
-        </a>
-
-        {/* X / Twitter */}
-        <a
-          href="https://x.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="social-btn social-btn-x relative left-[6px] -top-[24px] w-[76px] h-[92px] flex items-center justify-center rounded-[12px] bg-[#27272a] text-white border-[3px] border-[#C57019] z-10"
-        >
-          <span className="social-icon font-syne font-bold text-[20px]">𝕏</span>
-        </a>
+        {/* Floating 3D brand tiles (Instagram, LinkedIn, X) — shared Tile3D */}
+        {HERO_SOCIALS.map((social, idx) => {
+          const Icon = social.icon;
+          return (
+            <a
+              key={social.variant}
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={social.label}
+              className={`social-btn social-btn-${social.variant} relative left-[6px] -top-[24px] w-[76px] h-[92px] flex items-center justify-center rounded-[12px] bg-[#27272a] text-white border-[3px] border-[#C57019] z-10`}
+            >
+              <span className="social-icon">
+                <Tile3D variant={social.variant} delay={-idx * 1.5}>
+                  <Icon className={social.glyph} />
+                </Tile3D>
+              </span>
+            </a>
+          );
+        })}
 
         {/* S-Curve on the top, standard concave corner on the bottom-left */}
         <SCurveRight className="absolute -top-[55.5px] left-0 z-0" width={88} height={56} />

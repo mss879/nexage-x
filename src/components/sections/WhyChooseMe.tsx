@@ -148,7 +148,7 @@ export default function WhyChooseMe() {
           transition={{ duration: 0.8 }}
           className="mb-12"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-syne font-medium tracking-tight text-[#1A1A1A] uppercase">
+          <h2 className="text-[1.6rem] md:text-[2.4rem] lg:text-[3rem] font-michroma font-normal leading-[1.2] tracking-tight text-[#1A1A1A] uppercase">
             Why choose us
           </h2>
           <div className="h-[1px] w-full bg-black/10 mt-8" />

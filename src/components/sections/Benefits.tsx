@@ -5,9 +5,6 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 
 export default function Benefits() {
-  // Brand card clip-path formula (12px diagonal cuts on top-left, top-right, bottom-left; 48px cut on bottom-right)
-  const cardClipPath = "polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 48px), calc(100% - 48px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px)";
-
   return (
     <section
       id="benefits"
@@ -41,11 +38,11 @@ export default function Benefits() {
               </div>
               
               {/* Title */}
-              <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-[85px] font-sans font-extrabold tracking-tighter uppercase leading-[0.82] text-white">
+              <h2 className="text-[2.2rem] sm:text-[2.7rem] md:text-[2.5rem] lg:text-[3.25rem] xl:text-[56px] font-michroma font-normal tracking-tight uppercase leading-[1] text-white">
                 GLOBAL <br />
                 LOGISTICS <br />
-                <span className="text-white/30">THAT YOU</span> <br />
-                <span className="text-white/30">CAN TRUST.</span>
+                <span className="bg-gradient-to-r from-[#df8326] to-[#C57019] bg-clip-text text-transparent">THAT YOU</span> <br />
+                <span className="bg-gradient-to-r from-[#df8326] to-[#C57019] bg-clip-text text-transparent">CAN TRUST.</span>
               </h2>
             </div>
 
@@ -84,36 +81,37 @@ export default function Benefits() {
           {/* 3. Cards Layout Grid (4 columns, gap-x is 0 for grid guides alignment) */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-y-12 md:gap-y-0 w-full relative z-10">
             
-            {/* Column 1: Card 1 (Forward-Thinking Design) */}
+            {/* Column 1: Card 1 (Forward-Thinking Logistics) — same open layout as the other cards */}
             <div className="col-span-1 flex flex-col px-4 md:px-6 w-full">
-              {/* Dark card container with custom clip-path */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="w-full bg-[#0a0a0f] border border-white/[0.08] flex flex-col justify-between h-full min-h-[420px] shadow-[0_15px_35px_rgba(0,0,0,0.6)] overflow-hidden"
-                style={{ clipPath: cardClipPath }}
+                className="flex flex-col w-full h-full"
               >
-                {/* Header labels */}
-                <div className="pt-6 px-6 pb-4">
-                  <span className="text-xs md:text-sm font-mono font-bold uppercase tracking-widest text-[#df8326] block mb-1">
-                    Forward-Thinking
+                {/* Header divider line */}
+                <div className="border-t border-white/15 pt-3.5 pb-4 flex items-center justify-between font-mono text-xs md:text-sm w-full">
+                  <span className="font-bold uppercase tracking-widest text-white">
+                    Forward-Thinking Logistics
                   </span>
-                  <h3 className="text-2xl md:text-3xl font-sans font-extrabold text-white leading-none">
-                    Logistics
-                  </h3>
+                  {/* Diamond marker */}
+                  <span className="w-2 h-2 rotate-45 border border-[#df8326]/70 shrink-0" />
                 </div>
 
-                {/* Team member portrait image */}
-                <div className="relative w-full h-[280px] overflow-hidden mt-auto">
+                {/* Subtext description */}
+                <p className="text-sm md:text-base text-white/70 font-sans leading-relaxed mb-6">
+                  Experienced coordinators who plan, track, and communicate every step of your shipments.
+                </p>
+
+                {/* Team member portrait — rounded render card that fills the rest of the column */}
+                <div className="relative w-full overflow-hidden bg-[#0a0a0f] border border-white/[0.08] shadow-lg rounded-[16px] aspect-[4/5] md:aspect-auto md:flex-1 md:min-h-[320px]">
                   <Image
                     src="/logistics-coordinator.png"
-                    alt="Forward-Thinking Logistics Headshot"
-                    width={1024}
-                    height={1024}
-                    sizes="(max-width: 768px) 100vw, 700px"
-                    className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
+                    alt="Forward-Thinking Logistics coordinator"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                    className="object-cover object-center transition-transform duration-700 hover:scale-103"
                   />
                 </div>
               </motion.div>

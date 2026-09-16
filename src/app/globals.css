@@ -6,6 +6,7 @@
   --font-sans: var(--font-plus-jakarta-next), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
   --font-syne: var(--font-syne-next), sans-serif;
+  --font-michroma: var(--font-michroma-next), sans-serif;
   --font-orbitron: var(--font-orbitron-next), sans-serif;
   --font-plus-jakarta: var(--font-plus-jakarta-next), sans-serif;
   --font-mohave: var(--font-mohave-next), sans-serif;
@@ -208,6 +209,8 @@ html {
   position: relative;
 }
 
+/* Film grain: a fixed 200px noise tile repeated at 1:1. (An unsized SVG gets stretched across the whole
+   element, which blows the noise up into visible pixel blocks on large or odd-sized screens.) */
 .grain-texture::before {
   content: "";
   position: absolute;
@@ -217,7 +220,9 @@ html {
   opacity: 0.055;
   pointer-events: none;
   z-index: 1;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturation' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cfilter id='noiseFilter' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturation' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  background-repeat: repeat;
 }
 
 /* Hide standard cursor if using CustomCursor */
@@ -332,6 +337,24 @@ html {
   margin-top: 2.5px !important;
 }
 
+/* Gold Fill Variant — hero nav buttons: Learn-more gold gradient with a bold white label */
+.framer-m5N6O-gold {
+  --framer-text-color: #ffffff;
+  color: #ffffff;
+}
+
+.framer-m5N6O-gold .framer-text {
+  font-family: var(--font-michroma);
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0;
+}
+
+.framer-m5N6O-gold:hover {
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 12px 32px rgba(223, 131, 38, 0.4) !important;
+}
+
 /* Premium Social Buttons Animations */
 .social-btn {
   transform: skewY(-20deg) !important;
@@ -361,6 +384,248 @@ html {
 
 .social-btn-x:hover .social-icon {
   transform: skewY(20deg) scale(1.28) rotate(-10deg) !important;
+}
+
+/* 3D Floating Tiles (components/ui/Tile3D.tsx) — glossy face, extruded body and a tinted ground glow,
+   bobbing in 3D. Used for every social icon and the Values icons. No preserve-3d: the tile is composited
+   flat and then tilted, so z-index layering holds. The wrap carries the variant, --tile-size and
+   --tile-delay, so the tile and its ground glow share them. */
+.tile-3d-wrap {
+  position: relative;
+  display: block;
+  --tile-radius: calc(var(--tile-size, 42px) * 0.29);
+}
+
+.tile-3d {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--tile-size, 42px);
+  height: var(--tile-size, 42px);
+  color: #ffffff;
+  animation: tile-3d-float 4.5s ease-in-out infinite;
+  animation-delay: var(--tile-delay, 0s);
+}
+
+.tile-3d::before,
+.tile-3d::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--tile-radius);
+}
+
+/* Face: specular sheen over the variant fill, lit from the top-left */
+.tile-3d::before {
+  z-index: 1;
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.12) 35%, rgba(255, 255, 255, 0) 55%),
+    var(--tile-face);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.65),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.22);
+}
+
+/* Body: a darker copy pushed down reads as the tile's thickness, casting a soft shadow */
+.tile-3d::after {
+  z-index: 0;
+  background: var(--tile-face);
+  filter: brightness(0.5) saturate(1.2);
+  transform: translateY(calc(var(--tile-size, 42px) * 0.14));
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.55);
+}
+
+.tile-3d svg {
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.28)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+}
+
+/* Variants: tile face + ground glow (tinted so it reads on dark surfaces) */
+.tile-3d-insta {
+  --tile-face: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
+  --tile-glow: rgba(214, 36, 159, 0.6);
+}
+
+.tile-3d-facebook {
+  --tile-face: linear-gradient(160deg, #4a9dff 0%, #1877f2 55%, #0e5fd6 100%);
+  --tile-glow: rgba(24, 119, 242, 0.6);
+}
+
+.tile-3d-linkedin {
+  --tile-face: linear-gradient(160deg, #2a8ff0 0%, #0a66c2 60%, #0857a6 100%);
+  --tile-glow: rgba(42, 143, 240, 0.6);
+}
+
+.tile-3d-youtube {
+  --tile-face: linear-gradient(160deg, #ff5a5a 0%, #ff0000 55%, #c80000 100%);
+  --tile-glow: rgba(255, 30, 30, 0.5);
+}
+
+.tile-3d-x {
+  --tile-face: linear-gradient(160deg, #4a4a52 0%, #16161a 50%, #000000 100%);
+  --tile-glow: rgba(255, 255, 255, 0.28);
+}
+
+.tile-3d-github {
+  --tile-face: linear-gradient(160deg, #5c6570 0%, #24292f 55%, #0d1117 100%);
+  --tile-glow: rgba(255, 255, 255, 0.24);
+}
+
+/* Ground glow — tightens and fades as the tile rises */
+.tile-3d-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--tile-size, 42px) * -0.48);
+  width: calc(var(--tile-size, 42px) * 0.95);
+  height: calc(var(--tile-size, 42px) * 0.24);
+  transform-origin: center;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--tile-glow), rgba(0, 0, 0, 0));
+  animation: tile-3d-shadow 4.5s ease-in-out infinite;
+  animation-delay: var(--tile-delay, 0s);
+  pointer-events: none;
+}
+
+@keyframes tile-3d-float {
+  0%,
+  100% {
+    transform: perspective(180px) translateY(0) rotateX(16deg) rotateY(-16deg);
+  }
+  50% {
+    transform: perspective(180px) translateY(-7px) rotateX(8deg) rotateY(12deg);
+  }
+}
+
+@keyframes tile-3d-shadow {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(0.7);
+    opacity: 0.45;
+  }
+}
+
+/* Floating 3D render (Values icons) — a transparent 3D image that bobs on the tiles' 4.5s rhythm
+   over a gold ground glow. Set --float-delay on the wrapper to stagger neighbours. */
+.float-render {
+  position: relative;
+  display: block;
+}
+
+.float-render > img {
+  position: relative;
+  z-index: 1;
+  animation: float-render-bob 4.5s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+.float-render::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  width: 72%;
+  height: 12px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(223, 131, 38, 0.5), rgba(0, 0, 0, 0));
+  animation: tile-3d-shadow 4.5s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+  pointer-events: none;
+}
+
+@keyframes float-render-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile-3d,
+  .tile-3d-shadow,
+  .float-render > img,
+  .float-render::after {
+    animation: none;
+  }
+}
+
+/* Values card descriptions — four hand-fitted lines (224–232px at 15px), each justified edge to edge.
+   The font scales with the card's text column (it is a size container), so the fit holds at every width:
+   15px at a 233px column, clamped to 12-16px; the block stops widening once the font hits its cap. */
+.values-desc {
+  width: 100%;
+  max-width: calc(233px * 16 / 15);
+  font-size: clamp(12px, calc(100cqi * 15 / 233), 16px);
+}
+
+.values-desc > span {
+  display: block;
+  white-space: nowrap;
+  text-align: justify;
+  text-align-last: justify;
+}
+
+/* Legal pages (components/pages/LegalPage.tsx) — long-form body copy */
+.legal-prose p,
+.legal-prose li {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.75;
+  color: #d4d4d8;
+}
+
+.legal-prose p + p,
+.legal-prose p + ul,
+.legal-prose ul + p {
+  margin-top: 1rem;
+}
+
+.legal-prose ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.legal-prose li {
+  position: relative;
+  padding-left: 1.4rem;
+}
+
+.legal-prose li::before {
+  content: "";
+  position: absolute;
+  left: 0.15rem;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  rotate: 45deg;
+  border: 1px solid rgba(223, 131, 38, 0.8);
+}
+
+.legal-prose strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.legal-prose a {
+  color: #df8326;
+  text-decoration: underline;
+  text-decoration-color: rgba(223, 131, 38, 0.35);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.3s ease;
+}
+
+.legal-prose a:hover {
+  text-decoration-color: #df8326;
 }
 
 /* Premium CTA Button Shimmer & Scale Animations */

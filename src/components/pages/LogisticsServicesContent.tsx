@@ -72,7 +72,7 @@ export default function LogisticsServicesContent() {
         <div className="mx-auto max-w-7xl">
           <Reveal className="mb-16 max-w-2xl">
             <span className="font-rock-salt text-base text-[#df8326]">Capabilities</span>
-            <h2 className="mt-4 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight sm:text-5xl">
+            <h2 className="mt-4 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[2.4rem]">
               The full operations stack.
             </h2>
           </Reveal>
@@ -127,7 +127,7 @@ export default function LogisticsServicesContent() {
             <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#df8326]">
               How it flows
             </span>
-            <h2 className="mt-4 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight sm:text-5xl">
+            <h2 className="mt-4 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[2.4rem]">
               Five steps, fully tracked.
             </h2>
           </Reveal>
@@ -154,7 +154,7 @@ export default function LogisticsServicesContent() {
         <div className="mx-auto max-w-7xl">
           <Reveal className="mb-16 max-w-2xl">
             <span className="font-rock-salt text-base text-[#df8326]">Integrated by default</span>
-            <h2 className="mt-4 font-syne text-4xl font-bold uppercase leading-[1.02] tracking-tight sm:text-5xl">
+            <h2 className="mt-4 font-michroma text-[1.8rem] font-normal uppercase leading-[1.15] tracking-tight sm:text-[2.4rem]">
               Logistics that talks to your stack.
             </h2>
             <p className="mt-5 font-sans text-base leading-relaxed text-zinc-400 md:text-lg">

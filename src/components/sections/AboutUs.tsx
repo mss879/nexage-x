@@ -591,7 +591,7 @@ export default function AboutUs() {
 
             <motion.h2 
               variants={itemVariants} 
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-syne font-medium leading-[1.05] tracking-tight uppercase text-white select-none"
+              className="text-[1.8rem] sm:text-[2.4rem] md:text-[3rem] lg:text-[3.6rem] font-michroma font-normal leading-[1.2] tracking-tight uppercase text-white select-none"
             >
               We Are <br />
               <span className="bg-gradient-to-r from-[#df8326] to-[#C57019] bg-clip-text text-transparent">

@@ -98,7 +98,7 @@ function MethodCard({
           </h3>
 
           {/* Card Description (Text size slightly larger as requested for perfect readability) */}
-          <p className="text-[15px] lg:text-[15.5px] font-sans font-light leading-relaxed mb-6 text-white/80">
+          <p className="text-[15px] lg:text-[15.5px] font-sans font-light leading-relaxed mb-6 text-white/80 text-justify hyphens-auto">
             {description}
           </p>
 
@@ -260,7 +260,7 @@ export default function Methodology() {
             </div>
 
             {/* Premium, ultra-bold capitalized stacked header in brand colors */}
-            <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-7xl font-sans font-extrabold tracking-tighter uppercase leading-[0.88] select-none flex flex-col pt-1">
+            <h2 className="text-[2.2rem] sm:text-[2.7rem] md:text-[3.25rem] font-michroma font-normal tracking-tight uppercase leading-[1] select-none flex flex-col pt-1">
               <span className="bg-gradient-to-r from-[#df8326] to-[#C57019] bg-clip-text text-transparent">YARI®</span>
               <span className="text-[#1A1A1A]">METHOD</span>
             </h2>
@@ -268,7 +268,7 @@ export default function Methodology() {
 
           {/* Column 2: Right alignment descriptive copy */}
           <div className="lg:col-span-5 flex items-center justify-start lg:justify-end lg:pt-12">
-            <p className="text-[#808080] text-[17px] md:text-lg font-sans font-normal leading-relaxed max-w-sm text-justify select-none">
+            <p className="text-[#808080] text-[17px] md:text-lg font-sans font-normal leading-relaxed max-w-sm text-justify hyphens-auto select-none">
               Every project requires a distinct strategy, yet our underlying approach remains unified: intentional, collaborative, and engineered to{" "}
               <span className="text-[#1A1A1A] font-semibold">drive measurable outcomes</span>. This is our execution blueprint.
             </p>
