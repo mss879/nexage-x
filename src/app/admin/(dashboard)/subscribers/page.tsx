@@ -1,6 +1,7 @@
 import React from "react";
 import { createClient } from "@/lib/supabase/server";
 import SubscribersList from "./SubscribersList";
+import { PageHeader } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -23,15 +24,8 @@ export default async function SubscribersPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-mohave text-3xl font-bold uppercase tracking-tight text-white">
-          Email List
-        </h1>
-        <p className="mt-1 font-sans text-sm text-zinc-400">
-          Manage newsletter subscribers, track signups, and export subscriber lists.
-        </p>
-      </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Email list" description="Newsletter subscribers — search, export and manage." />
 
       <SubscribersList initialSubscribers={subscribers} />
     </div>

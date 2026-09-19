@@ -305,7 +305,7 @@ export default function Methodology() {
 
           {/* Right Side Slide-Up Text Reveal Link Button */}
           <motion.a 
-            href="./about-us#method-scroll-section"
+            href="/about"
             whileHover={{ 
               scale: 1.02,
               boxShadow: "0 10px 30px rgba(223,131,38,0.06)",

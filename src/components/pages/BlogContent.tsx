@@ -25,7 +25,7 @@ export default function BlogContent() {
   const featAccent = accentByCategory[featured.category];
 
   return (
-    <main className="relative min-h-screen w-full bg-[#050508] text-white">
+    <main id="main-content" className="relative min-h-screen w-full bg-[#050508] text-white">
       <SiteHeader />
 
       {/* ── Hero ─────────────────────────────────────────── */}

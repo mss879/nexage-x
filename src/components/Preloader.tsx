@@ -2,9 +2,16 @@
 
 import React, { useRef } from "react";
 import Image from "next/image";
-import * as THREE from "three";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import {
+  bindAttribute,
+  createContext,
+  createProgram,
+  perspective,
+  sphereModelView,
+  srgbToLinear,
+} from "@/components/preloader/gl";
 
 interface PreloaderProps {
   onActiveReveal: () => void;
@@ -15,8 +22,11 @@ interface PreloaderProps {
 // condense into a sphere: copper-gold upper hemisphere, silver-white lower,
 // a dark band at the equator. The core pulses, the sphere bursts past camera
 // and black panels part to reveal the hero. All particles live in a single
-// THREE.Points draw call; formation/burst are computed in the vertex shader
-// from two GSAP-driven uniforms, so per-frame JS cost stays near zero.
+// POINTS draw call; formation/burst are computed in the vertex shader from two
+// GSAP-driven uniforms, so per-frame JS cost stays near zero.
+// Drawn with raw WebGL (components/preloader/gl.ts) rather than three.js: the
+// library was the site's largest chunk and had to download before the first
+// frame. The shaders, particle maths and timeline are unchanged.
 // (The previous "Assembly" preloader is archived in components/preloaders/.)
 const SPHERE_R = 2.3;
 const CAM_Z = 7;
@@ -139,32 +149,22 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
       return;
     }
 
-    let renderer: THREE.WebGLRenderer;
+    const canvas = canvasRef.current;
+    const gl = createContext(canvas);
+    let program: WebGLProgram;
     try {
-      renderer = new THREE.WebGLRenderer({
-        canvas: canvasRef.current,
-        antialias: false, // round sprites are shader-feathered; MSAA buys nothing
-        alpha: true,
-        powerPreference: "high-performance",
-      });
+      if (!gl) throw new Error("preloader: WebGL unavailable");
+      program = createProgram(gl, VERT, FRAG);
     } catch {
       runSimple();
       return;
     }
 
     const width = containerRef.current.clientWidth;
-    const height = containerRef.current.clientHeight;
-    renderer.setSize(width, height);
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(FOV, width / height, 0.1, 100);
-    camera.position.z = CAM_Z;
-
-    // --- Group hierarchy: parent (responsive scale) > sphere (rotation) ---
-    const parentGroup = new THREE.Group();
-    const sphereGroup = new THREE.Group();
-    parentGroup.add(sphereGroup);
-    scene.add(parentGroup);
+    // --- Transform hierarchy: parent (responsive scale, float) > sphere (rotation, pulse) ---
+    const parentGroup = { y: 0, scale: { x: 1, y: 1, z: 1 } };
+    const sphereGroup = { rotX: 0, rotY: 0, scale: { x: 1, y: 1, z: 1 } };
 
     // --- Particle attributes ---
     const isMobile = width < 768;
@@ -177,10 +177,6 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
     const sizes = new Float32Array(COUNT);
     const seeds = new Float32Array(COUNT);
     const delays = new Float32Array(COUNT);
-
-    const _c = new THREE.Color();
-    const _v = new THREE.Vector3();
-    const _w = new THREE.Vector3();
 
     for (let i = 0; i < COUNT; i++) {
       // Direction on the unit sphere, rejection-sampled so density peaks at
@@ -220,14 +216,19 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
       starts[i * 3 + 2] = sz;
 
       // Bezier control: midpoint pushed sideways + up → curved swoop
-      _v.set(tx - sx, ty - sy, tz - sz);
-      const len = _v.length();
-      _w.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).cross(_v);
-      if (_w.lengthSq() < 0.001) _w.set(0, 1, 0);
-      _w.normalize().multiplyScalar(len * (0.15 + Math.random() * 0.3));
-      ctrls[i * 3] = (sx + tx) / 2 + _w.x;
-      ctrls[i * 3 + 1] = (sy + ty) / 2 + _w.y + len * 0.1;
-      ctrls[i * 3 + 2] = (sz + tz) / 2 + _w.z;
+      const vx = tx - sx, vy = ty - sy, vz = tz - sz;
+      const len = Math.sqrt(vx * vx + vy * vy + vz * vz);
+      const rx = Math.random() - 0.5, ry = Math.random() - 0.5, rz = Math.random() - 0.5;
+      // random vector × travel direction → a sideways push
+      let wx = ry * vz - rz * vy;
+      let wy = rz * vx - rx * vz;
+      let wz = rx * vy - ry * vx;
+      if (wx * wx + wy * wy + wz * wz < 0.001) { wx = 0; wy = 1; wz = 0; }
+      const push = (len * (0.15 + Math.random() * 0.3)) / Math.sqrt(wx * wx + wy * wy + wz * wz);
+      wx *= push; wy *= push; wz *= push;
+      ctrls[i * 3] = (sx + tx) / 2 + wx;
+      ctrls[i * 3 + 1] = (sy + ty) / 2 + wy + len * 0.1;
+      ctrls[i * 3 + 2] = (sz + tz) / 2 + wz;
 
       // Color: gold above the equator band, silver below, dim mix inside it
       const band = 0.07 + Math.random() * 0.05;
@@ -242,10 +243,9 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
       const hot = !dust && Math.random() < 0.06;
       if (hot) brightness = 1.35;
       if (dust) brightness *= 0.6;
-      _c.setHex(hex);
-      colors[i * 3] = _c.r * brightness;
-      colors[i * 3 + 1] = _c.g * brightness;
-      colors[i * 3 + 2] = _c.b * brightness;
+      colors[i * 3] = srgbToLinear(((hex >> 16) & 255) / 255) * brightness;
+      colors[i * 3 + 1] = srgbToLinear(((hex >> 8) & 255) / 255) * brightness;
+      colors[i * 3 + 2] = srgbToLinear((hex & 255) / 255) * brightness;
 
       // World-space point diameter (projected to px in the shader)
       sizes[i] = hot
@@ -257,14 +257,16 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
       delays[i] = Math.random();
     }
 
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(targets, 3));
-    geo.setAttribute("aStart", new THREE.BufferAttribute(starts, 3));
-    geo.setAttribute("aCtrl", new THREE.BufferAttribute(ctrls, 3));
-    geo.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
-    geo.setAttribute("aSize", new THREE.BufferAttribute(sizes, 1));
-    geo.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 1));
-    geo.setAttribute("aDelay", new THREE.BufferAttribute(delays, 1));
+    gl.useProgram(program);
+    const buffers = [
+      bindAttribute(gl, program, "position", targets, 3),
+      bindAttribute(gl, program, "aStart", starts, 3),
+      bindAttribute(gl, program, "aCtrl", ctrls, 3),
+      bindAttribute(gl, program, "aColor", colors, 3),
+      bindAttribute(gl, program, "aSize", sizes, 1),
+      bindAttribute(gl, program, "aSeed", seeds, 1),
+      bindAttribute(gl, program, "aDelay", delays, 1),
+    ];
 
     const uniforms = {
       uBuild: { value: 0 },
@@ -273,36 +275,47 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
       uGlow: { value: 0.15 },
       uProj: { value: 1 },
     };
-    const mat = new THREE.ShaderMaterial({
-      vertexShader: VERT,
-      fragmentShader: FRAG,
-      uniforms,
-      transparent: true,
-      depthWrite: false,
-      depthTest: false,
-      blending: THREE.AdditiveBlending,
-    });
+    const loc = {
+      uBuild: gl.getUniformLocation(program, "uBuild"),
+      uBoom: gl.getUniformLocation(program, "uBoom"),
+      uTime: gl.getUniformLocation(program, "uTime"),
+      uGlow: gl.getUniformLocation(program, "uGlow"),
+      uProj: gl.getUniformLocation(program, "uProj"),
+      modelView: gl.getUniformLocation(program, "modelViewMatrix"),
+      projection: gl.getUniformLocation(program, "projectionMatrix"),
+    };
 
-    const points = new THREE.Points(geo, mat);
-    points.frustumCulled = false; // particles start far outside the base bounds
-    sphereGroup.add(points);
+    // Additive, non-premultiplied, no depth — what three set up for
+    // { transparent, depthTest: false, depthWrite: false, AdditiveBlending }
+    gl.disable(gl.DEPTH_TEST);
+    gl.depthMask(false);
+    gl.enable(gl.BLEND);
+    gl.blendEquation(gl.FUNC_ADD);
+    gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE);
+    gl.clearColor(0, 0, 0, 0);
+
+    const projectionMatrix = new Float32Array(16);
+    const modelViewMatrix = new Float32Array(16);
 
     const handleResize = () => {
       if (!containerRef.current) return;
       const w = containerRef.current.clientWidth;
       const h = containerRef.current.clientHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
+      perspective(projectionMatrix, FOV, w / h, 0.1, 100);
       // Lower pixel-ratio cap on small screens — biggest mobile fill-rate win
       const pr = Math.min(window.devicePixelRatio || 1, w < 768 ? 1.5 : 2);
-      renderer.setPixelRatio(pr);
-      renderer.setSize(w, h);
-      uniforms.uProj.value = (h * pr) / (2 * Math.tan(THREE.MathUtils.degToRad(FOV / 2)));
+      canvas.width = Math.floor(w * pr);
+      canvas.height = Math.floor(h * pr);
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      const tanHalfFov = Math.tan((FOV * Math.PI) / 360);
+      uniforms.uProj.value = (h * pr) / (2 * tanHalfFov);
       // Fit the sphere to ~62% of the limiting viewport dimension
-      const halfH = Math.tan(THREE.MathUtils.degToRad(FOV / 2)) * CAM_Z;
+      const halfH = tanHalfFov * CAM_Z;
       const halfW = halfH * (w / h);
       const s = (0.62 * Math.min(halfW, halfH)) / SPHERE_R;
-      parentGroup.scale.setScalar(s);
+      parentGroup.scale.x = parentGroup.scale.y = parentGroup.scale.z = s;
     };
     window.addEventListener("resize", handleResize);
     handleResize();
@@ -369,6 +382,13 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
     tl.to(leftDoorRef.current, { xPercent: -100.5, duration: 0.85, ease: "power4.inOut" }, T_DOORS);
     tl.to(rightDoorRef.current, { xPercent: 100.5, duration: 0.85, ease: "power4.inOut" }, T_DOORS);
 
+    // Dev aid: /?preloaderAt=2.6 freezes the timeline at that second, for
+    // visual comparison. Never active in production builds.
+    if (process.env.NODE_ENV !== "production") {
+      const at = new URLSearchParams(window.location.search).get("preloaderAt");
+      if (at) tl.pause(parseFloat(at));
+    }
+
     // --- Render loop: slow spin, idle float, mouse parallax ---
     let frameId: number;
     let time = 0;
@@ -377,11 +397,28 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
       time += 0.016;
       uniforms.uTime.value = time;
 
-      parentGroup.position.y = Math.sin(time * 1.1) * 0.05;
-      sphereGroup.rotation.y += (time * 0.14 + mouse.x * 0.16 - sphereGroup.rotation.y) * 0.07;
-      sphereGroup.rotation.x += (mouse.y * 0.1 + Math.sin(time * 0.5) * 0.03 - sphereGroup.rotation.x) * 0.07;
+      parentGroup.y = Math.sin(time * 1.1) * 0.05;
+      sphereGroup.rotY += (time * 0.14 + mouse.x * 0.16 - sphereGroup.rotY) * 0.07;
+      sphereGroup.rotX += (mouse.y * 0.1 + Math.sin(time * 0.5) * 0.03 - sphereGroup.rotX) * 0.07;
 
-      renderer.render(scene, camera);
+      sphereModelView(
+        modelViewMatrix,
+        CAM_Z,
+        parentGroup.y,
+        parentGroup.scale.x,
+        sphereGroup.rotX,
+        sphereGroup.rotY,
+        sphereGroup.scale.x
+      );
+      gl.uniform1f(loc.uBuild, uniforms.uBuild.value);
+      gl.uniform1f(loc.uBoom, uniforms.uBoom.value);
+      gl.uniform1f(loc.uTime, uniforms.uTime.value);
+      gl.uniform1f(loc.uGlow, uniforms.uGlow.value);
+      gl.uniform1f(loc.uProj, uniforms.uProj.value);
+      gl.uniformMatrix4fv(loc.modelView, false, modelViewMatrix);
+      gl.uniformMatrix4fv(loc.projection, false, projectionMatrix);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.POINTS, 0, COUNT);
       frameId = requestAnimationFrame(tick);
     };
     frameId = requestAnimationFrame(tick);
@@ -392,10 +429,10 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
       window.removeEventListener("mousemove", handleMouseMove);
       cancelAnimationFrame(frameId);
 
-      scene.remove(parentGroup);
-      geo.dispose();
-      mat.dispose();
-      renderer.dispose();
+      // Free GPU objects but keep the context alive: React strict mode re-runs
+      // this effect on the same canvas, and a lost context can't be reacquired.
+      buffers.forEach((b) => b && gl.deleteBuffer(b));
+      gl.deleteProgram(program);
     };
   }, { scope: containerRef, dependencies: [onActiveReveal, onComplete] });
 
@@ -406,6 +443,7 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
 
   return (
     <div
+      id="preloader-root"
       ref={containerRef}
       onClick={handleSkip}
       className="fixed inset-0 z-[100] bg-[#050508] overflow-hidden pointer-events-auto"
@@ -429,7 +467,7 @@ export default function Preloader({ onActiveReveal, onComplete }: PreloaderProps
           alt="YARI"
           width={480}
           height={104}
-          priority
+          preload
           className="yari-logo opacity-0 h-9 sm:h-11 md:h-[48px] w-auto object-contain select-none"
           draggable={false}
         />

@@ -3,6 +3,7 @@ import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { SYSTEM_PROMPT } from "@/lib/ai-context";
 import { createClient } from "@/lib/supabase/server";
+import { SITE } from "@/lib/site";
 
 export const maxDuration = 30;
 
@@ -66,7 +67,7 @@ export async function POST(req: Request) {
       let fallbackText = "Hello! I am YARI's AI Assistant. I can help answer your questions about our software engineering, custom Next.js web applications, Odoo ERP & Zoho CRM integrations, and logistics technology solutions.";
 
       if (lastUserMsg.toLowerCase().includes("contact") || lastUserMsg.toLowerCase().includes("email") || lastUserMsg.toLowerCase().includes("quote") || lastUserMsg.toLowerCase().includes("project")) {
-        fallbackText = "Thanks for your interest in working with YARI! You can reach our engineering team directly at contact@yari.com or call +971 50 863 2422. Please share your project scope, timeline, and email address, and we will get back to you with a proposal.";
+        fallbackText = `Thanks for your interest in working with YARI! You can reach our engineering team directly at ${SITE.email} or call ${SITE.phones[0].number}. Please share your project scope, timeline, and email address, and we will get back to you with a proposal.`;
       } else if (lastUserMsg.toLowerCase().includes("service")) {
         fallbackText = "YARI specializes in two core disciplines:\n- Software Services: Custom web apps, mobile apps, AI automation, Odoo/Zoho ERP & CRM sync, headless e-commerce.\n- Logistics Technology: Warehouse inventory syncing, automated dispatch, freight tracking, reverse logistics.\n\nWhich area would you like to explore?";
       }

@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import { SOCIAL_LIST } from "@/components/ui/SocialIcons";
 import Tile3D from "@/components/ui/Tile3D";
@@ -70,11 +71,30 @@ export default function Hero({ startAnimation = true }: HeroProps) {
   const titleLinesRef = useRef<HTMLSpanElement[]>([]);
   const descRef = useRef<HTMLParagraphElement>(null);
   const buttonRef = useRef<HTMLAnchorElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const navRef = useRef<HTMLDivElement>(null);
   const mobileNavRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const socialsRef = useRef<HTMLDivElement>(null);
   const imageWrapperRef = useRef<HTMLDivElement>(null);
+
+  // Start the background video once the main thread is idle (see the <video> note)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const start = () => {
+      video.play().catch(() => {
+        /* autoplay blocked — the poster stays, which is fine */
+      });
+    };
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(start, { timeout: 1500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(start, 600);
+    return () => clearTimeout(id);
+  }, []);
 
   const addToTitleRefs = (el: HTMLSpanElement | null) => {
     if (el && !titleLinesRef.current.includes(el)) {
@@ -156,7 +176,8 @@ export default function Hero({ startAnimation = true }: HeroProps) {
       className="relative w-full h-screen bg-[#18181b] max-md:bg-[#050508] p-0 md:p-3 flex flex-col justify-center items-center overflow-hidden font-sans"
     >
       {/* Mobile-only black navbar — real logo left, Menu/Connect right */}
-      <div
+      <nav
+        aria-label="Primary"
         ref={mobileNavRef}
         className="md:hidden w-full h-[60px] shrink-0 bg-[#050508] z-30 flex items-center justify-between pl-3 pr-3 select-none"
       >
@@ -189,7 +210,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
             </span>
           </a>
         </div>
-      </div>
+      </nav>
 
       {/* 1. Main Light-Grey Card — full-bleed on mobile, framed with padding on md+ */}
       <div
@@ -201,11 +222,16 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           ref={imageWrapperRef}
           className="absolute inset-0 pointer-events-none select-none z-0"
         >
+          {/* No autoPlay / preload="none": the 5 MB file must not compete with the
+              page's JS during load. The effect above starts it once the browser is
+              idle, so it buffers behind the preloader; the poster is frame 0. */}
           <video
-            autoPlay
+            ref={videoRef}
             loop
             muted
             playsInline
+            preload="none"
+            poster="/hero-poster.jpg"
             className="w-full h-full object-cover"
             style={{ objectPosition: "69.8% 49.5%" }}
           >
@@ -249,9 +275,10 @@ export default function Hero({ startAnimation = true }: HeroProps) {
           </p>
 
           {/* CTA button — orange gradient with top border highlight, rounded-xl (12px) */}
-          <a
+          <Link
             ref={buttonRef}
-            href="#work"
+            href="/services"
+            data-track="hero_learn_more"
             className="framer-m5N6O group cta-btn flex items-center shadow-[0_8px_30px_rgba(197,112,25,0.25)] select-none overflow-hidden"
             style={{
               "--border-bottom-width": "1px",
@@ -286,7 +313,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
               <span className="text-white font-michroma font-bold text-[13px]">Learn more</span>
               <ArrowRight className="w-4 h-4 text-white transition-transform duration-300 group-hover:translate-x-1.5" />
             </div>
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -294,7 +321,8 @@ export default function Hero({ startAnimation = true }: HeroProps) {
 
       {/* A. Top Nav — sits on the light card itself (no cutout): logo left, Menu & Connect right.
           Left padding matches the hero content's (md:px-14 lg:px-16) so the logo and text share one edge. */}
-      <div
+      <nav
+        aria-label="Primary"
         ref={navRef}
         className="hidden md:flex absolute top-[12px] left-[12px] right-[12px] z-30 items-center justify-between pl-14 lg:pl-16 pr-8 pt-6"
       >
@@ -400,7 +428,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
             </a>
           </div>
         </div>
-      </div>
+      </nav>
 
       {/* B. Bottom-Left Name Block — Trusted by Ticker */}
       <div

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { ArrowRight, Check } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import { submitInquiry } from "@/app/contact/actions";
+import { track } from "@/lib/track";
 
 const INTERESTS = [
   "Software",
@@ -56,6 +57,7 @@ export default function ContactForm() {
     setIsSubmitting(false);
 
     if (result.success) {
+      track("contact_submit", form.budget ? { budget: form.budget } : undefined);
       setSubmitted(true);
     } else {
       setError(result.error || "An unknown error occurred.");

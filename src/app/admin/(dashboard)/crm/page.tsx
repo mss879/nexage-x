@@ -1,6 +1,7 @@
 import React from "react";
 import { createClient } from "@/lib/supabase/server";
 import KanbanBoard from "./KanbanBoard";
+import { ErrorBanner, PageHeader } from "@/components/admin/ui";
 
 // Opt out of static caching for the CRM page to ensure real-time leads display
 export const dynamic = "force-dynamic";
@@ -26,20 +27,13 @@ export default async function CRMPage() {
   }
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="font-syne text-2xl font-bold uppercase tracking-tight md:text-3xl">CRM Pipeline</h1>
-          <p className="text-sm text-zinc-400 font-sans mt-1">
-            Track and manage your business deals and conversion status.
-          </p>
-        </div>
-      </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader title="CRM pipeline" description="Track deals from first contact to won." />
 
       {fetchError ? (
-        <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6 text-center text-sm text-red-400 font-sans">
-          Failed to fetch CRM leads: {fetchError}. Please ensure Supabase connection is established.
-        </div>
+        <ErrorBanner>
+          Couldn&rsquo;t load CRM leads: {fetchError}
+        </ErrorBanner>
       ) : (
         <KanbanBoard initialLeads={leads} />
       )}

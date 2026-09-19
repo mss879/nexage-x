@@ -171,11 +171,11 @@ export default function WhyChooseMe() {
             >
               <Image
                 src="/why-us.png"
-                alt="Why Choose YARI"
+                alt="Person in a VR headset selecting a shopping cart icon on a holographic e-commerce dashboard"
                 fill
+                sizes="(min-width: 1280px) 840px, (min-width: 768px) 66vw, 100vw"
                 className="object-cover"
                 style={{ objectPosition: "center" }}
-                priority
               />
               {/* Subtle dark gradient overlay to ensure text is never blocked */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
@@ -213,6 +213,8 @@ export default function WhyChooseMe() {
               <video
                 ref={videoRefCard2}
                 src="/Web_design_gallery_fly-through_202605271835.mp4"
+                poster="/why-us-gallery-poster.jpg"
+                preload="none"
                 loop
                 muted
                 playsInline
@@ -238,8 +240,9 @@ export default function WhyChooseMe() {
             >
               <Image
                 src="/projects completed.png"
-                alt="Projects Completed"
+                alt="60+ projects completed, shown over a wall of e-commerce website designs"
                 fill
+                sizes="(min-width: 1280px) 410px, (min-width: 768px) 33vw, 100vw"
                 className="object-cover"
                 style={{ objectPosition: "center" }}
               />
@@ -274,6 +277,8 @@ export default function WhyChooseMe() {
                 <video
                   ref={videoRefCard4}
                   src="/Plant_grows_on_platforms_202605271924.mp4#t=4"
+                  poster="/why-us-plant-poster.jpg"
+                  preload="none"
                   loop
                   muted
                   playsInline

@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Mail, Search, Download, Trash2, CheckCircle2, UserX, Copy, Check } from "lucide-react";
 import { deleteSubscriber, updateSubscriberStatus } from "@/app/admin/actions";
+import { Badge, Button, Card, Chip, EmptyState, Input, StatCard } from "@/components/admin/ui";
+import { SUBSCRIBER_STATUS_TONE } from "@/components/admin/status";
 
 interface Subscriber {
   id: string;
@@ -101,167 +103,104 @@ export default function SubscribersList({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Overview Stat Cards */}
+    <div className="flex flex-col gap-5">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs uppercase tracking-widest text-zinc-400">
-              Total Subscribers
-            </span>
-            <Mail className="h-5 w-5 text-[#df8326]" />
-          </div>
-          <p className="mt-3 font-mohave text-3xl font-bold text-white">{totalCount}</p>
-        </div>
-
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs uppercase tracking-widest text-emerald-400">
-              Active Subscribers
-            </span>
-            <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-          </div>
-          <p className="mt-3 font-mohave text-3xl font-bold text-white">{activeCount}</p>
-        </div>
-
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs uppercase tracking-widest text-zinc-500">
-              Unsubscribed
-            </span>
-            <UserX className="h-5 w-5 text-zinc-500" />
-          </div>
-          <p className="mt-3 font-mohave text-3xl font-bold text-white">{unsubscribedCount}</p>
-        </div>
+        <StatCard label="Total subscribers" value={totalCount} icon={Mail} />
+        <StatCard label="Active" value={activeCount} icon={CheckCircle2} emphasis />
+        <StatCard label="Unsubscribed" value={unsubscribedCount} icon={UserX} />
       </div>
 
-      {/* Toolbar: Search, Filters & Export CSV */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* Search Input */}
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-          <input
-            type="text"
+      {/* Toolbar */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative w-full lg:max-w-xs">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+          <Input
+            type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search email subscribers..."
-            className="w-full rounded-xl border border-white/[0.08] bg-zinc-900/50 pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-[#df8326] focus:outline-none focus:ring-1 focus:ring-[#df8326]"
+            placeholder="Search by email…"
+            aria-label="Search subscribers by email"
+            className="pl-9"
           />
         </div>
 
-        {/* Filter & Export Buttons */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-1 rounded-xl border border-white/[0.08] bg-white/[0.02] p-1">
-            {(["all", "active", "unsubscribed"] as const).map((st) => (
-              <button
-                key={st}
-                onClick={() => setStatusFilter(st)}
-                className={`rounded-lg px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition-colors ${
-                  statusFilter === st
-                    ? "bg-[#df8326] text-black font-bold"
-                    : "text-zinc-400 hover:text-white"
-                }`}
-              >
-                {st}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={handleExportCSV}
-            className="flex items-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-white transition-colors hover:border-[#df8326] hover:bg-[#df8326]/10 hover:text-[#df8326]"
-          >
-            <Download className="h-4 w-4" />
+        <div className="flex flex-wrap items-center gap-2">
+          {(["all", "active", "unsubscribed"] as const).map((status) => (
+            <Chip
+              key={status}
+              selected={statusFilter === status}
+              onClick={() => setStatusFilter(status)}
+              className="capitalize"
+            >
+              {status}
+            </Chip>
+          ))}
+          <Button variant="secondary" size="sm" onClick={handleExportCSV} className="ml-1">
+            <Download className="h-3.5 w-3.5" />
             Export CSV
-          </button>
+          </Button>
         </div>
       </div>
 
-      {/* Subscribers Table */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02]">
+      <Card className="overflow-hidden">
         {filtered.length === 0 ? (
-          <div className="p-12 text-center">
-            <Mail className="mx-auto h-10 w-10 text-zinc-600" />
-            <h3 className="mt-3 font-syne text-lg font-semibold text-white">No subscribers found</h3>
-            <p className="mt-1 font-sans text-sm text-zinc-500">
-              {search
-                ? `No email match found for "${search}".`
-                : "No newsletter subscribers have been recorded yet."}
-            </p>
-          </div>
+          <EmptyState
+            icon={Mail}
+            title="No subscribers found"
+            description={search ? "Try a different search or filter." : "Newsletter signups from the footer will appear here."}
+          />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-sans text-sm">
-              <thead className="border-b border-white/[0.08] bg-white/[0.02] font-mono text-xs uppercase tracking-wider text-zinc-400">
-                <tr>
-                  <th className="px-6 py-4">Subscriber Email</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Source</th>
-                  <th className="px-6 py-4">Date Subscribed</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+            <table className="w-full min-w-[640px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-stone-200 bg-stone-50 text-xs font-medium text-stone-500">
+                  <th scope="col" className="px-5 py-3 font-medium">Email</th>
+                  <th scope="col" className="px-5 py-3 font-medium">Status</th>
+                  <th scope="col" className="px-5 py-3 font-medium">Source</th>
+                  <th scope="col" className="px-5 py-3 font-medium">Subscribed</th>
+                  <th scope="col" className="px-5 py-3 text-right font-medium">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.06]">
+              <tbody className="divide-y divide-stone-200">
                 {filtered.map((sub) => (
-                  <tr key={sub.id} className="transition-colors hover:bg-white/[0.02]">
-                    <td className="px-6 py-4 font-mono font-medium text-white">
+                  <tr key={sub.id} className="transition-colors hover:bg-stone-50">
+                    <td className="px-5 py-3">
                       <div className="flex items-center gap-2">
-                        <span>{sub.email}</span>
+                        <span className="font-medium text-stone-900">{sub.email}</span>
                         <button
+                          type="button"
                           onClick={() => handleCopyEmail(sub.email)}
-                          title="Copy Email"
-                          className="text-zinc-500 hover:text-[#df8326] transition-colors"
+                          aria-label={`Copy ${sub.email}`}
+                          className="flex h-6 w-6 items-center justify-center rounded text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-700 cursor-pointer"
                         >
                           {copiedEmail === sub.email ? (
-                            <Check className="h-3.5 w-3.5 text-emerald-400" />
+                            <Check className="h-3.5 w-3.5 text-gold-600" />
                           ) : (
                             <Copy className="h-3.5 w-3.5" />
                           )}
                         </button>
                       </div>
                     </td>
-
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider ${
-                          sub.status === "active"
-                            ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                            : "border border-zinc-700 bg-zinc-800 text-zinc-400"
-                        }`}
-                      >
-                        <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            sub.status === "active" ? "bg-emerald-400" : "bg-zinc-500"
-                          }`}
-                        />
+                    <td className="px-5 py-3">
+                      <Badge tone={SUBSCRIBER_STATUS_TONE[sub.status]} className="capitalize">
                         {sub.status}
-                      </span>
+                      </Badge>
                     </td>
-
-                    <td className="px-6 py-4 font-mono text-xs text-zinc-400 uppercase">
-                      {sub.source || "footer"}
-                    </td>
-
-                    <td className="px-6 py-4 font-mono text-xs text-zinc-400">
-                      {formatDate(sub.created_at)}
-                    </td>
-
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-5 py-3 text-stone-600">{sub.source || "footer"}</td>
+                    <td className="px-5 py-3 tabular-nums text-stone-600">{formatDate(sub.created_at)}</td>
+                    <td className="px-5 py-3">
                       <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleToggleStatus(sub.id, sub.status)}
-                          className="rounded-lg border border-white/10 px-2.5 py-1.5 font-mono text-[11px] uppercase text-zinc-300 hover:border-[#df8326] hover:text-[#df8326] transition-colors"
-                        >
-                          {sub.status === "active" ? "Unsubscribe" : "Activate"}
-                        </button>
-
-                        <button
+                        <Button variant="secondary" size="sm" onClick={() => handleToggleStatus(sub.id, sub.status)}>
+                          {sub.status === "active" ? "Unsubscribe" : "Reactivate"}
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
                           onClick={() => handleDelete(sub.id, sub.email)}
-                          title="Delete Subscriber"
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 hover:border-red-500/40 transition-colors"
+                          aria-label={`Delete ${sub.email}`}
                         >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -270,7 +209,7 @@ export default function SubscribersList({
             </table>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

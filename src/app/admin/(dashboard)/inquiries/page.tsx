@@ -1,6 +1,7 @@
 import React from "react";
 import { createClient } from "@/lib/supabase/server";
 import InquiriesList from "./InquiriesList";
+import { ErrorBanner, PageHeader } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -25,18 +26,13 @@ export default async function InquiriesPage() {
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="font-syne text-2xl font-bold uppercase tracking-tight md:text-3xl">Inquiries Manager</h1>
-        <p className="text-sm text-zinc-400 font-sans mt-1">
-          Review and process contact form submissions from your public website.
-        </p>
-      </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Inquiries" description="Review and process contact form submissions from the website." />
 
       {fetchError ? (
-        <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6 text-center text-sm text-red-400 font-sans">
-          Failed to load inquiries: {fetchError}. Please check Supabase configuration.
-        </div>
+        <ErrorBanner>
+          Couldn&rsquo;t load inquiries: {fetchError}
+        </ErrorBanner>
       ) : (
         <InquiriesList initialInquiries={inquiries} />
       )}

@@ -1,5 +1,5 @@
 import React from "react";
-import { SITE } from "@/lib/site";
+import { SOCIAL_PROFILES, type SocialNetwork } from "@/lib/site";
 import Tile3D from "@/components/ui/Tile3D";
 
 // White brand glyphs, drawn to sit on the coloured 3D tiles below (viewBox 24)
@@ -56,14 +56,26 @@ export function GithubIcon({ className = "w-5 h-5" }: { className?: string }) {
 
 // `variant` picks the tile's brand colours (.tile-3d-<variant> in globals.css);
 // `glyph` sizes each mark so they read equally heavy on a 42px tile.
-export const SOCIAL_LIST = [
-  { label: "Instagram", href: SITE.social.instagram, icon: InstagramIcon, variant: "insta", glyph: "w-[23px] h-[23px]" },
-  { label: "Facebook", href: SITE.social.facebook, icon: FacebookIcon, variant: "facebook", glyph: "w-[22px] h-[22px]" },
-  { label: "LinkedIn", href: SITE.social.linkedin, icon: LinkedinIcon, variant: "linkedin", glyph: "w-[21px] h-[21px]" },
-  { label: "YouTube", href: SITE.social.youtube, icon: YoutubeIcon, variant: "youtube", glyph: "w-[22px] h-[22px]" },
-  { label: "X / Twitter", href: SITE.social.x, icon: XIcon, variant: "x", glyph: "w-[19px] h-[19px]" },
-  { label: "GitHub", href: SITE.social.github, icon: GithubIcon, variant: "github", glyph: "w-[22px] h-[22px]" },
+const SOCIAL_META: {
+  network: SocialNetwork;
+  label: string;
+  icon: (props: { className?: string }) => React.JSX.Element;
+  variant: string;
+  glyph: string;
+}[] = [
+  { network: "instagram", label: "Instagram", icon: InstagramIcon, variant: "insta", glyph: "w-[23px] h-[23px]" },
+  { network: "facebook", label: "Facebook", icon: FacebookIcon, variant: "facebook", glyph: "w-[22px] h-[22px]" },
+  { network: "linkedin", label: "LinkedIn", icon: LinkedinIcon, variant: "linkedin", glyph: "w-[21px] h-[21px]" },
+  { network: "youtube", label: "YouTube", icon: YoutubeIcon, variant: "youtube", glyph: "w-[22px] h-[22px]" },
+  { network: "x", label: "X / Twitter", icon: XIcon, variant: "x", glyph: "w-[19px] h-[19px]" },
+  { network: "github", label: "GitHub", icon: GithubIcon, variant: "github", glyph: "w-[22px] h-[22px]" },
 ];
+
+// Only networks with a real profile in SOCIAL_PROFILES are rendered.
+export const SOCIAL_LIST = SOCIAL_META.flatMap((meta) => {
+  const href = SOCIAL_PROFILES[meta.network];
+  return href ? [{ ...meta, href }] : [];
+});
 
 export function SocialIconsRow({ className = "flex flex-wrap items-center gap-2.5 sm:gap-3" }: { className?: string }) {
   return (

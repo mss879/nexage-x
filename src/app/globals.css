@@ -28,6 +28,18 @@
   --color-border-subtle: rgba(255, 255, 255, 0.06);
   --color-border-glow: rgba(139, 92, 246, 0.3);
 
+  /* Logo gold — the single accent of the light admin UI (DESIGN.md §9).
+     Same ramp as the preloader's gold hemisphere. */
+  --color-gold-50: #fffaeb;
+  --color-gold-100: #fff0c4;
+  --color-gold-200: #ffe499;
+  --color-gold-300: #ffd766;
+  --color-gold-400: #f5b93f;
+  --color-gold-500: #eaa42a;
+  --color-gold-600: #c98a1b;
+  --color-gold-700: #9a6a0e;
+  --color-gold-800: #6e4b08;
+
   /* Customized Animations */
   --animate-float-slow: float-slow 8s ease-in-out infinite;
   --animate-float-medium: float-medium 6s ease-in-out infinite;
@@ -150,6 +162,41 @@ html {
   background: rgba(223, 131, 38, 0.35);
   color: #ffffff;
   text-shadow: 0 0 8px rgba(223, 131, 38, 0.7);
+}
+
+/* ── Admin (light) ─────────────────────────────────────────────────────────
+   The backend is a light, quiet workspace: stone neutrals + logo gold only.
+   Everything is scoped to .admin-theme so the public site is untouched. */
+.admin-theme {
+  color-scheme: light;
+  background-color: #fafaf9;
+  color: #1c1917;
+}
+
+.admin-theme ::selection {
+  background: var(--color-gold-200);
+  color: #1c1917;
+  text-shadow: none;
+}
+
+/* Light scrollbars while an admin page is mounted */
+html:has(.admin-theme) {
+  scrollbar-color: #d6d3d1 #fafaf9;
+}
+html:has(.admin-theme) ::-webkit-scrollbar-track {
+  background: #fafaf9;
+}
+html:has(.admin-theme) ::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-color: #fafaf9;
+  box-shadow: none;
+}
+html:has(.admin-theme) ::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+  box-shadow: none;
+}
+html:has(.admin-theme) body {
+  background-color: #fafaf9;
 }
 
 /* Utility classes for Premium Aesthetics */

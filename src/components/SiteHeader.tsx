@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronDown, ArrowUpRight } from "lucide-react";
 import { useMenu } from "@/components/menu/MenuProvider";
 import Logo from "@/components/ui/Logo";
@@ -86,12 +86,15 @@ export default function SiteHeader({ revealAfterHero = false }: { revealAfterHer
                   />
                 </Link>
 
-                <AnimatePresence>
-                  {servicesOpen && (
+                {/* Always in the DOM so the two service pages are linked from every
+                    page's server HTML; hidden (and untabbable) until hovered. */}
                     <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.97 }}
+                      initial={false}
+                      animate={
+                        servicesOpen
+                          ? { opacity: 1, y: 0, scale: 1, visibility: "visible" }
+                          : { opacity: 0, y: 10, scale: 0.97, transitionEnd: { visibility: "hidden" } }
+                      }
                       transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                       className="absolute left-1/2 top-full w-72 -translate-x-1/2 pt-3"
                     >
@@ -115,8 +118,6 @@ export default function SiteHeader({ revealAfterHero = false }: { revealAfterHer
                         ))}
                       </div>
                     </motion.div>
-                  )}
-                </AnimatePresence>
               </div>
             ) : (
               <Link
@@ -136,6 +137,7 @@ export default function SiteHeader({ revealAfterHero = false }: { revealAfterHer
         <div className="flex items-center gap-3">
           <Link
             href="/contact"
+            data-track="header_connect"
             className="hidden sm:inline-flex items-center gap-2 rounded-full border border-[#C57019]/60 px-5 py-2 text-xs font-semibold uppercase tracking-wider text-white transition-all duration-300 hover:border-[#df8326] hover:bg-[#df8326]/10"
           >
             Connect

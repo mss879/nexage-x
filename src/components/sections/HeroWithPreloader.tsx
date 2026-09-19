@@ -1,13 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import dynamic from "next/dynamic";
 import Hero from "@/components/sections/Hero";
-
-// Load Preloader dynamically to prevent SSR/hydration mismatch with Three.js canvas
-const Preloader = dynamic(() => import("@/components/Preloader"), {
-  ssr: false,
-});
+// Imported statically and server-rendered: the preloader is a few KB of raw
+// WebGL, so it ships in the page bundle and starts on the first effect after
+// hydration instead of waiting for a second, lazily-requested chunk.
+import Preloader from "@/components/Preloader";
 
 export default function HeroWithPreloader() {
   const [isPreloaded, setIsPreloaded] = useState(false);
@@ -33,12 +31,10 @@ export default function HeroWithPreloader() {
 
   return (
     <>
-      {/* SSR-painted shield: the Preloader is a client-only chunk (three.js),
-          so without this the server-rendered hero flashes before it mounts.
-          The shield is in the initial HTML, covering the hero from the very
-          first paint, and unmounts when the preloader reveals (onActiveReveal
-          or the fallback timer). Hidden for no-JS visitors so the page never
-          stays black without JavaScript. */}
+      {/* SSR-painted shield: covers the server-rendered hero from the very first
+          paint and unmounts when the preloader reveals (onActiveReveal or the
+          fallback timer). Both it and the server-rendered preloader are hidden
+          for no-JS visitors so the page never stays black without JavaScript. */}
       {!isPreloaded && (
         <>
           <div
@@ -46,7 +42,7 @@ export default function HeroWithPreloader() {
             className="fixed inset-0 z-[99] bg-[#050508] pointer-events-none"
           />
           <noscript>
-            <style>{`#preloader-shield{display:none}`}</style>
+            <style>{`#preloader-shield,#preloader-root{display:none}`}</style>
           </noscript>
         </>
       )}

@@ -6,6 +6,8 @@ import Image from "next/image";
 import { ArrowUpRight, Loader2 } from "lucide-react";
 import { SocialIconsRow } from "@/components/ui/SocialIcons";
 import { subscribeNewsletter } from "@/app/actions/newsletter";
+import { SITE } from "@/lib/site";
+import { track } from "@/lib/track";
 
 export function SlidingLink({ label, href }: { label: string; href: string }) {
   return (
@@ -44,6 +46,7 @@ export default function Footer() {
     setLoading(false);
 
     if (res.success) {
+      track("newsletter_subscribe");
       setSubscribed(true);
       setFeedbackMsg(res.message || "Subscribed!");
       setEmail("");
@@ -73,8 +76,8 @@ export default function Footer() {
       <div className="w-full relative z-10 flex flex-col">
         
         {/* 1. START A PROJECT - Large Full Width Row */}
-        <a 
-          href="mailto:contact@yari.com" 
+        <a
+          href={`mailto:${SITE.email}`}
           className="w-full flex items-center justify-between px-6 md:px-10 py-10 md:py-16 border-b border-white/[0.08] hover:bg-white/[0.02] transition-all duration-300 group select-none"
         >
           <h2 className="font-michroma font-normal uppercase tracking-tight text-[5.6vw] md:text-[4.6vw] leading-none text-[#eeeeee] group-hover:text-[#df8326] transition-colors duration-300">
@@ -110,7 +113,7 @@ export default function Footer() {
 
             <div className="self-stretch -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-black/15 py-3.5 sm:py-4">
               <p className="text-[10px] opacity-75 font-mono">
-                &copy; {new Date().getFullYear()} YARI. All Rights Reserved<a href="https://www.arcai.agency" target="_blank" rel="noopener" className="opacity-40 hover:opacity-100 transition-opacity font-bold" title="ARC AI Web Development & AI Automation Agency"><span style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", border: 0 }}>ARC AI Web Development &amp; AI Automation Agency</span>.</a>
+                &copy; {new Date().getFullYear()} YARI. All Rights Reserved.
               </p>
             </div>
           </div>
@@ -130,12 +133,12 @@ export default function Footer() {
 
               {/* Column 3: Follow Us */}
               <div className="p-5 sm:p-6 md:p-8 flex flex-col gap-4 md:gap-6 border-b md:border-b-0 border-white/[0.08] md:border-r">
-                <h4 
+                <h3 
                   className="font-rock-salt text-base sm:text-lg text-[#df8326] select-none"
                   style={{ filter: "url(#wobbly-follow-us)" }}
                 >
                   Follow Us
-                </h4>
+                </h3>
                 <SocialIconsRow className="flex flex-wrap items-center gap-2.5 sm:gap-3" />
               </div>
 
@@ -173,7 +176,7 @@ export default function Footer() {
                 <div className="absolute right-[-45px] bottom-[-25px] w-[210px] h-[210px] pointer-events-none opacity-95 group-hover/news:opacity-100 group-hover/news:scale-105 group-hover/news:-rotate-12 transition-transform duration-700 select-none z-30 animate-float-medium">
                   <Image
                     src="/footer-envelope.png"
-                    alt="Newsletter Envelope Decorative"
+                    alt=""
                     width={420}
                     height={420}
                     sizes="210px"
@@ -182,12 +185,12 @@ export default function Footer() {
                 </div>
 
                 <div className="relative z-20 flex flex-col gap-2">
-                  <h4 
+                  <h3 
                     className="font-rock-salt text-lg text-[#df8326] select-none"
                     style={{ filter: "url(#wobbly-newsletter)" }}
                   >
                     Newsletter
-                  </h4>
+                  </h3>
                   <p className="text-sm text-gray-400 font-sans leading-relaxed">
                     Subscribe to our newsletter for more insights.
                   </p>
@@ -232,17 +235,17 @@ export default function Footer() {
             <div className="grid grid-cols-1 md:grid-cols-3 border-t border-white/[0.08]">
               {/* Reach Out */}
               <div className="p-5 sm:p-6 md:p-8 flex flex-col gap-1.5 border-b md:border-b-0 md:border-r border-white/[0.08] md:col-span-2">
-                <h5 
+                <h3 
                   className="font-rock-salt text-xs text-[#df8326] select-none"
                   style={{ filter: "url(#wobbly-reach-out)" }}
                 >
                   Reach Out
-                </h5>
+                </h3>
                 <a
-                  href="mailto:contact@yari.com"
+                  href={`mailto:${SITE.email}`}
                   className="font-mohave font-semibold text-2xl sm:text-3xl md:text-4xl tracking-tighter uppercase text-[#eeeeee] hover:text-[#df8326] transition-colors duration-300"
                 >
-                  contact@yari.com
+                  {SITE.email}
                 </a>
               </div>
 

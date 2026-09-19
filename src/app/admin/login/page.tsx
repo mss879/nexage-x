@@ -2,8 +2,11 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Lock, Mail, ShieldAlert } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, Lock, Mail } from "lucide-react";
 import { loginAdmin } from "@/app/admin/actions";
+import { Button, Card, ErrorBanner, Field, Input } from "@/components/admin/ui";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -36,108 +39,65 @@ export default function AdminLoginPage() {
     }
   };
 
-  const inputClass =
-    "w-full rounded-xl border border-white/[0.08] bg-white/[0.02] pl-11 pr-4 py-3 font-sans text-sm text-white placeholder-zinc-600 transition-all duration-300 focus:border-[#df8326] focus:outline-none focus:ring-1 focus:ring-[#df8326]/50 disabled:opacity-50";
-
   return (
-    <main className="relative flex min-h-screen w-full items-center justify-center bg-[#050508] px-6 text-white overflow-hidden">
-      {/* Background aesthetics */}
-      <div className="absolute inset-0 cyber-grid opacity-[0.03] pointer-events-none" />
-      <div className="grain-texture absolute inset-0 pointer-events-none" />
-      <div className="absolute -left-20 top-1/4 h-[400px] w-[400px] rounded-full bg-[#df8326]/10 blur-[150px] pointer-events-none" />
-      <div className="absolute -right-20 bottom-1/4 h-[400px] w-[400px] rounded-full bg-[#8b5cf6]/8 blur-[150px] pointer-events-none" />
-
-      <div className="relative z-10 w-full max-w-md">
-        {/* Brand logo/badge */}
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-1.5 mb-4">
-            <span className="h-2 w-2 rounded-full bg-[#df8326] animate-pulse" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-zinc-300">
-              YARI Administrative Control
-            </span>
-          </div>
-          <h1 className="font-syne text-3xl font-bold uppercase tracking-tight text-white">
-            Access Portal
-          </h1>
-          <p className="mt-2 font-sans text-sm text-zinc-400">
-            Sign in to access inquiries and the CRM pipeline.
-          </p>
+    <main className="flex min-h-screen w-full items-center justify-center px-5 py-10">
+      <div className="w-full max-w-sm">
+        <div className="mb-7 flex flex-col items-center text-center">
+          <Image src="/yari-logo-black.png" alt="YARI" width={120} height={38} className="h-8 w-auto" />
+          <h1 className="mt-6 text-xl font-semibold tracking-tight text-stone-900">Sign in to the admin</h1>
+          <p className="mt-1 text-sm text-stone-500">Inquiries, CRM pipeline and site analytics.</p>
         </div>
 
-        {/* Login form card */}
-        <div className="rounded-3xl border border-white/[0.08] bg-[#0a0a0d]/90 p-7 shadow-2xl backdrop-blur-xl md:p-8">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            {/* Email Input */}
-            <div className="flex flex-col gap-2">
-              <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                Authorized Email
-              </label>
+        <Card className="p-6 shadow-sm">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <Field label="Email" htmlFor="admin-email">
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
-                  <Mail className="h-4.5 w-4.5" strokeWidth={1.8} />
-                </span>
-                <input
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+                <Input
+                  id="admin-email"
                   required
                   disabled={isSubmitting}
                   type="email"
+                  autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@yari.com"
-                  className={inputClass}
+                  placeholder="admin@yariagency.com"
+                  className="pl-9"
                 />
               </div>
-            </div>
+            </Field>
 
-            {/* Password Input */}
-            <div className="flex flex-col gap-2">
-              <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                Security Password
-              </label>
+            <Field label="Password" htmlFor="admin-password">
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
-                  <Lock className="h-4.5 w-4.5" strokeWidth={1.8} />
-                </span>
-                <input
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+                <Input
+                  id="admin-password"
                   required
                   disabled={isSubmitting}
                   type="password"
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className={inputClass}
+                  className="pl-9"
                 />
               </div>
-            </div>
+            </Field>
 
-            {/* Error Message */}
-            {error && (
-              <div className="flex items-start gap-2.5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 font-sans text-xs text-red-400">
-                <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5" />
-                <span>{error}</span>
-              </div>
-            )}
+            {error && <ErrorBanner>{error}</ErrorBanner>}
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="group mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-[#df8326] to-[#C57019] py-3.5 font-mono text-xs uppercase tracking-[0.18em] text-white shadow-[0_6px_20px_rgba(197,112,25,0.25)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? "Verifying..." : "Authenticate"}
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </button>
+            <Button type="submit" disabled={isSubmitting} className="mt-1 w-full">
+              {isSubmitting ? "Signing in…" : "Sign in"}
+              <ArrowRight className="h-4 w-4" />
+            </Button>
           </form>
-        </div>
+        </Card>
 
-        {/* Back to main website link */}
-        <div className="mt-8 text-center">
-          <a
-            href="/"
-            className="font-mono text-[10px] uppercase tracking-wider text-zinc-500 transition-colors hover:text-white"
-          >
-            ← Return to Public Website
-          </a>
-        </div>
+        <p className="mt-6 text-center">
+          <Link href="/" className="text-xs text-stone-500 transition-colors hover:text-stone-900">
+            ← Back to the website
+          </Link>
+        </p>
       </div>
     </main>
   );

@@ -5,6 +5,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X, Send, Sparkles, RefreshCw, CheckCircle2, User } from "lucide-react";
 import YMark from "@/components/ui/YMark";
 import gsap from "gsap";
+import { SITE } from "@/lib/site";
+import { OPEN_CHAT_EVENT } from "@/components/ui/OpenChatButton";
+import { track } from "@/lib/track";
 
 interface Message {
   id: string;
@@ -33,9 +36,9 @@ function formatLinks(text: string) {
   );
 }
 
-export default function AiChatWidget() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+export default function AiChatWidget({ defaultOpen = false }: { defaultOpen?: boolean }) {
+  const [isVisible, setIsVisible] = useState(defaultOpen);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -65,6 +68,16 @@ export default function AiChatWidget() {
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Let other parts of the site (e.g. the contact page "Live chat" card) open the widget
+  useEffect(() => {
+    const handleOpen = () => {
+      setIsVisible(true);
+      setIsOpen(true);
+    };
+    window.addEventListener(OPEN_CHAT_EVENT, handleOpen);
+    return () => window.removeEventListener(OPEN_CHAT_EVENT, handleOpen);
   }, []);
 
   // Realistic 3D GSAP multi-ring animated pulsing & floating physics
@@ -125,6 +138,7 @@ export default function AiChatWidget() {
     };
 
     setMessages((prev) => [...prev, userMsg]);
+    track("chat_message");
     if (!textToSend) setInputValue("");
     setIsLoading(true);
 
@@ -153,6 +167,7 @@ export default function AiChatWidget() {
       setMessages((prev) => [...prev, reply]);
 
       if (content.includes("@") && !leadSaved) {
+        track("chat_lead");
         setLeadSaved(true);
       }
     } catch (err) {
@@ -162,7 +177,7 @@ export default function AiChatWidget() {
         {
           id: `err-${Date.now()}`,
           role: "assistant",
-          content: "Sorry, I ran into a connection issue. You can reach us directly at contact@yari.com or +971 50 863 2422.",
+          content: `Sorry, I ran into a connection issue. You can reach us directly at ${SITE.email} or ${SITE.phones[0].number}.`,
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         },
       ]);
@@ -204,7 +219,10 @@ export default function AiChatWidget() {
         {/* 3D Volumetric Glass Sphere Launcher Button */}
         <button
           ref={buttonRef}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            if (!isOpen) track("chat_open");
+            setIsOpen(!isOpen);
+          }}
           aria-label="Toggle Service Agent AI Chat"
           className="relative group flex items-center justify-center h-16 w-16 rounded-full text-white shadow-[0_20px_40px_rgba(0,0,0,0.8),inset_0_2px_4px_rgba(255,255,255,0.4),inset_0_-2px_6px_rgba(0,0,0,0.8),0_0_30px_rgba(223,131,38,0.4)] border border-white/30 backdrop-blur-2xl transition-all duration-300 cursor-pointer overflow-hidden"
           style={{

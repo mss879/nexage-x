@@ -5,7 +5,7 @@
  * results and entity understanding. Rendered into pages via the <JsonLd>
  * component (see components/seo/JsonLd.tsx).
  */
-import { SITE, SITE_URL, absoluteUrl } from "@/lib/site";
+import { SITE, SITE_URL, SOCIAL_URLS, absoluteUrl } from "@/lib/site";
 import type { Post, Faq } from "@/content/blog";
 
 const ORG_ID = `${SITE_URL}/#organization`;
@@ -39,19 +39,7 @@ export function organizationSchema() {
       areaServed: p.label === "UAE" ? "AE" : "GB",
       availableLanguage: ["en", "ar"],
     })),
-    sameAs: [
-      SITE.social.instagram,
-      SITE.social.facebook,
-      SITE.social.linkedin,
-      SITE.social.youtube,
-      SITE.social.x,
-      SITE.social.github,
-    ],
-    creator: {
-      "@type": "Organization",
-      name: "ARC AI",
-      url: "https://www.arcai.agency"
-    },
+    sameAs: SOCIAL_URLS,
   };
 }
 
@@ -65,11 +53,6 @@ export function websiteSchema() {
     name: SITE.name,
     description: SITE.tagline,
     publisher: { "@id": ORG_ID },
-    creator: {
-      "@type": "Organization",
-      name: "ARC AI",
-      url: "https://www.arcai.agency"
-    },
     inLanguage: "en",
   };
 }
@@ -98,6 +81,50 @@ export function professionalServiceSchema() {
     },
     parentOrganization: { "@id": ORG_ID },
   };
+}
+
+/** Service offered by YARI, tied to the organization and its service area. */
+export function serviceSchema(service: {
+  name: string;
+  description: string;
+  path: string;
+  serviceType: string;
+  offers?: string[];
+}) {
+  const url = absoluteUrl(service.path);
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${url}#service`,
+    name: service.name,
+    description: service.description,
+    serviceType: service.serviceType,
+    url,
+    provider: { "@id": ORG_ID },
+    areaServed: SITE.areaServed,
+    ...(service.offers
+      ? {
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: service.name,
+            itemListElement: service.offers.map((offer) => ({
+              "@type": "Offer",
+              itemOffered: { "@type": "Service", name: offer },
+            })),
+          },
+        }
+      : {}),
+  };
+}
+
+/** Home → … breadcrumb from [label, path] pairs (Home is prepended). */
+export function pageBreadcrumb(...trail: [name: string, path: string][]) {
+  return breadcrumbSchema(
+    [["Home", "/"] as [string, string], ...trail].map(([name, path]) => ({
+      name,
+      url: absoluteUrl(path),
+    }))
+  );
 }
 
 /** BreadcrumbList for a path of { name, url } items. */
@@ -138,7 +165,7 @@ export function articleSchema(post: Post) {
     url,
     headline: post.title,
     description: post.description,
-    image: absoluteUrl(SITE.ogImage),
+    image: absoluteUrl(post.cover),
     datePublished: post.date,
     dateModified: post.updated ?? post.date,
     inLanguage: "en",

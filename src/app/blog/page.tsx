@@ -4,11 +4,14 @@ import JsonLd from "@/components/seo/JsonLd";
 import { POSTS } from "@/content/blog";
 import { absoluteUrl } from "@/lib/site";
 import { breadcrumbSchema } from "@/lib/structured-data";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "The YARI Journal — E-commerce in Dubai, Explained",
   description:
-    "Practical guides on building, integrating and scaling online stores in Dubai and the GCC — e-commerce development, Shopify, Odoo & Zoho integration, fulfilment and COD.",
+    "Practical guides to building and scaling online stores in Dubai and the GCC — e-commerce development, Shopify, Odoo & Zoho integration, fulfilment and COD.",
+  socialDescription:
+    "Guides on e-commerce, software, automation and logistics for Dubai and GCC brands.",
   keywords: [
     "ecommerce blog Dubai",
     "ecommerce guides UAE",
@@ -16,14 +19,8 @@ export const metadata: Metadata = {
     "fulfilment Dubai",
     "Odoo Zoho UAE",
   ],
-  alternates: { canonical: "/blog" },
-  openGraph: {
-    url: "/blog",
-    title: "The YARI Journal — E-commerce in Dubai, Explained | YARI",
-    description:
-      "Guides on e-commerce, software, automation and logistics for Dubai and GCC brands.",
-  },
-};
+  path: "/blog",
+});
 
 export default function BlogPage() {
   const blogSchema = {

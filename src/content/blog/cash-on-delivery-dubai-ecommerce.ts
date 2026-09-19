@@ -3,7 +3,7 @@ import type { Post } from "./types";
 export const post: Post = {
   slug: "cash-on-delivery-dubai-ecommerce",
   title: "Cash on Delivery (COD) for Dubai E-commerce: A Complete Operations Guide",
-  metaTitle: "Cash on Delivery (COD) for Dubai E-commerce — Operations Guide | YARI",
+  metaTitle: "Cash on Delivery (COD) for Dubai E-commerce: A Guide | YARI",
   description:
     "Run cash on delivery profitably in Dubai. Reduce failed deliveries, reconcile cash, control fraud, shift customers to prepaid, and wire COD into your systems.",
   category: "Logistics",

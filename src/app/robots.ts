@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL, absoluteUrl } from "@/lib/site";
+import { absoluteUrl } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,11 +7,11 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        // Next.js internals, the admin backend, + any future private/api segments.
-        disallow: ["/_next/", "/api/", "/admin", "/admin/"],
+        // The admin backend + API routes. /_next/ must stay crawlable — Google
+        // needs the JS/CSS in there to render the pages.
+        disallow: ["/api/", "/admin"],
       },
     ],
     sitemap: absoluteUrl("/sitemap.xml"),
-    host: SITE_URL,
   };
 }

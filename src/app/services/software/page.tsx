@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import SoftwareServicesContent from "@/components/pages/SoftwareServicesContent";
+import { pageMetadata } from "@/lib/metadata";
+import JsonLd from "@/components/seo/JsonLd";
+import { pageBreadcrumb, serviceSchema } from "@/lib/structured-data";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "E-commerce & Software Development in Dubai",
   description:
-    "E-commerce website development in Dubai — Shopify and custom stores, web apps, AI automation, backends and deep Odoo & Zoho integrations, engineered for speed, scale and unified data.",
+    "E-commerce website development in Dubai — Shopify and custom stores, web apps, AI automation and deep Odoo & Zoho integrations built for speed and scale.",
+  socialDescription:
+    "Shopify and custom stores, web apps, AI automation and Odoo & Zoho integrations for Dubai and GCC brands.",
   keywords: [
     "e-commerce development Dubai",
     "Shopify development Dubai",
@@ -13,15 +18,36 @@ export const metadata: Metadata = {
     "Zoho integration UAE",
     "custom software Dubai",
   ],
-  alternates: { canonical: "/services/software" },
-  openGraph: {
-    url: "/services/software",
-    title: "E-commerce & Software Development in Dubai | YARI",
-    description:
-      "Shopify and custom stores, web apps, AI automation and Odoo & Zoho integrations for Dubai and GCC brands.",
-  },
-};
+  path: "/services/software",
+});
 
 export default function SoftwareServicesPage() {
-  return <SoftwareServicesContent />;
+  return (
+    <>
+      <JsonLd
+        data={[
+          pageBreadcrumb(["Services", "/services"], ["Software", "/services/software"]),
+          serviceSchema({
+            name: "E-commerce & Software Development",
+            serviceType: "E-commerce website and software development",
+            description:
+              "Shopify and custom online stores, web apps, AI automation, custom backends and Odoo & Zoho integrations for brands in Dubai and the GCC.",
+            path: "/services/software",
+            // Mirrors the service cards on the page
+            offers: [
+              "Custom Web & Web Apps",
+              "Smart Websites",
+              "E-commerce & Shopify",
+              "AI Assistants & Chatbots",
+              "Workflow Automation",
+              "Custom Backend Systems",
+              "Website + Odoo & Zoho Integration",
+              "Brand Kits & Identity",
+            ],
+          }),
+        ]}
+      />
+      <SoftwareServicesContent />
+    </>
+  );
 }

@@ -15,7 +15,7 @@ const SHOW_PORTFOLIO = false;
 
 export default function HomeContent() {
   return (
-    <main className="relative min-h-screen w-full bg-[#050508] overflow-x-hidden">
+    <main id="main-content" className="relative min-h-screen w-full bg-[#050508] overflow-x-hidden">
       {/* Sticky header — stays hidden over the hero (which has its own nav) and slides in on scroll */}
       <SiteHeader revealAfterHero />
       <HeroWithPreloader />

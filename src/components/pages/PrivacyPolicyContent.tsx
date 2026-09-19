@@ -4,8 +4,9 @@ import LegalPage, { type LegalSection } from "@/components/pages/LegalPage";
 import { SITE, SITE_URL } from "@/lib/site";
 
 // Written to match how the site actually handles data (contact form + newsletter → Supabase,
-// AI chat → OpenAI, no analytics or advertising cookies). Update it if any of that changes.
-const UPDATED = "16 September 2026";
+// AI chat → OpenAI, first-party cookieless statistics via /api/track, no advertising or
+// third-party analytics). Update it if any of that changes.
+const UPDATED = "19 September 2026";
 const [UAE_PHONE, UK_PHONE] = SITE.phones;
 const DOMAIN = SITE_URL.replace(/^https?:\/\//, "");
 
@@ -158,13 +159,26 @@ const sections: LegalSection[] = [
   },
   {
     id: "cookies",
-    title: "Cookies",
+    title: "Cookies & analytics",
     content: (
-      <p>
-        This website doesn&rsquo;t use advertising or analytics cookies. The only cookies we set are strictly necessary
-        ones for secure sign-in to our private admin area, which visitors don&rsquo;t use. If we add analytics or
-        marketing tools in future, we&rsquo;ll update this policy and ask for your consent where the law requires it.
-      </p>
+      <>
+        <p>
+          This website doesn&rsquo;t use advertising or analytics cookies. The only cookies we set are strictly
+          necessary ones for secure sign-in to our private admin area, which visitors don&rsquo;t use.
+        </p>
+        <p>
+          To understand how the site is used we run our own privacy-friendly statistics — no third-party analytics
+          service is involved. We count page views, the referring website, the country, device type and browser, a few
+          interactions (such as a form being sent), and page-speed measurements. We don&rsquo;t store your IP address,
+          set a cookie or build a profile: visits are counted with an anonymous code that changes every day, so it
+          can&rsquo;t be linked to you or followed from one day to the next. If your browser sends a &ldquo;Do Not
+          Track&rdquo; or Global Privacy Control signal, we don&rsquo;t record the visit at all.
+        </p>
+        <p>
+          If we add marketing or third-party analytics tools in future, we&rsquo;ll update this policy and ask for your
+          consent where the law requires it.
+        </p>
+      </>
     ),
   },
   {

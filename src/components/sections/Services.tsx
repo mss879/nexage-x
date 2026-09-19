@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -467,22 +467,10 @@ function VolumetricCyberCubeMatrix() {
 }
 
 export default function Services() {
-  const [mounted, setMounted] = useState(false);
+  // Rendered on the server like every other section: the service copy is the
+  // most keyword-rich content on the homepage, so it must be in the HTML.
   const [activeTab, setActiveTab] = useState<"ecommerce" | "automation">("ecommerce");
   const [expandedId, setExpandedId] = useState<string | null>(null); // Collapsed by default
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <section
-        id="what-we-do"
-        className="relative w-full py-16 md:py-20 bg-[#050508] text-white px-4 md:px-12 lg:px-24 border-b border-white/[0.04] overflow-hidden min-h-[600px]"
-      />
-    );
-  }
 
   const ecommerceServices: ServiceItem[] = [
     {
@@ -975,23 +963,22 @@ export default function Services() {
                           </h3>
 
                           {/* Description & Deliverables Body (Reveals beautifully inside height expansion) */}
-                          <AnimatePresence initial={false}>
-                            {isExpanded && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{
-                                  height: { type: "spring", stiffness: 260, damping: 28 },
-                                  opacity: { duration: 0.3 }
-                                }}
-                                className="overflow-hidden"
-                              >
+                          {/* Always in the DOM (collapsed to height 0) so the copy is
+                              server-rendered and crawlable; same spring as before. */}
+                          <motion.div
+                            initial={false}
+                            animate={isExpanded ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
+                            transition={{
+                              height: { type: "spring", stiffness: 260, damping: 28 },
+                              opacity: { duration: 0.3 }
+                            }}
+                            aria-hidden={!isExpanded}
+                            className="overflow-hidden"
+                          >
                                 <motion.div
-                                  initial={{ y: 8, opacity: 0 }}
-                                  animate={{ y: 0, opacity: 1 }}
-                                  exit={{ y: 8, opacity: 0 }}
-                                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+                                  initial={false}
+                                  animate={isExpanded ? { y: 0, opacity: 1 } : { y: 8, opacity: 0 }}
+                                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: isExpanded ? 0.05 : 0 }}
                                   className="mt-3 flex flex-col gap-3.5"
                                 >
                                   {/* Service Description (Slightly larger font size when expanded) */}
@@ -1012,9 +999,7 @@ export default function Services() {
                                     <span className="font-sans font-light text-zinc-700">{svc.deliverable}</span>
                                   </p>
                                 </motion.div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
+                          </motion.div>
                         </div>
 
                         {/* Right action button */}
@@ -1036,23 +1021,20 @@ export default function Services() {
                       </div>
 
                       {/* Bottom Row (Sub-Keywords) - Reveals at the bottom when expanded */}
-                      <AnimatePresence initial={false}>
-                        {isExpanded && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
+                      <motion.div
+                            initial={false}
+                            animate={isExpanded ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
                             transition={{
                               height: { type: "spring", stiffness: 260, damping: 28 },
                               opacity: { duration: 0.3 }
                             }}
+                            aria-hidden={!isExpanded}
                             className="overflow-hidden w-full relative z-10 pl-[66px] sm:pl-[108px] md:pl-[166px]"
                           >
                             <motion.div
-                              initial={{ y: 10, opacity: 0 }}
-                              animate={{ y: 0, opacity: 1 }}
-                              exit={{ y: 10, opacity: 0 }}
-                              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.12 }}
+                              initial={false}
+                              animate={isExpanded ? { y: 0, opacity: 1 } : { y: 10, opacity: 0 }}
+                              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: isExpanded ? 0.12 : 0 }}
                               className="flex flex-wrap gap-x-6 gap-y-3 pt-6 mt-6 border-t border-black/10 select-none font-mono text-[11px] sm:text-[12px] text-zinc-600 font-semibold"
                             >
                               {svc.keywords.map((kw, kwIdx) => (
@@ -1061,9 +1043,7 @@ export default function Services() {
                                 </span>
                               ))}
                             </motion.div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      </motion.div>
 
                     </motion.div>
                   </motion.div>
@@ -1072,6 +1052,20 @@ export default function Services() {
             </motion.div>
           </AnimatePresence>
         </motion.div>
+
+        {/* The other tab's services, kept in the HTML while its panel is closed so
+            both service lists are server-rendered. Swaps with the active tab. */}
+        <div hidden>
+          <h3>{activeTab === "ecommerce" ? "Business Automation" : "E-Commerce Growth"}</h3>
+          {(activeTab === "ecommerce" ? automationServices : ecommerceServices).map((svc) => (
+            <div key={svc.id}>
+              <h4>{svc.title}</h4>
+              <p>{svc.description}</p>
+              {svc.includes && <p>Includes: {svc.includes}</p>}
+              <p>{svc.deliverable}</p>
+            </div>
+          ))}
+        </div>
 
       </div>
     </section>

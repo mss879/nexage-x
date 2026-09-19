@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
+import { SITE } from "@/lib/site";
 
 type ContactCTAProps = {
   eyebrow?: string;
@@ -34,16 +35,17 @@ export default function ContactCTA({
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row">
           <Link
             href="/contact"
+            data-track="cta_start_project"
             className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-b from-[#df8326] to-[#C57019] px-8 py-4 text-sm font-semibold uppercase tracking-wider text-white shadow-[0_10px_30px_rgba(197,112,25,0.35)] transition-all duration-300 hover:scale-[1.03] active:scale-95"
           >
             Start a project
             <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
           <a
-            href="mailto:contact@yari.com"
+            href={`mailto:${SITE.email}`}
             className="inline-flex items-center gap-2 rounded-full border border-white/15 px-8 py-4 text-sm font-semibold uppercase tracking-wider text-zinc-200 transition-all duration-300 hover:border-[#df8326] hover:text-white"
           >
-            contact@yari.com
+            {SITE.email}
           </a>
         </div>
       </Reveal>

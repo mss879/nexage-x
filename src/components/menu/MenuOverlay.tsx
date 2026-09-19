@@ -39,13 +39,6 @@ const NAV_LINKS: NavLink[] = [
   { label: "Contact", href: "/contact", index: "05" },
 ];
 
-const SOCIALS = [
-  { label: "Instagram", href: SITE.social.instagram },
-  { label: "LinkedIn", href: SITE.social.linkedin },
-  { label: "X / Twitter", href: SITE.social.x },
-  { label: "GitHub", href: SITE.social.github },
-];
-
 /* ── Motion variants ──────────────────────────────────────────────── */
 const overlayV: Variants = {
   hidden: { opacity: 0 },

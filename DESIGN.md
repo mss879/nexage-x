@@ -91,3 +91,33 @@ Scale (display): ~2.1rem mobile → 5.2rem desktop for page heroes; section `h2`
 `/` · `/about` · `/services` · `/services/software` · `/services/logistics` · `/blog` · `/contact`
 Shared chrome: `SiteHeader` (inner pages) + `MenuOverlay` (global) + `Footer` (all pages).
 New pages must use **new sections** — never copy homepage sections — at equal fidelity.
+
+## 9. Admin (`/admin/*`) — light workspace
+The backend is a tool, not a marketing surface: **light, quiet, one accent**. Taste lane:
+**minimalist-skill** (Linear / Notion calm). None of §2's cinematic language applies here — no glow
+orbs, grain, gradients, neon shadows or glass. Scoped by `.admin-theme` (globals.css); primitives live
+in `components/admin/ui.tsx`. Admin screens must be built from those primitives, never inline styles.
+
+| Token | Value | Use |
+|-------|-------|-----|
+| page | `stone-50` `#fafaf9` | App background |
+| surface | `white` | Cards, sidebar, tables, modals |
+| hairline | `stone-200` `#e7e5e4` | All borders and dividers (1px) |
+| text | `stone-900` / `stone-600` / `stone-500` | Primary / secondary / labels (all ≥4.5:1 on white) |
+| **accent** | `gold-500` `#eaa42a` | Primary buttons, active nav, progress, chart marks |
+| accent text | `gold-700` `#9a6a0e` | Gold text and icons on white (5.1:1) |
+| accent tint | `gold-50` / `gold-100` | Active/selected backgrounds, soft badges |
+| on accent | `stone-900` | Text on a gold fill (never white — 2:1) |
+| danger | `red-600` on `red-50` | **Only** destructive actions and error banners |
+
+- **One accent.** State is carried by weight, not hue: outline (neutral) → gold tint → solid gold
+  (won / converted / active); lost / archived / unsubscribed are muted stone. No purple, blue, green or
+  amber anywhere in the admin, including charts.
+- **Type**: `Plus Jakarta Sans` for everything (headings `font-semibold tracking-tight`), `font-mono`
+  only for tabular numbers and IDs. Labels are 12px `stone-500` sentence case — not uppercase mono.
+- **Shape & depth**: `rounded-xl` cards, `rounded-lg` controls, 1px hairline, at most `shadow-sm`.
+  Modals get `shadow-xl` over a `stone-900/30` scrim.
+- **States**: hover = `stone-50` fill or darker hairline; focus-visible = 2px `gold-500` ring with
+  offset; active = `scale-[0.98]`; disabled = 50% opacity; every list has an empty state.
+- **Motion**: 150ms colour/opacity transitions only.
+

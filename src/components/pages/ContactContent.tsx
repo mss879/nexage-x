@@ -7,10 +7,12 @@ import ContactHero from "@/components/sections/ContactHero";
 import ContactForm from "@/components/sections/ContactForm";
 import ContactFAQs from "@/components/sections/ContactFAQs";
 import { SocialIconsRow } from "@/components/ui/SocialIcons";
+import OpenChatButton from "@/components/ui/OpenChatButton";
+import { SITE } from "@/lib/site";
 
 export default function ContactContent() {
   return (
-    <main className="relative min-h-screen w-full bg-[#050508] text-white">
+    <main id="main-content" className="relative min-h-screen w-full bg-[#050508] text-white">
       <SiteHeader />
 
       {/* ── Hero ─────────────────────────────────────────── */}
@@ -26,7 +28,7 @@ export default function ContactContent() {
           <Reveal y={40} delay={0.1} className="lg:col-span-5">
             <div className="flex h-full flex-col gap-5">
               {[
-                { icon: Mail, label: "Email", value: "contact@yari.com", href: "mailto:contact@yari.com" },
+                { icon: Mail, label: "Email", value: SITE.email, href: `mailto:${SITE.email}` },
                 { icon: MapPin, label: "Operations", value: "Global Logistics & Operations Node" },
                 { icon: Clock, label: "Response time", value: "Within 1 business day" },
               ].map((item) => {
@@ -110,22 +112,19 @@ export default function ContactContent() {
 
           <Reveal stagger={0.1} className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {[
-              { icon: Mail, t: "Email us", v: "contact@yari.com", href: "mailto:contact@yari.com" },
-              { icon: MessageCircle, t: "Live chat", v: "Message the studio", href: "#", accent: true },
-              { icon: Phone, t: "Book a call", v: "Schedule 30 minutes", href: "#" },
+              { icon: Mail, t: "Email us", v: SITE.email, href: `mailto:${SITE.email}` },
+              { icon: MessageCircle, t: "Live chat", v: "Message the studio", accent: true },
+              { icon: Phone, t: "Call us", v: SITE.phones[0].number, href: `tel:${SITE.phones[0].e164}` },
             ].map((c) => {
               const Icon = c.icon;
               const accent = (c as { accent?: boolean }).accent;
-              return (
-                <a
-                  key={c.t}
-                  href={c.href}
-                  className={`group relative flex flex-col gap-5 overflow-hidden rounded-2xl border p-7 transition-all duration-500 ${
-                    accent
-                      ? "border-[#ffd5a8]/40 bg-gradient-to-br from-[#e8954a] via-[#df8326] to-[#b7610c]"
-                      : "border-white/[0.08] bg-[#0a0a0d] hover:border-[#df8326]/30 hover:bg-[#101015]"
-                  }`}
-                >
+              const cardClass = `group relative flex flex-col gap-5 overflow-hidden rounded-2xl border p-7 text-left transition-all duration-500 ${
+                accent
+                  ? "border-[#ffd5a8]/40 bg-gradient-to-br from-[#e8954a] via-[#df8326] to-[#b7610c]"
+                  : "border-white/[0.08] bg-[#0a0a0d] hover:border-[#df8326]/30 hover:bg-[#101015]"
+              }`;
+              const body = (
+                <>
                   <div
                     className={`flex h-12 w-12 items-center justify-center rounded-xl border transition-all duration-500 ${
                       accent
@@ -141,7 +140,17 @@ export default function ContactContent() {
                     </h3>
                     <p className={`mt-1 font-sans text-sm ${accent ? "text-black/75" : "text-zinc-400"}`}>{c.v}</p>
                   </div>
+                </>
+              );
+              // The chat card has no URL — it opens the AI chat widget instead
+              return c.href ? (
+                <a key={c.t} href={c.href} className={cardClass}>
+                  {body}
                 </a>
+              ) : (
+                <OpenChatButton key={c.t} className={cardClass}>
+                  {body}
+                </OpenChatButton>
               );
             })}
           </Reveal>
