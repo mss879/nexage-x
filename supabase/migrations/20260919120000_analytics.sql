@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS public.analytics_events (
 );
 
 -- 2. Bound every field at the DB layer — the insert policy is public
+ALTER TABLE public.analytics_events DROP CONSTRAINT IF EXISTS analytics_events_sizes;
 ALTER TABLE public.analytics_events
     ADD CONSTRAINT analytics_events_sizes CHECK (
         char_length(path) BETWEEN 1 AND 300

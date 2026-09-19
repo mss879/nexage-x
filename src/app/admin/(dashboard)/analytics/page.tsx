@@ -202,7 +202,7 @@ export default async function AnalyticsPage({
   if (!report) {
     return (
       <div className="flex flex-col gap-6">
-        <PageHeader title="Analytics" description="Traffic, sources and conversions for the YARI website." />
+        <PageHeader title="Site analytics" description="Traffic, sources and conversions for the YARI website." />
         {needsMigration ? (
           <Card className="p-6">
             <h2 className="text-sm font-semibold text-stone-900">One step left: create the analytics tables</h2>
@@ -233,7 +233,7 @@ export default async function AnalyticsPage({
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Analytics"
+        title="Site analytics"
         description="First-party and cookieless — no personal data is stored. Days are in Dubai time."
         action={rangePicker}
       />

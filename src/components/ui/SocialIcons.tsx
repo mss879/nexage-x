@@ -71,11 +71,36 @@ const SOCIAL_META: {
   { network: "github", label: "GitHub", icon: GithubIcon, variant: "github", glyph: "w-[22px] h-[22px]" },
 ];
 
-// Only networks with a real profile in SOCIAL_PROFILES are rendered.
-export const SOCIAL_LIST = SOCIAL_META.flatMap((meta) => {
-  const href = SOCIAL_PROFILES[meta.network];
-  return href ? [{ ...meta, href }] : [];
-});
+// Every network's tile is always shown. `href` is only set once the real profile
+// is listed in SOCIAL_PROFILES (lib/site.ts); until then the tile renders as a
+// plain, non-clickable element — never as a link to a bare platform homepage.
+export const SOCIAL_LIST = SOCIAL_META.map((meta) => ({
+  ...meta,
+  href: SOCIAL_PROFILES[meta.network] as string | undefined,
+}));
+
+/** A social tile wrapper: a real link when the profile exists, otherwise an inert span. */
+export function SocialLink({
+  href,
+  label,
+  className,
+  children,
+}: {
+  href?: string;
+  label: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return href ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} className={className}>
+      {children}
+    </a>
+  ) : (
+    <span role="img" aria-label={`${label} (coming soon)`} title={`${label} — coming soon`} className={className}>
+      {children}
+    </span>
+  );
+}
 
 export function SocialIconsRow({ className = "flex flex-wrap items-center gap-2.5 sm:gap-3" }: { className?: string }) {
   return (
@@ -83,19 +108,16 @@ export function SocialIconsRow({ className = "flex flex-wrap items-center gap-2.
       {SOCIAL_LIST.map((social, idx) => {
         const IconComponent = social.icon;
         return (
-          <a
+          <SocialLink
             key={social.label}
             href={social.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={social.label}
-            title={social.label}
+            label={social.label}
             className="relative inline-flex rounded-xl pt-1 pb-5 transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#df8326]"
           >
             <Tile3D variant={social.variant} delay={-idx * 0.75}>
               <IconComponent className={social.glyph} />
             </Tile3D>
-          </a>
+          </SocialLink>
         );
       })}
     </div>

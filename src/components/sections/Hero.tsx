@@ -6,7 +6,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
-import { SOCIAL_LIST } from "@/components/ui/SocialIcons";
+import { SOCIAL_LIST, SocialLink } from "@/components/ui/SocialIcons";
 import Tile3D from "@/components/ui/Tile3D";
 import { useMenu } from "@/components/menu/MenuProvider";
 
@@ -520,12 +520,10 @@ export default function Hero({ startAnimation = true }: HeroProps) {
         {HERO_SOCIALS.map((social, idx) => {
           const Icon = social.icon;
           return (
-            <a
+            <SocialLink
               key={social.variant}
               href={social.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={social.label}
+              label={social.label}
               className={`social-btn social-btn-${social.variant} relative left-[6px] -top-[24px] w-[76px] h-[92px] flex items-center justify-center rounded-[12px] bg-[#27272a] text-white border-[3px] border-[#C57019] z-10`}
             >
               <span className="social-icon">
@@ -533,7 +531,7 @@ export default function Hero({ startAnimation = true }: HeroProps) {
                   <Icon className={social.glyph} />
                 </Tile3D>
               </span>
-            </a>
+            </SocialLink>
           );
         })}
 

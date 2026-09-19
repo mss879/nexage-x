@@ -5,52 +5,174 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X, Send, Sparkles, RefreshCw, CheckCircle2, User } from "lucide-react";
 import YMark from "@/components/ui/YMark";
 import gsap from "gsap";
-import { SITE } from "@/lib/site";
+import { SITE, SITE_URL } from "@/lib/site";
 import { OPEN_CHAT_EVENT } from "@/components/ui/OpenChatButton";
 import { track } from "@/lib/track";
 
 interface Message {
   id: string;
-  role: "user" | "assistant";
+  /** "admin" = a YARI team member who has joined the chat */
+  role: "user" | "assistant" | "admin";
   content: string;
   timestamp: string;
 }
 
+interface ServerMessage {
+  id: number;
+  role: Message["role"];
+  content: string;
+  created_at: string;
+}
+
+// The conversation id + secret token live in this browser only, so a visitor
+// can reload or come back and carry on the same conversation.
+const STORAGE_KEY = "yari_chat";
+const POLL_MS = 4000;
+
+const timeLabel = (date: Date) => date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+const WELCOME: Message = {
+  id: "welcome",
+  role: "assistant",
+  content:
+    "Hello! I'm the YARI assistant. How can I help you today with e-commerce, custom software, ERP/CRM integration, or logistics?",
+  timestamp: "",
+};
+
+function readSession(): { conversationId: string; token: string } | null {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return parsed?.conversationId && parsed?.token ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+const fromServer = (m: ServerMessage): Message => ({
+  id: `srv-${m.id}`,
+  role: m.role,
+  content: m.content,
+  timestamp: timeLabel(new Date(m.created_at)),
+});
+
+const LINK_CLASS = "text-[#f5b93f] underline font-semibold hover:text-white transition-colors break-words";
+
+/**
+ * Renders the light Markdown the assistant uses: [label](url), bare URLs and
+ * **bold**. Everything else is plain text — nothing is injected as HTML.
+ */
 function formatLinks(text: string) {
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  const parts = text.split(urlRegex);
-  return parts.map((part, i) =>
-    part.match(urlRegex) ? (
-      <a
-        key={i}
-        href={part}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-[#f5b93f] underline font-semibold hover:text-white transition-colors"
-      >
-        {part}
-      </a>
-    ) : (
-      part
-    )
-  );
+  // [label](https://…)  |  https://…  |  **bold**
+  const pattern = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s<>"]+)|\*\*([^*]+)\*\*/g;
+  const nodes: React.ReactNode[] = [];
+  let last = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > last) nodes.push(text.slice(last, match.index));
+    const [whole, label, labelledUrl, bareUrl, bold] = match;
+
+    if (bold) {
+      nodes.push(<strong key={match.index}>{bold}</strong>);
+    } else {
+      // A bare URL shouldn't swallow the sentence's closing punctuation
+      const trailing = bareUrl ? (bareUrl.match(/[.,;:!?)\]]+$/)?.[0] ?? "") : "";
+      const url = labelledUrl ?? bareUrl.slice(0, bareUrl.length - trailing.length);
+      const internal = url.startsWith(SITE_URL);
+      nodes.push(
+        <a
+          key={match.index}
+          href={url}
+          {...(internal ? {} : { target: "_blank", rel: "noopener noreferrer" })}
+          className={LINK_CLASS}
+        >
+          {label ?? url.replace(/^https?:\/\/(www\.)?/, "")}
+        </a>
+      );
+      if (trailing) nodes.push(trailing);
+    }
+    last = match.index + whole.length;
+  }
+  if (last < text.length) nodes.push(text.slice(last));
+  return nodes;
 }
 
 export default function AiChatWidget({ defaultOpen = false }: { defaultOpen?: boolean }) {
   const [isVisible, setIsVisible] = useState(defaultOpen);
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [inputValue, setInputValue] = useState("");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content:
-        "Hello! I'm your YARI Service Agent. How can I help you today with custom software engineering, ERP/CRM integration, or logistics solutions?",
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([WELCOME]);
   const [isLoading, setIsLoading] = useState(false);
   const [leadSaved, setLeadSaved] = useState(false);
+  // "human" once a YARI team member has taken the conversation over from the AI
+  const [mode, setMode] = useState<"ai" | "human">("ai");
+
+  const sessionRef = useRef<{ conversationId: string; token: string } | null>(null);
+  const lastIdRef = useRef(0);
+  const [hasSession, setHasSession] = useState(false);
+
+  /** Merge server messages in, skipping any we already show. */
+  const mergeServerMessages = (incoming: ServerMessage[], includeOwn: boolean) => {
+    if (incoming.length === 0) return;
+    lastIdRef.current = Math.max(lastIdRef.current, ...incoming.map((m) => m.id));
+    setMessages((prev) => {
+      const seen = new Set(prev.map((m) => m.id));
+      const fresh = incoming
+        .filter((m) => includeOwn || m.role !== "user")
+        .map(fromServer)
+        .filter((m) => !seen.has(m.id));
+      return fresh.length ? [...prev, ...fresh] : prev;
+    });
+  };
+
+  const fetchMessages = async (after: number): Promise<{ mode: "ai" | "human"; messages: ServerMessage[] } | null> => {
+    const session = sessionRef.current;
+    if (!session) return null;
+    const res = await fetch(`/api/chat/messages?after=${after}`, {
+      headers: { "x-chat-conversation": session.conversationId, "x-chat-token": session.token },
+      cache: "no-store",
+    });
+    if (res.status === 404) {
+      // Conversation no longer exists (e.g. deleted by the team) → start fresh next time
+      window.localStorage.removeItem(STORAGE_KEY);
+      sessionRef.current = null;
+      setHasSession(false);
+      return null;
+    }
+    return res.ok ? res.json() : null;
+  };
+
+  // Restore an earlier conversation from this browser
+  useEffect(() => {
+    const session = readSession();
+    if (!session) return;
+    sessionRef.current = session;
+    fetchMessages(0)
+      .then((data) => {
+        if (!data) return; // conversation gone — fetchMessages already cleared the session
+        setHasSession(true);
+        setMode(data.mode);
+        mergeServerMessages(data.messages, true);
+      })
+      .catch(() => {});
+  }, []);
+
+  // While the chat is open, pick up replies from a team member (and mode changes)
+  useEffect(() => {
+    if (!isOpen || !hasSession) return;
+    const timer = setInterval(() => {
+      if (document.hidden) return;
+      fetchMessages(lastIdRef.current)
+        .then((data) => {
+          if (!data) return;
+          setMode(data.mode);
+          mergeServerMessages(data.messages, false);
+        })
+        .catch(() => {});
+    }, POLL_MS);
+    return () => clearInterval(timer);
+  }, [isOpen, hasSession]);
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const pulseRingRef = useRef<HTMLDivElement>(null);
@@ -134,39 +256,53 @@ export default function AiChatWidget({ defaultOpen = false }: { defaultOpen?: bo
       id: `user-${Date.now()}`,
       role: "user",
       content,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      timestamp: timeLabel(new Date()),
     };
 
+    const history = messages.filter((m) => m.id !== WELCOME.id).map((m) => ({ role: m.role, content: m.content }));
     setMessages((prev) => [...prev, userMsg]);
     track("chat_message");
     if (!textToSend) setInputValue("");
     setIsLoading(true);
 
     try {
-      const payload = [...messages, userMsg].map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
-
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: payload }),
+        body: JSON.stringify({
+          message: content,
+          conversationId: sessionRef.current?.conversationId,
+          token: sessionRef.current?.token,
+          path: window.location.pathname,
+          history, // only used by the server when conversations aren't being stored
+        }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch AI response");
 
-      const reply: Message = {
-        id: `assistant-${Date.now()}`,
-        role: "assistant",
-        content: data.content || "Thank you. Let me know if you would like me to connect you with our team!",
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      };
+      if (data.conversationId && data.token) {
+        sessionRef.current = { conversationId: data.conversationId, token: data.token };
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionRef.current));
+        setHasSession(true);
+      }
+      lastIdRef.current = Math.max(lastIdRef.current, data.userMessageId ?? 0, data.messageId ?? 0);
+      if (data.mode) setMode(data.mode);
 
-      setMessages((prev) => [...prev, reply]);
+      // In human mode the AI stays silent — the team member's reply arrives via polling
+      if (data.content) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: data.messageId ? `srv-${data.messageId}` : `assistant-${Date.now()}`,
+            role: "assistant",
+            content: data.content,
+            timestamp: timeLabel(new Date()),
+          },
+        ]);
+      }
 
-      if (content.includes("@") && !leadSaved) {
+      if (data.leadCaptured && !leadSaved) {
         track("chat_lead");
         setLeadSaved(true);
       }
@@ -178,7 +314,7 @@ export default function AiChatWidget({ defaultOpen = false }: { defaultOpen?: bo
           id: `err-${Date.now()}`,
           role: "assistant",
           content: `Sorry, I ran into a connection issue. You can reach us directly at ${SITE.email} or ${SITE.phones[0].number}.`,
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          timestamp: timeLabel(new Date()),
         },
       ]);
     } finally {
@@ -186,15 +322,14 @@ export default function AiChatWidget({ defaultOpen = false }: { defaultOpen?: bo
     }
   };
 
+  // Starts a brand-new conversation (the old one stays in the team's inbox)
   const handleResetChat = () => {
-    setMessages([
-      {
-        id: "welcome-reset",
-        role: "assistant",
-        content: "Chat reset! How can I assist you with your project today?",
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      },
-    ]);
+    window.localStorage.removeItem(STORAGE_KEY);
+    sessionRef.current = null;
+    lastIdRef.current = 0;
+    setHasSession(false);
+    setMode("ai");
+    setMessages([{ ...WELCOME, id: "welcome-reset", content: "New conversation started. How can I help with your project today?" }]);
     setLeadSaved(false);
   };
 
@@ -293,7 +428,7 @@ export default function AiChatWidget({ defaultOpen = false }: { defaultOpen?: bo
                       Service Agent
                     </h3>
                     <span className="rounded-full bg-[#df8326]/20 border border-[#df8326]/40 px-2 py-0.5 font-mono text-[9.5px] font-semibold text-[#f5b93f] tracking-wider">
-                      ONLINE
+                      {mode === "human" ? "TEAM" : "ONLINE"}
                     </span>
                   </div>
                   <span className="font-mono text-[11px] text-zinc-400 block mt-0.5">
@@ -328,6 +463,14 @@ export default function AiChatWidget({ defaultOpen = false }: { defaultOpen?: bo
               </div>
             )}
 
+            {/* A person has taken over from the AI */}
+            {mode === "human" && (
+              <div className="flex items-center gap-2 border-b border-[#df8326]/30 bg-[#df8326]/10 px-5 py-2.5 text-xs font-mono text-[#f5b93f]">
+                <User className="h-4 w-4" />
+                <span>A YARI team member has joined — you&rsquo;re now chatting with a person.</span>
+              </div>
+            )}
+
             {/* Message Thread (Expands to fill full vertical height) */}
             <div className="flex-1 min-h-0 overflow-y-auto p-5 space-y-4 bg-[#0c0c12] text-sm">
               {messages.map((msg) => (
@@ -335,9 +478,13 @@ export default function AiChatWidget({ defaultOpen = false }: { defaultOpen?: bo
                   key={msg.id}
                   className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  {msg.role === "assistant" && (
+                  {msg.role !== "user" && (
                     <div className="h-8 w-8 shrink-0 rounded-xl bg-[#df8326]/20 border border-[#df8326]/40 flex items-center justify-center text-[#df8326] mt-0.5 shadow-sm">
-                      <YMark className="h-3.5 w-3.5 text-[#f5b93f]" />
+                      {msg.role === "admin" ? (
+                        <User className="h-3.5 w-3.5 text-[#f5b93f]" />
+                      ) : (
+                        <YMark className="h-3.5 w-3.5 text-[#f5b93f]" />
+                      )}
                     </div>
                   )}
 
@@ -348,7 +495,10 @@ export default function AiChatWidget({ defaultOpen = false }: { defaultOpen?: bo
                         : "bg-[#181824] border border-white/15 text-zinc-100 rounded-bl-none shadow-[0_4px_15px_rgba(0,0,0,0.5)]"
                     }`}
                   >
-                    <div>{formatLinks(msg.content)}</div>
+                    {msg.role === "admin" && (
+                      <span className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-[#f5b93f]">YARI team</span>
+                    )}
+                    <div className="whitespace-pre-line">{formatLinks(msg.content)}</div>
                     <span
                       className={`block mt-1.5 font-mono text-[10px] ${
                         msg.role === "user" ? "text-white/80 text-right" : "text-zinc-400"
@@ -367,7 +517,7 @@ export default function AiChatWidget({ defaultOpen = false }: { defaultOpen?: bo
               ))}
 
               {/* Typing Indicator */}
-              {isLoading && (
+              {isLoading && mode === "ai" && (
                 <div className="flex gap-3 justify-start items-center">
                   <div className="h-8 w-8 shrink-0 rounded-xl bg-[#df8326]/20 border border-[#df8326]/40 flex items-center justify-center text-[#df8326]">
                     <Sparkles className="h-4 w-4 text-[#f5b93f] animate-spin" />
@@ -395,7 +545,7 @@ export default function AiChatWidget({ defaultOpen = false }: { defaultOpen?: bo
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Ask about software, ERP/CRM, or logistics..."
+                placeholder={mode === "human" ? "Message the YARI team..." : "Ask about software, ERP/CRM, or logistics..."}
                 disabled={isLoading}
                 className="flex-1 bg-[#1c1c28] border border-white/20 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder-zinc-400 focus:outline-none focus:border-[#df8326] transition-all disabled:opacity-50"
               />

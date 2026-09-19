@@ -16,17 +16,11 @@ import Counter from "@/components/ui/Counter";
 import Marquee from "@/components/ui/Marquee";
 import ContactCTA from "@/components/ui/ContactCTA";
 import LogisticsHero from "@/components/sections/LogisticsHero";
+import { LOGISTICS_FLOW, LOGISTICS_SERVICES } from "@/content/services";
 
-const SERVICES = [
-  { icon: PackageCheck, num: "01", title: "Fulfilment Management", body: "Pick, pack and dispatch handled end-to-end so every order moves the moment it lands." },
-  { icon: Warehouse, num: "02", title: "Warehousing", body: "Secure storage with real-time inventory monitoring and stock-level syncing to your store." },
-  { icon: Plane, num: "03", title: "Freight & Shipping", body: "Air, sea and ground freight coordination with the right carrier for every lane." },
-  { icon: Banknote, num: "04", title: "COD Management", body: "Cash-on-delivery handling, reconciliation and reporting built for emerging markets." },
-  { icon: Undo2, num: "05", title: "Returns & Reverse Logistics", body: "Painless returns, inspection and restocking that protect margin and the customer." },
-  { icon: Globe2, num: "06", title: "International Shipping", body: "Cross-border coordination, customs docs and duties handled without the headaches." },
-  { icon: RefreshCw, num: "07", title: "Inventory Sync", body: "Live two-way stock sync between warehouse, storefront and ERP — no overselling.", accent: true },
-  { icon: MapPin, num: "08", title: "Last-Mile Delivery", body: "Reliable final-leg delivery partners with tracking your customers actually trust." },
-];
+// Copy lives in content/services.ts (shared with the AI assistant); icons are matched by position
+const SERVICE_ICONS = [PackageCheck, Warehouse, Plane, Banknote, Undo2, Globe2, RefreshCw, MapPin];
+const SERVICES = LOGISTICS_SERVICES.map((service, i) => ({ ...service, icon: SERVICE_ICONS[i] }));
 
 const STATS = [
   { to: 2.1, suffix: "M+", label: "Orders fulfilled", decimals: 1 },
@@ -35,13 +29,7 @@ const STATS = [
   { to: 24, suffix: "h", label: "Avg. handling time" },
 ];
 
-const FLOW = [
-  { step: "01", title: "Receive", body: "Inbound stock checked, logged and shelved." },
-  { step: "02", title: "Store", body: "Inventory tracked live and synced to your store." },
-  { step: "03", title: "Pick & Pack", body: "Orders fulfilled fast with branded packaging." },
-  { step: "04", title: "Ship", body: "Best-fit carrier selected for every destination." },
-  { step: "05", title: "Track & Return", body: "Live tracking plus effortless reverse logistics." },
-];
+const FLOW = LOGISTICS_FLOW;
 
 export default function LogisticsServicesContent() {
   return (

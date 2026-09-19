@@ -24,3 +24,10 @@ export const SUBSCRIBER_STATUS_TONE: Record<string, BadgeTone> = {
   active: "soft",
   unsubscribed: "muted",
 };
+
+export const INVOICE_STATUS_TONE: Record<string, BadgeTone> = {
+  draft: "outline",
+  sent: "soft",
+  paid: "solid",
+  void: "muted",
+};

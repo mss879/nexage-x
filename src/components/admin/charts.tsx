@@ -9,6 +9,7 @@
  * data colour.
  */
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { formatMoney } from "@/lib/invoices";
 import { cn } from "@/lib/utils";
 
 const GOLD_LINE = "#c98a1b"; // gold-600 — the 2px line
@@ -262,5 +263,158 @@ export function BarList({
         </li>
       ))}
     </ul>
+  );
+}
+
+/* ── Invoiced vs collected, per day or per month ────────────────────────── */
+
+export interface MoneyPoint {
+  /** Axis label: "12" for a day, "Sep" for a month */
+  label: string;
+  /** Tooltip / table label: "12 September 2026", "September 2026" */
+  longLabel: string;
+  invoiced: number;
+  collected: number;
+}
+
+const NEUTRAL_BAR = "#78716c"; // stone-500 — the context series; gold stays the one accent
+
+/** A bar with a 4px rounded data-end, square on the baseline. */
+function barPath(x: number, y: number, w: number, h: number) {
+  const r = Math.min(4, w / 2, h);
+  return `M${x},${y + h} V${y + r} Q${x},${y} ${x + r},${y} H${x + w - r} Q${x + w},${y} ${x + w},${y + r} V${y + h} Z`;
+}
+
+/**
+ * Two series, so a legend is always present and identity never rests on colour
+ * alone: neutral stone = invoiced, gold = collected, both named in the legend,
+ * the tooltip and the screen-reader table.
+ */
+export function MoneyBars({ data, currency, caption }: { data: MoneyPoint[]; currency: string; caption: string }) {
+  const formatValue = (value: number) => formatMoney(value, currency);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(720);
+  const [hover, setHover] = useState<number | null>(null);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => setWidth(Math.max(280, entry.contentRect.width)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  if (data.length === 0) return null;
+
+  const height = 240;
+  const pad = { top: 12, right: 8, bottom: 28, left: 44 };
+  const innerW = width - pad.left - pad.right;
+  const innerH = height - pad.top - pad.bottom;
+  const yMax = niceCeil(Math.max(0, ...data.map((d) => Math.max(d.invoiced, d.collected))));
+  const band = innerW / data.length;
+  const barW = Math.max(2, Math.min(16, (band - 6) / 2 - 1));
+  const baseline = pad.top + innerH;
+  const scaleY = (v: number) => (v / yMax) * innerH;
+  const labelEvery = Math.max(1, Math.ceil(30 / band));
+
+  const active = hover !== null ? data[hover] : null;
+  const tooltipLeft = hover !== null ? Math.min(Math.max(pad.left + band * (hover + 0.5), 100), width - 100) : 0;
+
+  return (
+    <div ref={wrapRef} className="relative w-full">
+      <div className="mb-3 flex items-center gap-4 px-1 text-xs text-stone-600">
+        <span className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: NEUTRAL_BAR }} />
+          Invoiced
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: GOLD_FILL }} />
+          Collected
+        </span>
+      </div>
+
+      <svg width={width} height={height} role="img" aria-label={caption} className="block">
+        {[0, yMax / 2, yMax].map((t) => {
+          const y = baseline - scaleY(t);
+          return (
+            <g key={t}>
+              <line x1={pad.left} x2={width - pad.right} y1={y} y2={y} stroke={GRID} strokeWidth={1} />
+              <text x={pad.left - 8} y={y} textAnchor="end" dominantBaseline="middle" fontSize={11} fill={INK_MUTED}>
+                {compact.format(t)}
+              </text>
+            </g>
+          );
+        })}
+
+        {data.map((d, i) => {
+          const cx = pad.left + band * (i + 0.5);
+          return (
+            <g key={d.longLabel}>
+              {hover === i && <rect x={pad.left + band * i} y={pad.top} width={band} height={innerH} fill="#f5f5f4" />}
+              {d.invoiced > 0 && <path d={barPath(cx - barW - 1, baseline - scaleY(d.invoiced), barW, scaleY(d.invoiced))} fill={NEUTRAL_BAR} />}
+              {d.collected > 0 && <path d={barPath(cx + 1, baseline - scaleY(d.collected), barW, scaleY(d.collected))} fill={GOLD_FILL} />}
+              {i % labelEvery === 0 && (
+                <text x={cx} y={height - 8} textAnchor="middle" fontSize={11} fill={INK_MUTED}>
+                  {d.label}
+                </text>
+              )}
+              {/* Hit area — the whole column, not the thin bars */}
+              <rect
+                x={pad.left + band * i}
+                y={pad.top}
+                width={band}
+                height={innerH}
+                fill="transparent"
+                onPointerEnter={() => setHover(i)}
+                onPointerLeave={() => setHover((h) => (h === i ? null : h))}
+              />
+            </g>
+          );
+        })}
+      </svg>
+
+      {active && (
+        <div
+          className="pointer-events-none absolute top-8 z-10 w-48 -translate-x-1/2 rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs shadow-md"
+          style={{ left: tooltipLeft }}
+        >
+          <div className="font-medium text-stone-900">{active.longLabel}</div>
+          <div className="mt-1.5 flex items-center justify-between gap-3 text-stone-600">
+            <span className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-[2px]" style={{ background: NEUTRAL_BAR }} />
+              Invoiced
+            </span>
+            <span className="font-semibold tabular-nums text-stone-900">{formatValue(active.invoiced)}</span>
+          </div>
+          <div className="mt-1 flex items-center justify-between gap-3 text-stone-600">
+            <span className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-[2px]" style={{ background: GOLD_FILL }} />
+              Collected
+            </span>
+            <span className="font-semibold tabular-nums text-stone-900">{formatValue(active.collected)}</span>
+          </div>
+        </div>
+      )}
+
+      <table className="sr-only">
+        <caption>{caption}</caption>
+        <thead>
+          <tr>
+            <th scope="col">Period</th>
+            <th scope="col">Invoiced</th>
+            <th scope="col">Collected</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((d) => (
+            <tr key={d.longLabel}>
+              <th scope="row">{d.longLabel}</th>
+              <td>{formatValue(d.invoiced)}</td>
+              <td>{formatValue(d.collected)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

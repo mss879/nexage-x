@@ -120,4 +120,7 @@ in `components/admin/ui.tsx`. Admin screens must be built from those primitives,
 - **States**: hover = `stone-50` fill or darker hairline; focus-visible = 2px `gold-500` ring with
   offset; active = `scale-[0.98]`; disabled = 50% opacity; every list has an empty state.
 - **Motion**: 150ms colour/opacity transitions only.
+- **Invoice sheet** (`components/admin/invoice/InvoiceSheet.tsx`) is a printed A4 document, not a screen: fixed
+  794px page in px units, ink + hairlines, gold in exactly two places (mark above "Invoice", rule over the total).
+  Overdue uses an ink (`stone-900`) badge — still no second hue.
 

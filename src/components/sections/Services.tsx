@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { HOME_AUTOMATION_SERVICES, HOME_ECOMMERCE_SERVICES, type HomeService } from "@/content/services";
 
 interface ServiceItem {
   id: string;
@@ -466,260 +467,103 @@ function VolumetricCyberCubeMatrix() {
   );
 }
 
-export default function Services() {
-  // Rendered on the server like every other section: the service copy is the
-  // most keyword-rich content on the homepage, so it must be in the HTML.
-  const [activeTab, setActiveTab] = useState<"ecommerce" | "automation">("ecommerce");
-  const [expandedId, setExpandedId] = useState<string | null>(null); // Collapsed by default
-
-  const ecommerceServices: ServiceItem[] = [
-    {
-      id: "brand-setup",
-      num: "001",
-      title: "Brand & Store Setup",
-      description: "We build your brand foundation and launch-ready online store from the ground up, including identity, visuals, store setup, payments, shipping, and mobile optimization.",
-      includes: "Brand identity, logo design, packaging design, product photography, Shopify setup, domain and email setup, payment gateway integration, shipping setup, mobile optimization, and conversion-focused UI/UX.",
-      deliverable: "A fully launch-ready online store.",
-      keywords: ["IDENTITY", "LOGO", "SHOPIFY SETUP", "LAUNCH READY"],
-      icon: (
+// Icons stay with the component; the service copy itself lives in
+// content/services.ts so the page and the AI assistant read the same source.
+const SERVICE_ICONS: Record<string, React.ReactNode> = {
+  "brand-setup": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" />
         </svg>
-      ),
-    },
-    {
-      id: "store-dev",
-      num: "002",
-      title: "Store Development & Customization",
-      description: "We design and develop high-performing e-commerce stores tailored to your products, customers, and business goals.",
-      includes: "Custom Shopify sections, theme customization, product page optimization, collection setup, checkout improvements, upsell features, app integrations, and performance optimization.",
-      deliverable: "A customized online store built for speed, trust, and conversions.",
-      keywords: ["THEME CUSTOMIZATION", "SHOPIFY SECTIONS", "SPEED", "CONVERSIONS"],
-      icon: (
+  ),
+  "store-dev": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <circle cx="12" cy="12" r="10" />
           <circle cx="12" cy="12" r="3" />
         </svg>
-      ),
-    },
-    {
-      id: "retention-loyalty",
-      num: "003",
-      title: "Retention & Loyalty Systems",
-      description: "We help brands increase repeat purchases through customer retention, loyalty, and automated engagement systems.",
-      includes: "Email marketing flows, SMS campaigns, loyalty programs, referral systems, abandoned cart recovery, customer win-back campaigns, and post-purchase automation.",
-      deliverable: "A retention system that keeps customers engaged and buying again.",
-      keywords: ["EMAIL FLOWS", "SMS CAMPAIGNS", "LOYALTY", "AUTOMATIONS"],
-      icon: (
+  ),
+  "retention-loyalty": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <path d="M12 2L2 22h20L12 2z" />
         </svg>
-      ),
-    },
-    {
-      id: "perf-marketing",
-      num: "004",
-      title: "Performance Marketing",
-      description: "We create and manage data-driven advertising campaigns that help e-commerce brands attract customers and generate sales.",
-      includes: "Meta Ads, Google Ads, campaign strategy, creative direction, audience targeting, retargeting, conversion tracking, and performance reporting.",
-      deliverable: "A paid advertising system focused on traffic, conversions, and return on ad spend.",
-      keywords: ["META ADS", "GOOGLE ADS", "RETARGETING", "ROI OUTCOME"],
-      icon: (
+  ),
+  "perf-marketing": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
         </svg>
-      ),
-    },
-    {
-      id: "ops-automation",
-      num: "005",
-      title: "Operations & Automation",
-      description: "We streamline your e-commerce operations using automation, integrations, and smart backend systems.",
-      includes: "Inventory syncing, ERP integrations, warehouse automation, CRM setup, customer service systems, WhatsApp integrations, AI chatbots, Make.com automation, and Shopify Flow automation.",
-      deliverable: "A more efficient e-commerce operation with fewer manual tasks and better control.",
-      keywords: ["INTEGRATIONS", "SYNCING", "MAKE.COM", "AI CHATBOTS"],
-      icon: (
+  ),
+  "ops-automation": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
         </svg>
-      ),
-    },
-    {
-      id: "marketplace-exp",
-      num: "006",
-      title: "Marketplace Expansion",
-      description: "We help brands expand beyond their own website by setting up and optimizing marketplace sales channels.",
-      includes: "Amazon setup, Noon setup, product listing creation, marketplace account configuration, catalog structuring, and basic marketplace optimization.",
-      deliverable: "Your products listed and ready to sell across major marketplaces.",
-      keywords: ["AMAZON SETUP", "NOON SETUP", "LISTINGS", "EXPANSION"],
-      icon: (
+  ),
+  "marketplace-exp": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <circle cx="12" cy="12" r="10" />
           <path d="M8 12h8M12 8v8" />
         </svg>
-      ),
-    },
-    {
-      id: "fulfillment-mgmt",
-      num: "007",
-      title: "Fulfillment Management",
-      description: "We manage the operational side of shipping and order fulfillment so brands can focus on growth.",
-      includes: "Warehouse coordination, pick and pack management, inventory monitoring, shipping label generation, COD management, return handling, and international shipping coordination.",
-      deliverable: "A reliable fulfillment process that keeps orders moving smoothly.",
-      keywords: ["WAREHOUSE COORD", "PICK AND PACK", "COD MGMT", "SHIPPING LABELS"],
-      icon: (
+  ),
+  "fulfillment-mgmt": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <path d="M2 9l7-7h6l7 7v6l-7 7H9l-7-7V9z" />
         </svg>
-      ),
-    },
-  ];
-
-  const automationServices: ServiceItem[] = [
-    {
-      id: "workflow-automation",
-      num: "001",
-      title: "Workflow Automation Systems",
-      description: "We automate repetitive business tasks so your team can save time, reduce errors, and operate more efficiently.",
-      deliverable: "Automated workflows that save time and eliminate manual errors.",
-      keywords: ["INTEGRATIONS", "API SYNC", "TASK AUTOMATION", "ERROR REDUCTION"],
-      icon: (
+  ),
+  "workflow-automation": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" />
         </svg>
-      ),
-    },
-    {
-      id: "content-automation",
-      num: "002",
-      title: "Content Automation Systems",
-      description: "We build systems that help plan, create, organize, and publish content faster across multiple platforms.",
-      deliverable: "A central publishing and automation system for digital media.",
-      keywords: ["CONTENT SCHEDULING", "DYNAMIC TEMPLATES", "MULTI-PLATFORM", "AUTO-PUBLISH"],
-      icon: (
+  ),
+  "content-automation": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <circle cx="12" cy="12" r="10" />
           <circle cx="12" cy="12" r="3" />
         </svg>
-      ),
-    },
-    {
-      id: "ai-assistants",
-      num: "003",
-      title: "AI Assistants & Chatbots",
-      description: "We create AI-powered assistants and chatbots that can support customers, answer questions, qualify leads, and handle routine tasks.",
-      deliverable: "An intelligent AI chatbot working 24/7 to capture and support leads.",
-      keywords: ["LEAD QUALIFICATION", "CUSTOMER SUPPORT", "NLP ENGINES", "CRM SYNC"],
-      icon: (
+  ),
+  "ai-assistants": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <path d="M12 2L2 22h20L12 2z" />
         </svg>
-      ),
-    },
-    {
-      id: "consulting-audits",
-      num: "004",
-      title: "Consulting & Automation Audits",
-      description: "We review your current systems, identify bottlenecks, and recommend practical automation solutions for your business.",
-      deliverable: "A complete automation strategy report tailored to your business.",
-      keywords: ["BOTTLENECK ANALYSIS", "PIPELINE AUDITS", "ROI ESTIMATES", "ARCH PLANS"],
-      icon: (
+  ),
+  "consulting-audits": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
         </svg>
-      ),
-    },
-    {
-      id: "smart-websites",
-      num: "005",
-      title: "Smart Websites",
-      description: "We build modern, SEO-optimized websites designed to look professional, load fast, and convert visitors into leads or customers.",
-      deliverable: "A fast, modern website built to turn traffic into paying leads.",
-      keywords: ["SEO OPTIMIZATION", "STATIC BUILDS", "RESPONSIVE UI", "CONVERSION FLOWS"],
-      icon: (
+  ),
+  "smart-websites": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
         </svg>
-      ),
-    },
-    {
-      id: "smart-campaigns",
-      num: "006",
-      title: "Smart Ad Campaigns",
-      description: "We plan, launch, and optimize targeted advertising campaigns across platforms to help businesses generate leads, sales, and measurable growth.",
-      deliverable: "High-ROI ad campaigns built to generate predictable business growth.",
-      keywords: ["AUDIENCE RESEARCH", "PERFORMANCE TRACK", "AD TESTING", "BUDGET CONTROL"],
-      icon: (
+  ),
+  "smart-campaigns": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <circle cx="12" cy="12" r="10" />
           <path d="M8 12h8M12 8v8" />
         </svg>
-      ),
-    },
-    {
-      id: "web-apps",
-      num: "007",
-      title: "Web Apps",
-      description: "We design and develop custom web applications built around your business needs, workflows, and customer experience.",
-      deliverable: "A custom-coded web application designed to run your business operations.",
-      keywords: ["CUSTOM WORKFLOWS", "USER INTERFACES", "CLOUD COMPUTE", "DATABASE ARCH"],
-      icon: (
+  ),
+  "web-apps": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <path d="M2 9l7-7h6l7 7v6l-7 7H9l-7-7V9z" />
         </svg>
-      ),
-    },
-    {
-      id: "smart-funnels",
-      num: "008",
-      title: "Smart Funnels",
-      description: "We create conversion-focused funnels that guide visitors from interest to action through landing pages, forms, automations, and follow-up systems.",
-      deliverable: "A high-converting marketing funnel that guides visitors to take action.",
-      keywords: ["LANDING PAGES", "FORM BUILDERS", "SEQUENTIAL EMAILS", "CONVERSION HOOKS"],
-      icon: (
+  ),
+  "smart-funnels": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <path d="M17 11l-5-5-5 5M17 18l-5-5-5 5" />
         </svg>
-      ),
-    },
-    {
-      id: "custom-backend",
-      num: "009",
-      title: "Custom Backend Systems",
-      description: "We build secure backend systems that manage data, users, operations, dashboards, and business processes.",
-      deliverable: "A robust backend engine to manage data, security, and users.",
-      keywords: ["SECURE DATABASES", "API GATEWAYS", "DASHBOARD LOGIC", "SYSTEM INTEGRITY"],
-      icon: (
+  ),
+  "custom-backend": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <rect x="8" y="8" width="8" height="8" />
         </svg>
-      ),
-    },
-    {
-      id: "brand-kits",
-      num: "010",
-      title: "Brand Kits",
-      description: "We create professional brand kits that give your business a consistent visual identity across websites, ads, social media, and marketing materials.",
-      deliverable: "A unified visual identity guidelines package for all materials.",
-      keywords: ["COLOR PALETTES", "LOGO SUITES", "VECTOR BRANDING", "STYLE MANUALS"],
-      icon: (
+  ),
+  "brand-kits": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <path d="M3 21L21 3" />
         </svg>
-      ),
-    },
-    {
-      id: "chat-voice-agents",
-      num: "011",
-      title: "AI Chat Agents & Voice Agents",
-      description: "We build AI chat and voice agents that can handle customer conversations, answer inquiries, capture leads, and support business operations.",
-      deliverable: "AI chat and voice agents operating seamlessly across calls and text.",
-      keywords: ["NATURAL DIALOGUE", "LEAD CAPTURE", "INTEGRATED CHANNELS", "SUPPORT AGENTS"],
-      icon: (
+  ),
+  "chat-voice-agents": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <circle cx="12" cy="5" r="2" />
           <circle cx="5" cy="12" r="2" />
@@ -727,24 +571,26 @@ export default function Services() {
           <circle cx="12" cy="19" r="2" />
           <path d="M12 7v10M7 12h10" />
         </svg>
-      ),
-    },
-    {
-      id: "odoo-zoho-integration",
-      num: "012",
-      title: "Website + Odoo & Zoho Integration",
-      description: "We connect your website and storefront to Odoo ERP and tools like Zoho — unifying CRM, inventory, accounting, and order fulfilment into one synchronized system with no manual re-entry.",
-      includes: "Odoo ERP integration, Zoho CRM & Books sync, two-way product/customer/order sync, invoicing automation, inventory and stock syncing, payment reconciliation, custom Odoo modules, and API middleware between your site and back office.",
-      deliverable: "A fully integrated website wired into Odoo/Zoho with reliable two-way data sync.",
-      keywords: ["ODOO ERP", "ZOHO CRM", "TWO-WAY SYNC", "UNIFIED DATA"],
-      icon: (
+  ),
+  "odoo-zoho-integration": (
         <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current stroke-2">
           <path d="M4 7h16M4 7l2 13h12l2-13M9 11v5M15 11v5" />
           <circle cx="12" cy="4" r="1.6" />
         </svg>
-      ),
-    },
-  ];
+  ),
+};
+
+const withIcon = (service: HomeService): ServiceItem => ({ ...service, icon: SERVICE_ICONS[service.id] });
+
+export default function Services() {
+  // Rendered on the server like every other section: the service copy is the
+  // most keyword-rich content on the homepage, so it must be in the HTML.
+  const [activeTab, setActiveTab] = useState<"ecommerce" | "automation">("ecommerce");
+  const [expandedId, setExpandedId] = useState<string | null>(null); // Collapsed by default
+
+  const ecommerceServices: ServiceItem[] = HOME_ECOMMERCE_SERVICES.map(withIcon);
+
+  const automationServices: ServiceItem[] = HOME_AUTOMATION_SERVICES.map(withIcon);
 
   const handleToggle = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));

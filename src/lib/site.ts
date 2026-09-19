@@ -44,9 +44,10 @@ export type SocialNetwork =
   | "github";
 
 /**
- * Real, live social profiles only. Anything listed here is rendered in the
- * footer / menu / hero AND asserted to Google as `sameAs`, so never add a
- * placeholder — leave a network out until the profile exists.
+ * Real, live social profiles only. Every network's icon is always shown on the
+ * site, but only the ones listed here become links and are asserted to Google
+ * as `sameAs` — so never add a placeholder URL. To switch a network on, add its
+ * real profile URL here (keys: instagram, facebook, linkedin, youtube, x, github).
  */
 export const SOCIAL_PROFILES: Partial<Record<SocialNetwork, string>> = {
   instagram: "https://www.instagram.com/yariagency/",

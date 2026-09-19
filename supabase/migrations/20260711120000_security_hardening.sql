@@ -90,16 +90,22 @@ CREATE POLICY "Allow public inserts" ON public.inquiries
 
 -- 5. Size limits enforced at the database layer (NOT VALID so any existing
 --    oversized rows don't block the migration; new rows are checked).
+ALTER TABLE public.inquiries DROP CONSTRAINT IF EXISTS inquiries_name_len;
 ALTER TABLE public.inquiries
     ADD CONSTRAINT inquiries_name_len CHECK (char_length(name) BETWEEN 2 AND 100) NOT VALID;
+ALTER TABLE public.inquiries DROP CONSTRAINT IF EXISTS inquiries_email_len;
 ALTER TABLE public.inquiries
     ADD CONSTRAINT inquiries_email_len CHECK (char_length(email) <= 254) NOT VALID;
+ALTER TABLE public.inquiries DROP CONSTRAINT IF EXISTS inquiries_company_len;
 ALTER TABLE public.inquiries
     ADD CONSTRAINT inquiries_company_len CHECK (company IS NULL OR char_length(company) <= 100) NOT VALID;
+ALTER TABLE public.inquiries DROP CONSTRAINT IF EXISTS inquiries_budget_len;
 ALTER TABLE public.inquiries
     ADD CONSTRAINT inquiries_budget_len CHECK (budget IS NULL OR char_length(budget) <= 50) NOT VALID;
+ALTER TABLE public.inquiries DROP CONSTRAINT IF EXISTS inquiries_message_len;
 ALTER TABLE public.inquiries
     ADD CONSTRAINT inquiries_message_len CHECK (message IS NULL OR char_length(message) <= 2000) NOT VALID;
+ALTER TABLE public.inquiries DROP CONSTRAINT IF EXISTS inquiries_interests_bounds;
 ALTER TABLE public.inquiries
     ADD CONSTRAINT inquiries_interests_bounds CHECK (
         coalesce(array_length(interests, 1), 0) <= 12

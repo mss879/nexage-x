@@ -199,6 +199,24 @@ html:has(.admin-theme) body {
   background-color: #fafaf9;
 }
 
+/* Printing an invoice (admin → Finance → Invoices). The editor portals a print
+   copy of the sheet to <body> as #invoice-print-root; on paper that copy is the
+   only thing left — sidebar, form, chat widget and the rest are dropped. */
+@media print {
+  html:has(#invoice-print-root),
+  html:has(#invoice-print-root) body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  html:has(#invoice-print-root) body > *:not(#invoice-print-root) {
+    display: none !important;
+  }
+  #invoice-print-root {
+    display: block !important;
+  }
+}
+
 /* Utility classes for Premium Aesthetics */
 .glassmorphism {
   background: var(--color-bg-panel);

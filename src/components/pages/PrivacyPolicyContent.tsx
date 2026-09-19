@@ -94,12 +94,20 @@ const sections: LegalSection[] = [
     id: "ai-chat-assistant",
     title: "Our AI chat assistant",
     content: (
-      <p>
-        The chat assistant on our website is powered by OpenAI: the messages you send are passed to OpenAI to generate a
-        reply. Responses are automated and can be inaccurate, so please don&rsquo;t rely on them for important decisions
-        and avoid sharing sensitive information in the chat. When a conversation includes an email address, we store
-        the lead details described above in our systems.
-      </p>
+      <>
+        <p>
+          The chat assistant on our website is powered by OpenAI: the messages you send are passed to OpenAI to
+          generate a reply. Responses are automated and can be inaccurate, so please don&rsquo;t rely on them for
+          important decisions and avoid sharing sensitive information in the chat.
+        </p>
+        <p>
+          We keep a record of chat conversations so our team can review them, improve the assistant and follow up. A
+          member of the YARI team may read a conversation and join it to reply in person — the chat tells you when that
+          happens. Your conversation is linked to your browser so you can pick it up again; starting a new chat from
+          the reset button unlinks it. When a conversation includes an email address, we store the lead details
+          described above in our systems. You can ask us to delete a conversation at any time.
+        </p>
+      </>
     ),
   },
   {

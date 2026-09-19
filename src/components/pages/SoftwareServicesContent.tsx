@@ -17,74 +17,13 @@ import Reveal from "@/components/ui/Reveal";
 import Marquee from "@/components/ui/Marquee";
 import ContactCTA from "@/components/ui/ContactCTA";
 import SoftwareHero from "@/components/sections/SoftwareHero";
+import { ODOO_ZOHO_SYNC_ITEMS, SOFTWARE_SERVICES } from "@/content/services";
 
-const SERVICES = [
-  {
-    icon: Globe,
-    num: "01",
-    title: "Custom Web & Web Apps",
-    body: "Bespoke, production-grade applications built around your workflows — fast, secure and scalable.",
-    featured: false,
-  },
-  {
-    icon: Gauge,
-    num: "02",
-    title: "Smart Websites",
-    body: "SEO-optimised, lightning-fast marketing sites engineered to convert traffic into pipeline.",
-    featured: false,
-  },
-  {
-    icon: ShoppingBag,
-    num: "03",
-    title: "E-commerce & Shopify",
-    body: "High-converting storefronts, custom sections and checkout optimisation built for revenue.",
-    featured: false,
-  },
-  {
-    icon: Bot,
-    num: "04",
-    title: "AI Assistants & Chatbots",
-    body: "24/7 AI agents that qualify leads, support customers and handle routine work across channels.",
-    featured: false,
-  },
-  {
-    icon: Workflow,
-    num: "05",
-    title: "Workflow Automation",
-    body: "Connect your tools and eliminate manual tasks with reliable, monitored automation pipelines.",
-    featured: false,
-  },
-  {
-    icon: Database,
-    num: "06",
-    title: "Custom Backend Systems",
-    body: "Secure databases, APIs and dashboards that run the operational core of your business.",
-    featured: false,
-  },
-  {
-    icon: Boxes,
-    num: "07",
-    title: "Website + Odoo & Zoho Integration",
-    body: "Wire your site and storefront directly into Odoo ERP and Zoho — one synchronized source of truth across CRM, inventory, accounting and fulfilment.",
-    featured: true,
-  },
-  {
-    icon: Palette,
-    num: "08",
-    title: "Brand Kits & Identity",
-    body: "A consistent visual system across product, web, ads and social — unmistakably yours.",
-    featured: false,
-  },
-];
+// Copy lives in content/services.ts (shared with the AI assistant); icons are matched by position
+const SERVICE_ICONS = [Globe, Gauge, ShoppingBag, Bot, Workflow, Database, Boxes, Palette];
+const SERVICES = SOFTWARE_SERVICES.map((service, i) => ({ ...service, icon: SERVICE_ICONS[i] }));
 
-const SYNC_ITEMS = [
-  "Products & catalogue",
-  "Customers & contacts",
-  "Orders & invoices",
-  "Inventory & stock levels",
-  "Payments & reconciliation",
-  "Chart of accounts & taxes",
-];
+const SYNC_ITEMS = ODOO_ZOHO_SYNC_ITEMS;
 
 export default function SoftwareServicesContent() {
   return (

@@ -20,5 +20,16 @@ export default async function DashboardLayout({
     redirect("/admin/login");
   }
 
-  return <DashboardShell email={user.email ?? "Admin"}>{children}</DashboardShell>;
+  // Visitors waiting for a person — shown as a badge on "AI chats". Stays 0 if
+  // the chat tables haven't been created yet.
+  const { count } = await supabase
+    .from("chat_conversations")
+    .select("id", { count: "exact", head: true })
+    .eq("needs_human", true);
+
+  return (
+    <DashboardShell email={user.email ?? "Admin"} chatsWaiting={count ?? 0}>
+      {children}
+    </DashboardShell>
+  );
 }
