@@ -1,5 +1,5 @@
 import React from "react";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import KanbanBoard from "./KanbanBoard";
 import { ErrorBanner, PageHeader } from "@/components/admin/ui";
 
@@ -11,7 +11,7 @@ export default async function CRMPage() {
   let fetchError: string | null = null;
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdmin();
     const { data, error } = await supabase
       .from("leads")
       .select("*")

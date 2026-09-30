@@ -1,13 +1,16 @@
 import React from "react";
 import Link from "next/link";
-import { AlertTriangle, Banknote, Clock, Plus, ReceiptText } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, Banknote, Clock, Plus, ReceiptText, Wallet } from "lucide-react";
 import { Card, CardHeader, EmptyState, ErrorBanner, PageHeader, StatCard, buttonClass } from "@/components/admin/ui";
 import { BarList, MoneyBars, type MoneyPoint } from "@/components/admin/charts";
-import { formatInvoiceDate, formatMoney, isOverdue, todayInDubai, type InvoiceSummaryRow } from "@/lib/invoices";
+import InvoiceStatusBadge from "@/components/admin/invoice/InvoiceStatusBadge";
+import { lastDayOf, monthName, shiftMonth } from "@/lib/dates";
+import { liquidityCards } from "@/lib/finance";
+import { formatInvoiceDate, formatMoney, invoiceBalance, isOverdue, todayInDubai, type InvoiceSummaryRow } from "@/lib/invoices";
 import { cn } from "@/lib/utils";
 import FinanceSetupCard from "./FinanceSetupCard";
-import { InvoiceStatusBadge } from "./invoices/InvoicesList";
-import { listInvoices } from "./invoices/actions";
+import { listInvoices, listPaymentFlows } from "./invoices/actions";
+import { getLiquidity } from "./ledger/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -23,20 +26,10 @@ const PREVIOUS_LABELS: Record<Period, string> = {
 };
 
 const sum = (rows: InvoiceSummaryRow[]) => rows.reduce((total, row) => total + row.total, 0);
-
-/** "2026-09" shifted by n months. */
-function shiftMonth(ym: string, n: number): string {
-  const [year, month] = ym.split("-").map(Number);
-  return new Date(Date.UTC(year, month - 1 + n, 1)).toISOString().slice(0, 7);
-}
-
-const lastDayOf = (ym: string) => {
-  const [year, month] = ym.split("-").map(Number);
-  return new Date(Date.UTC(year, month, 0)).getUTCDate();
-};
-
-const monthName = (ym: string, options: Intl.DateTimeFormatOptions) =>
-  new Date(`${ym}-01T00:00:00Z`).toLocaleDateString("en-GB", { ...options, timeZone: "UTC" });
+/** What has actually been received on these invoices */
+const sumPaid = (rows: InvoiceSummaryRow[]) => rows.reduce((total, row) => total + row.amount_paid, 0);
+/** What is still owed on them */
+const sumOwed = (rows: InvoiceSummaryRow[]) => rows.reduce((total, row) => total + invoiceBalance(row), 0);
 
 interface DateWindow {
   /** Inclusive YYYY-MM-DD bounds */
@@ -93,7 +86,10 @@ export default async function FinanceAnalyticsPage({
 }) {
   const params = await searchParams;
   const period: Period = (PERIODS as readonly string[]).includes(params.period ?? "") ? (params.period as Period) : "month";
-  const res = await listInvoices();
+  const today = todayInDubai();
+  const { current, previous, title } = windowsFor(period, today);
+  // Payments are only needed back to the start of the period this one is compared with
+  const [res, flows, liquidity] = await Promise.all([listInvoices(), listPaymentFlows(previous.from), getLiquidity()]);
 
   if (!res.success) {
     return (
@@ -114,38 +110,44 @@ export default async function FinanceAnalyticsPage({
   const currency = currencies.includes(params.currency ?? "") ? (params.currency as string) : (currencies[0] ?? "AED");
   const money = (value: number) => formatMoney(value, currency);
 
-  const today = todayInDubai();
-  const { current, previous, title } = windowsFor(period, today);
   const rows = issued.filter((inv) => inv.currency === currency);
   const paidRows = rows.filter((inv) => inv.status === "paid");
 
   const invoicedNow = rows.filter((inv) => within(inv.issue_date, current));
-  const collectedNow = paidRows.filter((inv) => within(inv.paid_at, current));
   const invoicedBefore = sum(rows.filter((inv) => within(inv.issue_date, previous)));
-  const collectedBefore = sum(paidRows.filter((inv) => within(inv.paid_at, previous)));
   const outstanding = rows.filter((inv) => inv.status === "sent");
   const overdue = outstanding.filter((inv) => isOverdue(inv, today));
+
+  // "Collected" is money that arrived. With payment tracking that is each payment on the day it was
+  // received (so part payments count); before it, an invoice's whole total on the day it was marked paid.
+  const receipts = flows
+    ? flows.filter((flow) => flow.currency === currency).map((flow) => ({ date: flow.paid_on, amount: flow.amount }))
+    : paidRows.map((inv) => ({ date: inv.paid_at ?? "", amount: inv.total }));
+  const received = (match: (date: string) => boolean) => receipts.filter((r) => match(r.date)).reduce((total, r) => total + r.amount, 0);
+  const collectedNow = received((date) => within(date, current));
+  const collectedCount = receipts.filter((r) => within(r.date, current)).length;
+  const collectedBefore = received((date) => within(date, previous));
 
   const chart: MoneyPoint[] = bucketsFor(period, current).map(({ prefix, label, longLabel }) => ({
     label,
     longLabel,
     invoiced: sum(rows.filter((inv) => inv.issue_date.startsWith(prefix))),
-    collected: sum(paidRows.filter((inv) => inv.paid_at?.startsWith(prefix))),
+    collected: received((date) => date.startsWith(prefix)),
   }));
   const daily = period === "month" || period === "last-month";
 
   // Where the money from this period's invoices stands today
   const draftsNow = res.invoices.filter((inv) => inv.status === "draft" && inv.currency === currency && within(inv.issue_date, current));
   const standing = [
-    { label: "Paid", value: sum(invoicedNow.filter((inv) => inv.status === "paid")) },
-    { label: "Awaiting payment", value: sum(invoicedNow.filter((inv) => inv.status === "sent" && !isOverdue(inv, today))) },
-    { label: "Overdue", value: sum(invoicedNow.filter((inv) => isOverdue(inv, today))) },
+    { label: "Paid", value: sumPaid(invoicedNow) },
+    { label: "Awaiting payment", value: sumOwed(invoicedNow.filter((inv) => inv.status === "sent" && !isOverdue(inv, today))) },
+    { label: "Overdue", value: sumOwed(invoicedNow.filter((inv) => isOverdue(inv, today))) },
     { label: "Draft — not sent yet", value: sum(draftsNow) },
   ]
     .filter((row) => row.value > 0)
     .map((row) => ({ ...row, value: Math.round(row.value) }));
   const invoicedTotal = sum(invoicedNow);
-  const paidShare = invoicedTotal > 0 ? Math.round((sum(invoicedNow.filter((inv) => inv.status === "paid")) / invoicedTotal) * 100) : null;
+  const paidShare = invoicedTotal > 0 ? Math.round((sumPaid(invoicedNow) / invoicedTotal) * 100) : null;
 
   const clientTotals = new Map<string, number>();
   for (const inv of invoicedNow) {
@@ -157,8 +159,8 @@ export default async function FinanceAnalyticsPage({
     .slice(0, 6)
     .map(([label, value]) => ({ label, value: Math.round(value) }));
 
-  // Days from issue to payment, for invoices paid in the period
-  const paidDays = collectedNow.map((inv) =>
+  // Days from issue to payment, for invoices paid off in the period
+  const paidDays = paidRows.filter((inv) => within(inv.paid_at, current)).map((inv) =>
     Math.max(0, Math.round((Date.parse(inv.paid_at as string) - Date.parse(inv.issue_date)) / 86_400_000))
   );
   const avgDaysToPay = paidDays.length > 0 ? Math.round(paidDays.reduce((a, b) => a + b, 0) / paidDays.length) : null;
@@ -202,7 +204,7 @@ export default async function FinanceAnalyticsPage({
           <div className="flex justify-center pb-10">
             <Link href="/admin/finance/invoices/new" className={buttonClass("primary")}>
               <Plus className="h-4 w-4" />
-              New invoice
+              Create invoice
             </Link>
           </div>
         </Card>
@@ -218,13 +220,44 @@ export default async function FinanceAnalyticsPage({
         action={pickers}
       />
 
+      {liquidity && (
+        <Card className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold-50 text-gold-700">
+              <Wallet className="h-5 w-5" />
+            </span>
+            <div>
+              <h2 className="text-sm font-semibold text-stone-900">Liquidity right now</h2>
+              <p className="mt-0.5 text-xs text-stone-500">Invoice payments and other income, minus expenses — per currency, all time.</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
+            {liquidityCards(liquidity).map((row) => (
+              <div key={row.currency} className="flex flex-col">
+                <span className="text-xs text-stone-500">{row.currency}</span>
+                <span className={cn("text-lg font-semibold tracking-tight tabular-nums", row.balance > 0 ? "text-gold-700" : "text-stone-900")}>
+                  {formatMoney(row.balance, row.currency)}
+                </span>
+              </div>
+            ))}
+            <Link
+              href="/admin/finance/ledger"
+              className="inline-flex items-center gap-1 rounded text-xs font-medium text-gold-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500"
+            >
+              Expenses &amp; income
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </Card>
+      )}
+
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           label={`Collected · ${title}`}
-          value={money(sum(collectedNow))}
+          value={money(collectedNow)}
           icon={Banknote}
           emphasis
-          hint={`${collectedNow.length} paid · ${PREVIOUS_LABELS[period].toLowerCase()} ${money(collectedBefore)}`}
+          hint={`${collectedCount} payment${collectedCount === 1 ? "" : "s"} · ${PREVIOUS_LABELS[period].toLowerCase()} ${money(collectedBefore)}`}
         />
         <StatCard
           label={`Invoiced · ${title}`}
@@ -234,13 +267,13 @@ export default async function FinanceAnalyticsPage({
         />
         <StatCard
           label="Outstanding now"
-          value={money(sum(outstanding))}
+          value={money(sumOwed(outstanding))}
           icon={Clock}
           hint={`${outstanding.length} invoice${outstanding.length === 1 ? "" : "s"} awaiting payment`}
         />
         <StatCard
           label="Overdue now"
-          value={money(sum(overdue))}
+          value={money(sumOwed(overdue))}
           icon={AlertTriangle}
           hint={overdue.length === 0 ? "Nothing is late" : `${overdue.length} invoice${overdue.length === 1 ? "" : "s"} past due`}
         />
@@ -277,10 +310,10 @@ export default async function FinanceAnalyticsPage({
         <Card className="lg:col-span-2">
           <CardHeader
             title="Waiting to be paid"
-            description="Oldest due date first"
+            description="What is still owed, oldest due date first"
             action={
               <Link href="/admin/finance/invoices" className="rounded text-xs font-medium text-gold-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500">
-                All invoices
+                Past invoices
               </Link>
             }
           />
@@ -305,7 +338,7 @@ export default async function FinanceAnalyticsPage({
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
                         <InvoiceStatusBadge invoice={inv} today={today} />
-                        <span className="text-sm font-medium tabular-nums text-stone-900">{money(inv.total)}</span>
+                        <span className="text-sm font-medium tabular-nums text-stone-900">{money(invoiceBalance(inv))}</span>
                       </span>
                     </Link>
                   </li>

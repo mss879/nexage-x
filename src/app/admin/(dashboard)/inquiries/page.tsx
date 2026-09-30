@@ -1,5 +1,5 @@
 import React from "react";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import InquiriesList from "./InquiriesList";
 import { ErrorBanner, PageHeader } from "@/components/admin/ui";
 
@@ -10,7 +10,7 @@ export default async function InquiriesPage() {
   let fetchError: string | null = null;
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdmin();
     const { data, error } = await supabase
       .from("inquiries")
       .select("*")

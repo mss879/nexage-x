@@ -123,4 +123,13 @@ in `components/admin/ui.tsx`. Admin screens must be built from those primitives,
 - **Invoice sheet** (`components/admin/invoice/InvoiceSheet.tsx`) is a printed A4 document, not a screen: fixed
   794px page in px units, ink + hairlines, gold in exactly two places (mark above "Invoice", rule over the total).
   Overdue uses an ink (`stone-900`) badge — still no second hue.
+- **Progress** (`ProgressBar`): `stone-100` track, `gold-500` fill, and the number always beside it as text
+  (invoice paid / total, share of income spent). Never a red-to-green scale.
+- **Money in two currencies** (`components/admin/money.tsx`): AED and LKR are never added or converted — one
+  line per currency (`MoneyStack`), AED then LKR. Direction is a sign and an arrow (`+` in, `−` out); a
+  negative balance is ink with a minus, not red.
+- **Calendar** (`components/admin/MonthCalendar.tsx`): to-dos are the gold marks (soft tint; solid for high
+  priority), invoice and project deadlines are neutral outlines told apart by icon (project = dashed),
+  overdue = ink, done = muted with a strike. Today is a solid gold disc.
+- **Tabs** (`TabBar`): link-based, same pill as the finance period picker — active = gold tint.
 

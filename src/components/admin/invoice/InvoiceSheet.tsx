@@ -17,6 +17,7 @@ import {
   formatInvoiceDate,
   formatMoney,
   lineAmount,
+  round2,
   type InvoiceDraft,
 } from "@/lib/invoices";
 
@@ -41,13 +42,25 @@ function Lines({ values }: { values: (string | false | undefined)[] }) {
   );
 }
 
-export default function InvoiceSheet({ invoice, mode = "screen" }: { invoice: InvoiceDraft; mode?: "screen" | "print" }) {
+export default function InvoiceSheet({
+  invoice,
+  mode = "screen",
+  amountPaid = 0,
+}: {
+  invoice: InvoiceDraft;
+  mode?: "screen" | "print";
+  /** Payments already received — a part-paid invoice shows them and asks only for the balance */
+  amountPaid?: number;
+}) {
   const totals = computeTotals(invoice);
   const { seller, client, currency } = invoice;
   const placeholder = mode === "screen"; // empty-field hints never reach paper
   const billedTo = client.company || client.name;
   const items = invoice.items.filter((item) => item.description || item.unitPrice > 0);
   const paid = invoice.status === "paid";
+  // Part paid: some money in, some still owed. (Fully paid invoices say so in the masthead instead.)
+  const partPaid = !paid && invoice.status !== "void" && amountPaid > 0 && amountPaid < totals.total;
+  const balance = round2(totals.total - amountPaid);
 
   return (
     <article
@@ -109,8 +122,10 @@ export default function InvoiceSheet({ invoice, mode = "screen" }: { invoice: In
             </div>
           )}
           <div className="mt-2 border-t border-stone-200 pt-3">
-            <dt className="text-stone-500">{paid ? "Amount paid" : "Amount due"}</dt>
-            <dd className="mt-0.5 text-[17px] font-semibold tracking-tight tabular-nums">{formatMoney(totals.total, currency)}</dd>
+            <dt className="text-stone-500">{paid ? "Amount paid" : partPaid ? "Balance due" : "Amount due"}</dt>
+            <dd className="mt-0.5 text-[17px] font-semibold tracking-tight tabular-nums">
+              {formatMoney(partPaid ? balance : totals.total, currency)}
+            </dd>
           </div>
         </dl>
       </section>
@@ -173,9 +188,21 @@ export default function InvoiceSheet({ invoice, mode = "screen" }: { invoice: In
           </div>
         )}
         <div className="mt-2 flex items-baseline justify-between gap-4 border-t-2 border-gold-500 pt-3">
-          <dt className="text-[13px] font-semibold">{paid ? "Total paid" : "Total due"}</dt>
+          <dt className="text-[13px] font-semibold">{paid ? "Total paid" : partPaid ? "Total" : "Total due"}</dt>
           <dd className="text-[19px] font-semibold tracking-tight tabular-nums">{formatMoney(totals.total, currency)}</dd>
         </div>
+        {partPaid && (
+          <>
+            <div className="flex justify-between gap-4">
+              <dt className="text-stone-500">Paid to date</dt>
+              <dd className="tabular-nums">−{formatAmount(amountPaid)}</dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-4 border-t border-stone-200 pt-2">
+              <dt className="text-[13px] font-semibold">Balance due</dt>
+              <dd className="text-[15px] font-semibold tracking-tight tabular-nums">{formatMoney(balance, currency)}</dd>
+            </div>
+          </>
+        )}
       </dl>
 
       {/* Notes + how to pay */}

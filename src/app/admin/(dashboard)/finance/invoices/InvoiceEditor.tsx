@@ -4,12 +4,13 @@ import React, { useEffect, useId, useMemo, useRef, useState, useSyncExternalStor
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ChevronDown, Copy, Plus, Printer, Save, Trash2 } from "lucide-react";
-import { Badge, Button, Card, Chip, ErrorBanner, Field, Input, Modal, Select, Textarea, buttonClass } from "@/components/admin/ui";
+import { ChevronDown, Copy, Plus, Printer, Save, Trash2, UserPlus } from "lucide-react";
+import { Button, Card, Chip, ErrorBanner, Field, Input, Modal, Select, Textarea, buttonClass } from "@/components/admin/ui";
 import InvoiceSheet, { SHEET_HEIGHT, SHEET_WIDTH } from "@/components/admin/invoice/InvoiceSheet";
-import { INVOICE_STATUS_TONE } from "@/components/admin/status";
+import InvoiceStatusBadge from "@/components/admin/invoice/InvoiceStatusBadge";
+import { CurrencyPicker } from "@/components/admin/money";
+import type { ClientOption, ProjectOption } from "@/lib/clients";
 import {
-  CURRENCIES,
   INVOICE_STATUSES,
   INVOICE_STATUS_LABELS,
   MAX_INVOICE_ITEMS,
@@ -20,10 +21,14 @@ import {
   type DiscountType,
   type InvoiceClient,
   type InvoiceDraft,
+  type InvoicePayment,
+  type InvoicePaymentState,
   type InvoiceSeller,
   type InvoiceStatus,
 } from "@/lib/invoices";
 import { cn } from "@/lib/utils";
+import { saveClient } from "../../clients/actions";
+import PaymentsPanel from "./PaymentsPanel";
 import { deleteInvoice, saveInvoice } from "./actions";
 
 /* Numbers are edited as text so "1." or an empty box never fights the keyboard. */
@@ -82,10 +87,36 @@ function Section({ title, hint, children }: { title: string; hint?: string; chil
   );
 }
 
-export default function InvoiceEditor({ initial, isNew }: { initial: InvoiceDraft; isNew: boolean }) {
+export default function InvoiceEditor({
+  initial,
+  isNew,
+  clients = [],
+  projects = [],
+  payments: initialPayments = [],
+  amountPaid: initialAmountPaid = 0,
+  paymentsReady = false,
+  clientsReady = false,
+}: {
+  initial: InvoiceDraft;
+  isNew: boolean;
+  /** Saved clients and their projects, for "Billed to". Empty until the clients migration has been run. */
+  clients?: ClientOption[];
+  projects?: ProjectOption[];
+  payments?: InvoicePayment[];
+  amountPaid?: number;
+  /** Part payments can be recorded (the payments migration has been run) */
+  paymentsReady?: boolean;
+  /** The clients table exists, so "Billed to" can be saved as a client */
+  clientsReady?: boolean;
+}) {
   const router = useRouter();
   const uid = useId();
   const [form, setForm] = useState<FormState>(() => toForm(initial));
+  const [clientOptions, setClientOptions] = useState(clients);
+  const [payments, setPayments] = useState(initialPayments);
+  // What the database holds: payments are measured against the saved total, not the one being typed
+  const [money, setMoney] = useState(() => ({ amountPaid: initialAmountPaid, total: computeTotals(initial).total }));
+  const [savingClient, startSavingClient] = useTransition();
   const [savedSnapshot, setSavedSnapshot] = useState(() => JSON.stringify(toForm(initial)));
   const [error, setError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
@@ -144,6 +175,64 @@ export default function InvoiceEditor({ initial, isNew }: { initial: InvoiceDraf
   const setStatus = (status: InvoiceStatus) =>
     setForm((f) => ({ ...f, status, paidAt: status === "paid" ? f.paidAt || todayInDubai() : "" }));
 
+  /* ── Saved clients ── */
+  const linkedClient = clientOptions.find((client) => client.id === form.clientId);
+  const clientProjects = projects.filter((project) => project.client_id === form.clientId);
+  const hasPayments = money.amountPaid > 0;
+
+  const pickClient = (clientId: string) => {
+    const client = clientOptions.find((c) => c.id === clientId);
+    setForm((f) =>
+      client
+        ? {
+            ...f,
+            clientId,
+            projectId: "",
+            client: client.billing,
+            // Bill them in their usual currency — unless money has already been received in this one
+            currency: hasPayments ? f.currency : client.default_currency,
+          }
+        : { ...f, clientId: "", projectId: "" }
+    );
+  };
+
+  /** Keep what was typed into "Billed to" as a client, so the next invoice can just pick them. */
+  const saveAsClient = () => {
+    setError(null);
+    startSavingClient(async () => {
+      const { client } = form;
+      const res = await saveClient({
+        company: client.company,
+        contact_name: client.name,
+        email: client.email,
+        phone: client.phone,
+        address: client.address,
+        tax_id: client.taxId,
+        default_currency: form.currency,
+        status: "active",
+      });
+      if (!res.success) {
+        setError(res.error);
+        return;
+      }
+      setClientOptions((options) => [
+        ...options,
+        { id: res.id, name: client.company || client.name, status: "active", default_currency: form.currency, billing: client },
+      ]);
+      setForm((f) => ({ ...f, clientId: res.id, projectId: "" }));
+    });
+  };
+
+  /** The database decides status and amount paid (see the payments migration) — show what it decided. */
+  const applyServerState = (state: InvoicePaymentState, nextPayments: InvoicePayment[] | null, savedForm?: FormState) => {
+    const patch = { status: state.status, paidAt: state.paidAt };
+    // After a save the whole form is what's stored; after a payment only these two fields changed
+    setSavedSnapshot((snapshot) => JSON.stringify({ ...(savedForm ?? (JSON.parse(snapshot) as FormState)), ...patch }));
+    setForm((f) => ({ ...f, ...patch }));
+    setMoney({ amountPaid: state.amountPaid, total: state.total });
+    if (nextPayments) setPayments(nextPayments);
+  };
+
   /* ── Actions ── */
   const handleSave = () => {
     setError(null);
@@ -153,7 +242,7 @@ export default function InvoiceEditor({ initial, isNew }: { initial: InvoiceDraf
         setError(res.error);
         return;
       }
-      setSavedSnapshot(JSON.stringify(form));
+      applyServerState(res.state, res.payments, form);
       setSavedAt(new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }));
       if (isNew) router.replace(`/admin/finance/invoices/${res.id}`);
       else router.refresh();
@@ -192,21 +281,23 @@ export default function InvoiceEditor({ initial, isNew }: { initial: InvoiceDraf
       {/* Toolbar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
-          <Link
-            href="/admin/finance/invoices"
-            className="inline-flex items-center gap-1.5 rounded text-xs font-medium text-stone-500 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Invoices
-          </Link>
-          <div className="mt-1 flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
             <h1 className="truncate text-2xl font-semibold tracking-tight text-stone-900">
-              {isNew ? "New invoice" : `Invoice ${form.number}`}
+              {isNew ? "Create invoice" : `Invoice ${form.number}`}
             </h1>
-            <Badge tone={INVOICE_STATUS_TONE[form.status]}>{INVOICE_STATUS_LABELS[form.status]}</Badge>
+            <InvoiceStatusBadge
+              invoice={{ status: form.status, due_date: form.dueDate || null, total: money.total, amount_paid: money.amountPaid }}
+              today={todayInDubai()}
+            />
           </div>
           <p className="mt-1 text-xs text-stone-500" aria-live="polite">
-            {dirty ? "Unsaved changes" : savedAt ? `Saved at ${savedAt}` : "All changes saved"}
+            {isNew
+              ? "Fill in the form — the invoice on the right updates as you type."
+              : dirty
+                ? "Unsaved changes"
+                : savedAt
+                  ? `Saved at ${savedAt}`
+                  : "All changes saved"}
           </p>
         </div>
 
@@ -245,6 +336,18 @@ export default function InvoiceEditor({ initial, isNew }: { initial: InvoiceDraf
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,430px)_minmax(0,1fr)]">
         {/* ── Left: the form ── */}
         <div className={cn("flex-col gap-4", view === "edit" ? "flex" : "hidden lg:flex")}>
+          {!isNew && form.id && paymentsReady && (
+            <PaymentsPanel
+              invoice={{ id: form.id, number: form.number, clientName: form.client.company || form.client.name, currency: form.currency }}
+              status={form.status}
+              total={money.total}
+              amountPaid={money.amountPaid}
+              payments={payments}
+              dirty={dirty}
+              onChange={applyServerState}
+            />
+          )}
+
           <Section title="Invoice details">
             <div className="grid grid-cols-2 gap-3">
               <Field label="Invoice number" htmlFor={id("number")}>
@@ -265,26 +368,55 @@ export default function InvoiceEditor({ initial, isNew }: { initial: InvoiceDraf
               <Field label="Due date" htmlFor={id("due")}>
                 <Input id={id("due")} type="date" value={form.dueDate} min={form.issueDate} onChange={(e) => set("dueDate", e.target.value)} />
               </Field>
-              <Field label="Currency" htmlFor={id("currency")}>
-                <Select id={id("currency")} value={form.currency} onChange={(e) => set("currency", e.target.value)}>
-                  {(CURRENCIES as readonly string[]).includes(form.currency) ? null : <option value={form.currency}>{form.currency}</option>}
-                  {CURRENCIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </Select>
+              <Field label="Currency" htmlFor={id("currency")} className="col-span-2">
+                <CurrencyPicker id={id("currency")} value={form.currency} onChange={(currency) => set("currency", currency)} disabled={hasPayments} />
+                <p className="text-xs text-stone-500">
+                  {hasPayments
+                    ? `Payments have been received in ${form.currency}, so the currency is fixed.`
+                    : "Switching currency relabels the amounts — it doesn't convert them."}
+                </p>
               </Field>
               {form.status === "paid" && (
-                <Field label="Paid on" htmlFor={id("paid")}>
+                <Field label="Paid on" htmlFor={id("paid")} className="col-span-2">
                   <Input id={id("paid")} type="date" value={form.paidAt} onChange={(e) => set("paidAt", e.target.value)} />
+                  {paymentsReady && totals.total > money.amountPaid && (
+                    <p className="text-xs text-stone-500">
+                      Saving records the {formatMoney(totals.total - money.amountPaid, form.currency)} still owed as a payment on this date.
+                    </p>
+                  )}
                 </Field>
               )}
             </div>
           </Section>
 
-          <Section title="Billed to">
+          <Section title="Billed to" hint={clientOptions.length > 0 ? "Pick a saved client to fill this in, or type the details." : undefined}>
             <div className="grid grid-cols-2 gap-3">
+              {clientOptions.length > 0 && (
+                <Field label="Client" htmlFor={id("c-saved")} className={clientProjects.length > 0 ? "col-span-2 sm:col-span-1" : "col-span-2"}>
+                  <Select id={id("c-saved")} value={linkedClient ? form.clientId : ""} onChange={(e) => pickClient(e.target.value)}>
+                    <option value="">Not a saved client</option>
+                    {clientOptions
+                      .filter((client) => client.status === "active" || client.id === form.clientId)
+                      .map((client) => (
+                        <option key={client.id} value={client.id}>
+                          {client.name}
+                        </option>
+                      ))}
+                  </Select>
+                </Field>
+              )}
+              {clientProjects.length > 0 && (
+                <Field label="Project (optional)" htmlFor={id("c-project")} className="col-span-2 sm:col-span-1">
+                  <Select id={id("c-project")} value={form.projectId} onChange={(e) => set("projectId", e.target.value)}>
+                    <option value="">No project</option>
+                    {clientProjects.map((project) => (
+                      <option key={project.id} value={project.id}>
+                        {project.name}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+              )}
               <Field label="Company" htmlFor={id("c-company")} className="col-span-2">
                 <Input id={id("c-company")} value={form.client.company} maxLength={120} onChange={(e) => setClient("company", e.target.value)} />
               </Field>
@@ -304,6 +436,12 @@ export default function InvoiceEditor({ initial, isNew }: { initial: InvoiceDraf
                 <Input id={id("c-tax")} value={form.client.taxId} maxLength={40} onChange={(e) => setClient("taxId", e.target.value)} />
               </Field>
             </div>
+            {clientsReady && !linkedClient && (form.client.company || form.client.name) && (
+              <Button variant="secondary" size="sm" onClick={saveAsClient} disabled={savingClient} className="self-start">
+                <UserPlus className="h-3.5 w-3.5" />
+                {savingClient ? "Saving…" : "Save to clients"}
+              </Button>
+            )}
           </Section>
 
           <Section title="Items" hint="First line is the item title — add detail on the lines below it.">
@@ -494,7 +632,7 @@ export default function InvoiceEditor({ initial, isNew }: { initial: InvoiceDraf
             <div ref={paneRef} aria-label="Invoice preview" role="region">
               <div className="overflow-hidden rounded-sm bg-white shadow-sm ring-1 ring-stone-200" style={{ height: sheetHeight * scale }}>
                 <div ref={sheetRef} style={{ width: SHEET_WIDTH, transform: `scale(${scale})`, transformOrigin: "top left" }}>
-                  <InvoiceSheet invoice={draft} />
+                  <InvoiceSheet invoice={draft} amountPaid={money.amountPaid} />
                 </div>
               </div>
             </div>
@@ -507,7 +645,7 @@ export default function InvoiceEditor({ initial, isNew }: { initial: InvoiceDraf
         createPortal(
           <div id="invoice-print-root" className="hidden">
             <style>{"@page { size: A4; margin: 15mm; }"}</style>
-            <InvoiceSheet invoice={draft} mode="print" />
+            <InvoiceSheet invoice={draft} mode="print" amountPaid={money.amountPaid} />
           </div>,
           document.body
         )}

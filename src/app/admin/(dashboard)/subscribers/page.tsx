@@ -1,5 +1,5 @@
 import React from "react";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import SubscribersList from "./SubscribersList";
 import { PageHeader } from "@/components/admin/ui";
 
@@ -12,7 +12,7 @@ export const metadata = {
 export default async function SubscribersPage() {
   let subscribers: any[] = [];
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdmin();
     const { data } = await supabase
       .from("newsletter_subscribers")
       .select("*")

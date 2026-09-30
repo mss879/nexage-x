@@ -4,7 +4,11 @@
  * Used by the editor (live preview), the server actions (which never trust the
  * browser's totals and recompute them here) and the finance analytics page.
  */
+import { addDays, formatDate, isIsoDate, todayInDubai } from "@/lib/dates";
+import { cleanAmount as amount, cleanText as text, uuidOrNull } from "@/lib/sanitize";
 import { SITE, SITE_URL } from "@/lib/site";
+
+export { addDays, isIsoDate, todayInDubai };
 
 export const INVOICE_STATUSES = ["draft", "sent", "paid", "void"] as const;
 export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
@@ -16,7 +20,19 @@ export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
   void: "Void",
 };
 
-export const CURRENCIES = ["AED", "USD", "GBP", "EUR", "SAR", "LKR"] as const;
+export const CURRENCIES = ["AED", "LKR", "USD", "GBP", "EUR", "SAR"] as const;
+
+/** The two currencies YARI actually bills in — offered first, one click apart. */
+export const PRIMARY_CURRENCIES = ["AED", "LKR"] as const;
+
+/** AED, LKR, then everything else alphabetically — the order money is listed in across the admin. */
+export function orderCurrencies(codes: Iterable<string>): string[] {
+  const rank = (code: string) => {
+    const i = (PRIMARY_CURRENCIES as readonly string[]).indexOf(code);
+    return i === -1 ? PRIMARY_CURRENCIES.length : i;
+  };
+  return [...new Set(codes)].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+}
 
 export type DiscountType = "percent" | "amount";
 
@@ -55,6 +71,9 @@ export interface InvoiceDraft {
   /** Only meaningful when status is "paid". */
   paidAt: string;
   currency: string;
+  /** The saved client this invoice belongs to ("" = typed by hand, not linked). */
+  clientId: string;
+  projectId: string;
   seller: InvoiceSeller;
   client: InvoiceClient;
   items: InvoiceItem[];
@@ -85,9 +104,15 @@ export interface InvoiceSummaryRow {
   currency: string;
   client_name: string;
   total: number;
+  /** Sum of the payments recorded against it (payments migration). */
+  amount_paid: number;
+  client_id: string | null;
 }
 
-export const INVOICE_SUMMARY_COLUMNS = "id, number, status, issue_date, due_date, paid_at, currency, client_name, total";
+/** Before the payments migration has been run… */
+export const INVOICE_SUMMARY_COLUMNS_LEGACY = "id, number, status, issue_date, due_date, paid_at, currency, client_name, total";
+/** …and after. */
+export const INVOICE_SUMMARY_COLUMNS = `${INVOICE_SUMMARY_COLUMNS_LEGACY}, amount_paid, client_id`;
 
 export const MAX_INVOICE_ITEMS = 60;
 
@@ -119,28 +144,74 @@ export const formatAmount = (amount: number) =>
 
 /* ── Dates ──────────────────────────────────────────────────────────────── */
 
-const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
-
-export const isIsoDate = (value: unknown): value is string =>
-  typeof value === "string" && ISO_DATE.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
-
-/** Today's calendar date in Dubai, as YYYY-MM-DD. */
-export const todayInDubai = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dubai" }).format(new Date());
-
-export function addDays(isoDate: string, days: number): string {
-  const d = new Date(`${isoDate}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-}
-
-export const formatInvoiceDate = (isoDate: string | null | undefined) =>
-  isIsoDate(isoDate)
-    ? new Date(`${isoDate}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })
-    : "—";
+export const formatInvoiceDate = formatDate;
 
 /** Sent, unpaid and past its due date. */
 export const isOverdue = (invoice: { status: InvoiceStatus; due_date: string | null }, today = todayInDubai()) =>
   invoice.status === "sent" && Boolean(invoice.due_date) && (invoice.due_date as string) < today;
+
+/* ── Payments ───────────────────────────────────────────────────────────── */
+
+export const PAYMENT_METHODS = ["bank_transfer", "cash", "card", "cheque", "online", "other"] as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  bank_transfer: "Bank transfer",
+  cash: "Cash",
+  card: "Card",
+  cheque: "Cheque",
+  online: "Online payment",
+  other: "Other",
+};
+
+export interface InvoicePayment {
+  id: string;
+  invoice_id: string;
+  amount: number;
+  /** YYYY-MM-DD */
+  paid_on: string;
+  method: PaymentMethod;
+  reference: string;
+  note: string;
+}
+
+export const INVOICE_PAYMENT_COLUMNS = "id, invoice_id, amount, paid_on, method, reference, note";
+
+/** What the database says about an invoice's money right now. */
+export interface InvoicePaymentState {
+  status: InvoiceStatus;
+  paidAt: string;
+  total: number;
+  amountPaid: number;
+}
+
+/** What's still owed. Never negative — an overpaid invoice owes nothing. */
+export const invoiceBalance = (invoice: { total: number; amount_paid: number }) => round2(Math.max(invoice.total - invoice.amount_paid, 0));
+
+/** Sent, with some — but not all — of it paid. */
+export const isPartPaid = (invoice: { status: InvoiceStatus; total: number; amount_paid: number }) =>
+  invoice.status === "sent" && invoice.amount_paid > 0 && invoice.amount_paid < invoice.total;
+
+export function sanitizePayment(input: unknown):
+  | { payment: { invoiceId: string; amount: number; paidOn: string; method: PaymentMethod; reference: string; note: string } }
+  | { error: string } {
+  const raw = (input ?? {}) as Record<string, unknown>;
+  const invoiceId = uuidOrNull(raw.invoiceId);
+  if (!invoiceId) return { error: "Invoice not found." };
+  const value = round2(amount(raw.amount));
+  if (value <= 0) return { error: "Enter how much was paid." };
+  if (!isIsoDate(raw.paidOn)) return { error: "Pick the date the payment arrived." };
+  return {
+    payment: {
+      invoiceId,
+      amount: value,
+      paidOn: raw.paidOn,
+      method: PAYMENT_METHODS.includes(raw.method as PaymentMethod) ? (raw.method as PaymentMethod) : "bank_transfer",
+      reference: text(raw.reference, 80),
+      note: text(raw.note, 500),
+    },
+  };
+}
 
 /* ── Defaults ───────────────────────────────────────────────────────────── */
 
@@ -167,6 +238,8 @@ export function blankInvoice(number: string): InvoiceDraft {
     dueDate: addDays(today, 14),
     paidAt: "",
     currency: "AED",
+    clientId: "",
+    projectId: "",
     seller: defaultSeller(),
     client: emptyClient(),
     items: [{ description: "", quantity: 1, unitPrice: 0 }],
@@ -188,13 +261,6 @@ export function nextInvoiceNumber(lastNumber: string | null | undefined, year = 
 }
 
 /* ── Validation (server-side source of truth) ───────────────────────────── */
-
-const text = (value: unknown, max: number) => (typeof value === "string" ? value.trim().slice(0, max) : "");
-
-const amount = (value: unknown, max = 1_000_000_000) => {
-  const n = typeof value === "number" ? value : Number(value);
-  return Number.isFinite(n) ? Math.min(Math.max(n, 0), max) : 0;
-};
 
 /** Coerce anything the browser sends into a well-formed draft, or explain what's wrong. */
 export function sanitizeInvoice(input: unknown): { draft: InvoiceDraft } | { error: string } {
@@ -244,6 +310,8 @@ export function sanitizeInvoice(input: unknown): { draft: InvoiceDraft } | { err
       dueDate,
       paidAt: status === "paid" ? (isIsoDate(raw.paidAt) ? raw.paidAt : todayInDubai()) : "",
       currency,
+      clientId: uuidOrNull(raw.clientId) ?? "",
+      projectId: uuidOrNull(raw.projectId) ?? "",
       seller: {
         name: text(seller.name, 120),
         address: text(seller.address, 400),
@@ -266,7 +334,11 @@ export function sanitizeInvoice(input: unknown): { draft: InvoiceDraft } | { err
 
 /* ── Row mapping ────────────────────────────────────────────────────────── */
 
-export interface InvoiceRow extends InvoiceSummaryRow {
+export interface InvoiceRow extends Omit<InvoiceSummaryRow, "amount_paid" | "client_id"> {
+  /** Absent until the payments migration has been run. */
+  amount_paid?: number;
+  client_id?: string | null;
+  project_id?: string | null;
   client: Partial<InvoiceClient>;
   seller: Partial<InvoiceSeller>;
   items: Partial<InvoiceItem>[];
@@ -304,6 +376,12 @@ export function draftToRow(draft: InvoiceDraft) {
   };
 }
 
+/** The link to a saved client / project — columns that only exist after the payments migration. */
+export const draftLinks = (draft: InvoiceDraft) => ({
+  client_id: draft.clientId || null,
+  project_id: draft.projectId || null,
+});
+
 export function rowToDraft(row: InvoiceRow): InvoiceDraft {
   return {
     id: row.id,
@@ -313,6 +391,8 @@ export function rowToDraft(row: InvoiceRow): InvoiceDraft {
     dueDate: row.due_date ?? "",
     paidAt: row.paid_at ?? "",
     currency: row.currency,
+    clientId: row.client_id ?? "",
+    projectId: row.project_id ?? "",
     seller: { ...defaultSeller(), ...row.seller },
     client: { ...emptyClient(), ...row.client },
     items: (row.items ?? []).map((i) => ({

@@ -4,10 +4,29 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, KanbanSquare, Inbox, LogOut, Menu, X, LayoutDashboard, Mail, MessageSquare, ReceiptText, TrendingUp } from "lucide-react";
+import {
+  BarChart3,
+  Building2,
+  KanbanSquare,
+  Inbox,
+  KeyRound,
+  LogOut,
+  Menu,
+  X,
+  LayoutDashboard,
+  ListTodo,
+  Mail,
+  MessageSquare,
+  ReceiptText,
+  TrendingUp,
+  UsersRound,
+  Wallet,
+} from "lucide-react";
 import { logoutAdmin } from "@/app/admin/actions";
 import { Button } from "@/components/admin/ui";
+import { ADMIN_ROLE_LABELS, type AdminRole } from "@/lib/admin";
 import { cn } from "@/lib/utils";
+import ChangePasswordModal from "./ChangePasswordModal";
 
 interface NavLink {
   href: string;
@@ -19,6 +38,8 @@ interface NavLink {
 
 const NAV_LINKS: NavLink[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/todos", label: "To-dos", icon: ListTodo },
+  { href: "/admin/clients", label: "Clients", icon: Building2, nested: true },
   { href: "/admin/analytics", label: "Site analytics", icon: BarChart3 },
   { href: "/admin/chats", label: "AI chats", icon: MessageSquare },
   { href: "/admin/crm", label: "CRM pipeline", icon: KanbanSquare },
@@ -29,7 +50,11 @@ const NAV_LINKS: NavLink[] = [
 const FINANCE_LINKS: NavLink[] = [
   { href: "/admin/finance", label: "Analytics", icon: TrendingUp },
   { href: "/admin/finance/invoices", label: "Invoices", icon: ReceiptText, nested: true },
+  { href: "/admin/finance/ledger", label: "Expenses & income", icon: Wallet },
 ];
+
+/** Only a super admin manages who can sign in. */
+const TEAM_LINK: NavLink = { href: "/admin/team", label: "Team", icon: UsersRound };
 
 function Brand() {
   return (
@@ -43,18 +68,30 @@ function Brand() {
 }
 
 export default function DashboardShell({
-  email,
+  admin,
   chatsWaiting = 0,
+  todosDue = 0,
   children,
 }: {
-  email: string;
+  admin: { fullName: string; email: string; role: AdminRole; legacy: boolean };
   /** Conversations where a visitor asked for a person and nobody has stepped in yet. */
   chatsWaiting?: number;
+  /** The signed-in person's open to-dos that are due today or overdue. */
+  todosDue?: number;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+
+  // Until the team migration has been run the Team page explains what to do, so it stays reachable
+  const canManageTeam = admin.legacy || admin.role === "super_admin";
+
+  const badges: Record<string, { count: number; title: string }> = {
+    "/admin/chats": { count: chatsWaiting, title: `${chatsWaiting} visitor${chatsWaiting === 1 ? "" : "s"} asked for a person` },
+    "/admin/todos": { count: todosDue, title: `${todosDue} of your to-dos ${todosDue === 1 ? "is" : "are"} due today or overdue` },
+  };
 
   const handleLogout = async () => {
     const result = await logoutAdmin();
@@ -67,6 +104,7 @@ export default function DashboardShell({
   const renderLink = (link: NavLink) => {
     const Icon = link.icon;
     const active = pathname === link.href || (link.nested === true && pathname.startsWith(`${link.href}/`));
+    const badge = badges[link.href];
     return (
       <Link
         key={link.href}
@@ -80,12 +118,12 @@ export default function DashboardShell({
       >
         <Icon className={cn("h-4 w-4 shrink-0", active ? "text-gold-600" : "text-stone-400")} />
         {link.label}
-        {link.href === "/admin/chats" && chatsWaiting > 0 && (
+        {badge && badge.count > 0 && (
           <span
             className="ml-auto rounded-full bg-gold-500 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-stone-900"
-            title={`${chatsWaiting} visitor${chatsWaiting === 1 ? "" : "s"} asked for a person`}
+            title={badge.title}
           >
-            {chatsWaiting}
+            {badge.count}
           </span>
         )}
       </Link>
@@ -121,6 +159,7 @@ export default function DashboardShell({
 
           <nav aria-label="Admin" className="flex flex-col gap-0.5">
             {NAV_LINKS.map(renderLink)}
+            {canManageTeam && renderLink(TEAM_LINK)}
           </nav>
 
           <nav aria-labelledby="nav-finance" className="rounded-xl border border-stone-200 bg-stone-50 p-1.5">
@@ -133,11 +172,22 @@ export default function DashboardShell({
 
         <div className="flex flex-col gap-3 border-t border-stone-200 px-3 pt-4">
           <div className="flex flex-col">
-            <span className="text-[11px] text-stone-500">Signed in as</span>
-            <span className="truncate text-xs font-medium text-stone-800" title={email}>
-              {email}
+            <span className="text-[11px] text-stone-500">
+              {admin.legacy ? "Signed in as" : ADMIN_ROLE_LABELS[admin.role]}
             </span>
+            <span className="truncate text-xs font-medium text-stone-800" title={admin.email}>
+              {admin.fullName || admin.email}
+            </span>
+            {admin.fullName && (
+              <span className="truncate text-[11px] text-stone-500" title={admin.email}>
+                {admin.email}
+              </span>
+            )}
           </div>
+          <Button variant="ghost" size="sm" onClick={() => setChangingPassword(true)} className="w-full justify-start px-2">
+            <KeyRound className="h-3.5 w-3.5" />
+            Change password
+          </Button>
           <Button variant="secondary" size="sm" onClick={handleLogout} className="w-full">
             <LogOut className="h-3.5 w-3.5" />
             Sign out
@@ -153,6 +203,8 @@ export default function DashboardShell({
       <div className="flex min-w-0 flex-1 flex-col pt-14 lg:pl-60 lg:pt-0">
         <main className="mx-auto w-full max-w-7xl flex-1 p-5 md:p-8">{children}</main>
       </div>
+
+      {changingPassword && <ChangePasswordModal onClose={() => setChangingPassword(false)} />}
     </div>
   );
 }

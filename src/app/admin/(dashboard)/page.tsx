@@ -1,9 +1,14 @@
 import React from "react";
 import Link from "next/link";
 import { Inbox, KanbanSquare, DollarSign, Award, ArrowUpRight, FolderSync, Percent, Users } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { requireAdmin } from "@/lib/admin-auth";
+import MonthCalendar, { type CalendarItem } from "@/components/admin/MonthCalendar";
 import { Badge, Card, CardHeader, EmptyState, ErrorBanner, PageHeader, StatCard } from "@/components/admin/ui";
 import { INQUIRY_STATUS_TONE, LEAD_STAGE_TONE } from "@/components/admin/status";
+import { isOpenProject, type ProjectStatus } from "@/lib/clients";
+import { addDays, todayInDubai } from "@/lib/dates";
+import { formatMoney } from "@/lib/invoices";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -34,15 +39,90 @@ interface Lead {
   notes?: string;
 }
 
+/**
+ * Everything with a date on it: to-do deadlines, unpaid invoices' due dates and
+ * project deadlines. Each source is optional — a table whose migration hasn't
+ * been run yet simply contributes nothing.
+ */
+async function loadCalendar(supabase: SupabaseClient, today: string): Promise<{ items: CalendarItem[]; todosReady: boolean }> {
+  // Finished to-dos drop off the calendar after a while; open ones stay however late they are
+  const doneSince = addDays(today, -45);
+
+  const [todosRes, teamRes, invoicesRes, projectsRes] = await Promise.all([
+    supabase
+      .from("todos")
+      .select("id, title, status, priority, due_date, assignee_id")
+      .not("due_date", "is", null)
+      .or(`status.neq.done,due_date.gte.${doneSince}`)
+      .limit(1000),
+    supabase.from("team_members").select("id, full_name"),
+    supabase.from("invoices").select("*").eq("status", "sent").not("due_date", "is", null).limit(500),
+    supabase.from("projects").select("id, name, status, due_date, client_id, clients(company, contact_name)").not("due_date", "is", null).limit(500),
+  ]);
+
+  const names = new Map((teamRes.data ?? []).map((member) => [member.id as string, member.full_name as string]));
+  const items: CalendarItem[] = [];
+
+  for (const todo of todosRes.data ?? []) {
+    items.push({
+      id: todo.id,
+      date: todo.due_date,
+      kind: "todo",
+      title: todo.title,
+      detail: todo.assignee_id ? (names.get(todo.assignee_id) ?? "Unassigned") : "Unassigned",
+      href: `/admin/todos?open=${todo.id}`,
+      done: todo.status === "done",
+      important: todo.priority === "high",
+    });
+  }
+
+  for (const inv of invoicesRes.data ?? []) {
+    // amount_paid only exists once the payments migration has been run
+    const owed = Math.max(Number(inv.total) - Number(inv.amount_paid ?? 0), 0);
+    items.push({
+      id: inv.id,
+      date: inv.due_date,
+      kind: "invoice",
+      title: `${inv.number}${inv.client_name ? ` · ${inv.client_name}` : ""}`,
+      detail: `${formatMoney(owed, inv.currency)} to collect`,
+      href: `/admin/finance/invoices/${inv.id}`,
+    });
+  }
+
+  for (const project of (projectsRes.data ?? []) as unknown as {
+    id: string;
+    name: string;
+    status: ProjectStatus;
+    due_date: string;
+    client_id: string;
+    clients: { company: string; contact_name: string } | null;
+  }[]) {
+    if (project.status === "cancelled") continue;
+    items.push({
+      id: project.id,
+      date: project.due_date,
+      kind: "project",
+      title: project.name,
+      detail: project.clients?.company || project.clients?.contact_name || undefined,
+      href: `/admin/clients/${project.client_id}`,
+      done: !isOpenProject(project.status),
+    });
+  }
+
+  return { items, todosReady: !todosRes.error };
+}
+
 export default async function AdminDashboardPage() {
   let inquiries: Inquiry[] = [];
   let leads: Lead[] = [];
   let fetchError: string | null = null;
   // null until the analytics migration has been applied
   let weekVisitors: number | null = null;
+  const today = todayInDubai();
+  let calendar: { items: CalendarItem[]; todosReady: boolean } = { items: [], todosReady: false };
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdmin();
     
     // Fetch inquiries and leads in parallel
     const [inquiriesRes, leadsRes] = await Promise.all([
@@ -62,6 +142,8 @@ export default async function AdminDashboardPage() {
       p_to: now.toISOString(),
     });
     if (traffic?.totals) weekVisitors = Number(traffic.totals.visitors);
+
+    calendar = await loadCalendar(supabase, today);
   } catch (err: any) {
     console.error("Dashboard data fetch error:", err);
     fetchError = err.message || "Failed to load database records.";
@@ -164,6 +246,24 @@ export default async function AdminDashboardPage() {
           icon={Percent}
         />
       </div>
+
+      {/* Calendar: what is due, and when */}
+      <Card className="overflow-hidden">
+        <CardHeader
+          title="Calendar"
+          description={
+            calendar.todosReady
+              ? "To-do deadlines, invoices waiting to be paid and project deadlines. Click a day to see what's due."
+              : "Invoice due dates. To-do deadlines appear here once the to-dos migration has been run."
+          }
+          action={calendar.todosReady ? viewAll("/admin/todos") : undefined}
+        />
+        <MonthCalendar
+          items={calendar.items}
+          today={today}
+          newTodoHref={calendar.todosReady ? "/admin/todos?new=1&due=" : undefined}
+        />
+      </Card>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Recent inquiries */}

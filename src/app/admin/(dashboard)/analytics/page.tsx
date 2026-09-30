@@ -11,7 +11,7 @@ import {
   Target,
   Users,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { Badge, Card, CardHeader, EmptyState, ErrorBanner, PageHeader, StatCard } from "@/components/admin/ui";
 import { BarList, VisitorsChart, type BarRow, type DailyPoint } from "@/components/admin/charts";
 import {
@@ -165,7 +165,7 @@ export default async function AnalyticsPage({
   let needsMigration = false;
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdmin();
     const { data, error } = await supabase.rpc("analytics_report", {
       p_from: from.toISOString(),
       p_to: to.toISOString(),

@@ -2,8 +2,10 @@
 
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { createClient as createPlainClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
-import { isAllowedAdmin } from "@/lib/admin";
+import { resolveAdmin } from "@/lib/admin";
+import { requireAdmin, requireAdminContext } from "@/lib/admin-auth";
 import { checkRateLimit, clientIpFrom } from "@/lib/rate-limit";
 
 const STAGES = ["Lead", "Contacted", "Qualified", "Proposal", "Won", "Lost"] as const;
@@ -38,8 +40,8 @@ export async function loginAdmin(prevState: unknown, formData: FormData) {
       return { success: false, error: "Invalid email or password." };
     }
 
-    // Even with valid credentials, only allowlisted admins may enter.
-    if (!isAllowedAdmin(data.user?.email)) {
+    // Even with valid credentials, only active team members may enter.
+    if (!(await resolveAdmin(supabase, data.user))) {
       await supabase.auth.signOut();
       return { success: false, error: "This account is not authorized to access the admin portal." };
     }
@@ -66,16 +68,39 @@ export async function logoutAdmin() {
 }
 
 /**
- * Check that the caller is an authenticated, allowlisted admin.
- * Used internally inside actions to secure database writes.
+ * Change the signed-in admin's own password. The current password is checked
+ * first (on a throwaway client, so the session cookies are untouched) — a
+ * borrowed, still-signed-in browser is not enough to take over an account.
  */
-async function checkAuth() {
-  const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user || !isAllowedAdmin(user.email)) {
-    throw new Error("Unauthorized access");
+export async function changeMyPassword(currentPassword: string, newPassword: string) {
+  try {
+    const { supabase, admin } = await requireAdminContext();
+    if (typeof currentPassword !== "string" || typeof newPassword !== "string" || !currentPassword) {
+      return { success: false, error: "Enter your current password." };
+    }
+    if (newPassword.length < 10 || newPassword.length > 72) {
+      return { success: false, error: "Use 10 to 72 characters for the new password." };
+    }
+    if (newPassword === currentPassword) {
+      return { success: false, error: "The new password is the same as the current one." };
+    }
+    if (!checkRateLimit(`admin-password:${admin.id}`, 5, 15 * 60 * 1000)) {
+      return { success: false, error: "Too many attempts. Please try again later." };
+    }
+
+    const verifier = createPlainClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { error: wrong } = await verifier.auth.signInWithPassword({ email: admin.email, password: currentPassword });
+    if (wrong) return { success: false, error: "Your current password isn't right." };
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (err) {
+    console.error("Change password error:", err);
+    return { success: false, error: "Couldn't change the password. Please try again." };
   }
-  return supabase;
 }
 
 // ── CRM Leads Actions ────────────────────────────────────────────────────────
@@ -123,7 +148,7 @@ function cleanStage(value: unknown): (typeof STAGES)[number] {
  */
 export async function createLead(input: LeadInput) {
   try {
-    const supabase = await checkAuth();
+    const supabase = await requireAdmin();
 
     const name = cleanString(input?.name, 100);
     if (!name) {
@@ -156,7 +181,7 @@ export async function createLead(input: LeadInput) {
  */
 export async function updateLead(id: string, updates: Partial<LeadInput>) {
   try {
-    const supabase = await checkAuth();
+    const supabase = await requireAdmin();
 
     if (typeof id !== "string" || !id) {
       return { success: false, error: "Invalid lead id." };
@@ -196,7 +221,7 @@ export async function updateLead(id: string, updates: Partial<LeadInput>) {
  */
 export async function deleteLead(id: string) {
   try {
-    const supabase = await checkAuth();
+    const supabase = await requireAdmin();
 
     if (typeof id !== "string" || !id) {
       return { success: false, error: "Invalid lead id." };
@@ -223,7 +248,7 @@ export async function deleteLead(id: string) {
  */
 export async function updateInquiryStatus(id: string, status: "new" | "converted" | "archived") {
   try {
-    const supabase = await checkAuth();
+    const supabase = await requireAdmin();
 
     if (typeof id !== "string" || !id) {
       return { success: false, error: "Invalid inquiry id." };
@@ -251,7 +276,7 @@ export async function updateInquiryStatus(id: string, status: "new" | "converted
  */
 export async function convertInquiryToLead(inquiryId: string) {
   try {
-    const supabase = await checkAuth();
+    const supabase = await requireAdmin();
 
     if (typeof inquiryId !== "string" || !inquiryId) {
       return { success: false, error: "Invalid inquiry id." };
@@ -304,7 +329,7 @@ export async function convertInquiryToLead(inquiryId: string) {
 // ── Newsletter Subscribers Actions ───────────────────────────────────────────
 export async function deleteSubscriber(id: string) {
   try {
-    const supabase = await checkAuth();
+    const supabase = await requireAdmin();
     const { error } = await supabase.from("newsletter_subscribers").delete().eq("id", id);
     if (error) throw error;
     revalidatePath("/admin/subscribers");
@@ -317,7 +342,7 @@ export async function deleteSubscriber(id: string) {
 
 export async function updateSubscriberStatus(id: string, status: "active" | "unsubscribed") {
   try {
-    const supabase = await checkAuth();
+    const supabase = await requireAdmin();
     const { error } = await supabase
       .from("newsletter_subscribers")
       .update({ status })

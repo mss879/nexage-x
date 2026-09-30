@@ -4,6 +4,7 @@
  * from these; don't restyle inline.
  */
 import React from "react";
+import Link from "next/link";
 import { AlertCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -160,6 +161,67 @@ export function StatCard({
       </span>
       {hint && <span className="text-xs text-stone-500">{hint}</span>}
     </Card>
+  );
+}
+
+/* ── Progress ───────────────────────────────────────────────────────────── */
+
+/** How much of something is done: a stone track with a gold fill. The number itself is always shown as text beside it. */
+export function ProgressBar({
+  value,
+  max,
+  label,
+  className,
+}: {
+  value: number;
+  max: number;
+  /** What the bar measures, for screen readers ("Paid") */
+  label: string;
+  className?: string;
+}) {
+  const percent = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
+  return (
+    <div
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(percent)}
+      className={cn("h-1.5 w-full overflow-hidden rounded-full bg-stone-100", className)}
+    >
+      <div className="h-full rounded-full bg-gold-500 transition-[width] duration-300" style={{ width: `${percent}%` }} />
+    </div>
+  );
+}
+
+/* ── Tabs ───────────────────────────────────────────────────────────────── */
+
+export interface TabLink {
+  href: string;
+  label: string;
+  active: boolean;
+  icon?: React.ComponentType<{ className?: string }>;
+}
+
+/** Link-based tabs — each tab is a real page, so they work with back/forward and can be bookmarked. */
+export function TabBar({ tabs, ariaLabel, className }: { tabs: TabLink[]; ariaLabel: string; className?: string }) {
+  return (
+    <nav aria-label={ariaLabel} className={cn("flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg border border-stone-200 bg-white p-1", className)}>
+      {tabs.map(({ href, label, active, icon: Icon }) => (
+        <Link
+          key={href}
+          href={href}
+          aria-current={active ? "page" : undefined}
+          className={cn(
+            "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md px-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500",
+            active ? "bg-gold-50 text-gold-700" : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+          )}
+        >
+          {Icon && <Icon className={cn("h-4 w-4", active ? "text-gold-600" : "text-stone-400")} />}
+          {label}
+        </Link>
+      ))}
+    </nav>
   );
 }
 

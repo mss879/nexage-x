@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { isAllowedAdmin } from "@/lib/admin";
+import { resolveAdmin } from "@/lib/admin";
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
@@ -40,8 +40,8 @@ export async function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
 
   // Route protection for administrative backend. A session alone is not
-  // enough — the account must also be on the ADMIN_EMAILS allowlist.
-  const isAdmin = !!user && isAllowedAdmin(user.email);
+  // enough — the account must also be an active team member (see lib/admin.ts).
+  const isAdmin = (await resolveAdmin(supabase, user)) !== null;
 
   if (url.pathname.startsWith("/admin")) {
     if (url.pathname === "/admin/login") {

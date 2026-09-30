@@ -31,3 +31,34 @@ export const INVOICE_STATUS_TONE: Record<string, BadgeTone> = {
   paid: "solid",
   void: "muted",
 };
+
+export const TODO_STATUS_TONE: Record<string, BadgeTone> = {
+  todo: "outline",
+  in_progress: "soft",
+  done: "muted",
+};
+
+/** Only "high" asks for attention; normal and low stay quiet. */
+export const TODO_PRIORITY_TONE: Record<string, BadgeTone> = {
+  low: "muted",
+  normal: "outline",
+  high: "solid",
+};
+
+export const CLIENT_STATUS_TONE: Record<string, BadgeTone> = {
+  active: "soft",
+  archived: "muted",
+};
+
+export const PROJECT_STATUS_TONE: Record<string, BadgeTone> = {
+  planned: "outline",
+  active: "soft",
+  on_hold: "outline",
+  completed: "solid",
+  cancelled: "muted",
+};
+
+export const TEAM_ROLE_TONE: Record<string, BadgeTone> = {
+  super_admin: "solid",
+  admin: "soft",
+};
