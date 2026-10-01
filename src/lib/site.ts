@@ -24,7 +24,7 @@ export const SITE = {
   locality: "Dubai",
   region: "Dubai",
   country: "AE",
-  email: "info@yariagency.com",
+  email: "support@yariagency.com",
   phones: [
     { label: "UAE", number: "+971 50 863 2422", e164: "+971508632422" },
     { label: "UK", number: "+44 7466 368427", e164: "+447466368427" },
